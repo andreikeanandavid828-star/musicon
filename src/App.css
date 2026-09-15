@@ -1,0 +1,36 @@
+.top-corner-container {
+  position: absolute; /* Takes it out of normal layout flow */
+  top: 20px;          /* 20 pixels down from the very top */
+  right: 20px;        /* 20 pixels in from the very right */
+  display: flex;      /* Aligns the buttons horizontally side-by-side */
+  gap: 10px;          /* Adds a 10px space between the buttons */
+}
+
+/* Base styles for your main container */
+.app-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #212529;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Makes the color flip look smooth */
+  padding: 40px;
+}
+/* Styles that kick in ONLY when .dark-mode is applied */
+.app-container.dark-mode {
+  background-color: #121212;
+  color: #f8f9fa;
+}
+
+/* Optional styling for your switch button */
+.theme-toggle-btn {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background: white;
+  color: black;
+}
+.dark-mode .theme-toggle-btn {
+  background: #333;
+  color: white;
+  border-color: #555;
+}
