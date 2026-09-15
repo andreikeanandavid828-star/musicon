@@ -14,8 +14,10 @@ function App() {
       <div className="top-corner-container">
         <LightSwitch toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       </div>
+      <div className="left-top-corner-container">
+        <Button />
+      </div>
 
-    
       <h1>Musicon</h1>
       <p>Click below to get started:</p>
     </div>

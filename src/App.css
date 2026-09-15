@@ -1,9 +1,29 @@
+/* Add this snippet to the top of your App.css */
+* {
+  box-sizing: border-box; /* Tells all elements to contain their padding */
+}
+
 .top-corner-container {
   position: absolute; /* Takes it out of normal layout flow */
   top: 20px;          /* 20 pixels down from the very top */
   right: 20px;        /* 20 pixels in from the very right */
   display: flex;      /* Aligns the buttons horizontally side-by-side */
   gap: 10px;          /* Adds a 10px space between the buttons */
+}
+.left-top-corner-container {
+  position: absolute; /* Takes it out of normal layout flow */
+  top: 20px;          /* 20 pixels down from the very top */
+  left: 20px;         /* 20 pixels in from the very left */
+  display: flex;      /* Aligns the buttons horizontally side-by-side */
+  gap: 10px;          /* Adds a 10px space between the buttons */
+}
+.Login-btn {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background: white;
+  color: black;
 }
 /* 🌐 1. Synchronize the browser's base canvas background color */
 html, body {
