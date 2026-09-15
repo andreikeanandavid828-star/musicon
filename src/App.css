@@ -5,19 +5,60 @@
   display: flex;      /* Aligns the buttons horizontally side-by-side */
   gap: 10px;          /* Adds a 10px space between the buttons */
 }
+/* 🌐 1. Synchronize the browser's base canvas background color */
+html, body {
+  background-color: #ffffff; /* Light mode default canvas */
+  transition: background-color 0.3s ease;
+}
+
+/* 🌙 2. When dark mode is active, turn the absolute root canvas dark too! */
+.dark-mode-active html, 
+html:has(.dark-mode) {
+  background-color: #121212 !important;
+}
+
+/* 🛑 3. Stop the annoying left-and-right scroll canvas leaks */
+html {
+  overscroll-behavior-x: none; /* Disables side-to-side rubber-banding completely */
+  overscroll-behavior-y: auto; /* Allows up/down bounce, but it will now be dark! */
+}
 
 /* Base styles for your main container */
+/* 1. Clear out the browser's default body margins */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Prevents accidental sideways scrolling */
+}
+
+/* 2. Force your app layout to fill the absolute entire screen */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .app-container {
   min-height: 100vh;
+  width: 100%;       /* ✨ Change this from 100vw to 100% */
+  box-sizing: border-box; 
+  
   background-color: #ffffff;
   color: #212529;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Makes the color flip look smooth */
+  transition: background-color 0.3s ease, color 0.3s ease;
   padding: 40px;
 }
+
+
 /* Styles that kick in ONLY when .dark-mode is applied */
 .app-container.dark-mode {
-  background-color: #121212;
-  color: #f8f9fa;
+  background-color: #121212 !important;
+}
+
+.app-container.dark-mode h1,
+.app-container.dark-mode p {
+  color: #f8f9fa !important;
 }
 
 /* Optional styling for your switch button */
