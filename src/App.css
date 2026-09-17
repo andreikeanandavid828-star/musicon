@@ -31,12 +31,48 @@
 }
 
 .Login-btn {
+  display: inline-block;
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 20px;
   border: 1px solid #ccc;
   background: white;
   color: black;
+  text-decoration: none;
+}
+
+.login-page {
+  max-width: 420px;
+  margin: 80px auto 0;
+  text-align: left;
+}
+
+.back-link {
+  color: inherit;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-form input {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.login-form button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #08060d;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
 }
 
 /* 🌐 1. Synchronize the browser's base canvas background color */
@@ -161,12 +197,10 @@ body {
 .pause-icon {
   width: 12px;
   height: 14px;
-  background: linear-gradient(
-    to right,
-    currentColor 0 4px,
-    transparent 4px 8px,
-    currentColor 8px 12px
-  );
+  background: linear-gradient(to right,
+      currentColor 0 4px,
+      transparent 4px 8px,
+      currentColor 8px 12px);
 }
 
 
@@ -238,4 +272,9 @@ body {
   background: #333;
   color: white;
   border-color: #555;
+}
+
+.dark-mode .login-form button {
+  background: #f8f9fa;
+  color: #121212;
 }

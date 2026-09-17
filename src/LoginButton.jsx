@@ -1,10 +1,7 @@
-export default function LoginButton() {
-  const handleClick = () => {
-    alert("Login button clicked!");
-  };
+import { Link } from 'react-router-dom';
 
+export default function LoginButton() {
   return (
-    <button onClick={handleClick} className="Login-btn">
-    </button>
+    <Link to="/login" className="Login-btn">Log in</Link>
   );
 }
