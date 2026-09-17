@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from supabase import create_client, Client
-from werkzeug.security import generate_password_hash
 import dotenv
 import os
 
@@ -10,7 +9,7 @@ app = Flask(__name__)
 
 # Initialize Supabase client
 url: str = os.getenv("SUPABASE_URL")
-key: str = os.getenv("SUPABASE_KEY")
+key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
 supabase: Client = create_client(url, key)
 
@@ -31,19 +30,40 @@ def register():
     if password != confirm_password:
         return jsonify({"error": "Passwords do not match"}), 400
 
-    # Hash the password before storing it
-    hashed_password = generate_password_hash(password)
+    try:
+        auth_response = supabase.auth.sign_up({
+            "email": email,
+            "password": password,
+            "options": {
+                "data": {
+                    "username": username,
+                    "first_name": first_name,
+                    "last_name": last_name
+                }
+            }
+        })
 
-    # Insert the new user into the Supabase database
-    response = supabase.table('users').insert({
-        'username': username,
-        'password_hash': hashed_password,
-        'email': email,
-        'first_name': first_name,
-        'last_name': last_name
-    }).execute()
+        user = auth_response.user
 
-    if response.status_code == 201:
-        return jsonify({"message": "User registered successfully"}), 201
-    else:
-        return jsonify({"error": "Failed to register user"}), 500
+        if not user:
+            return jsonify({
+                "error": "Failed to create user"
+            }), 400
+
+        return jsonify({
+            "message": "User registered successfully",
+            "user_id": user.id
+        }), 201
+
+        print("Auth user created:", user.id)    
+    
+    except Exception as e:
+        print("REGISTER ERROR:", e)
+
+        return jsonify({
+            "error": "Failed to register user",
+            "details": str(e)
+        }), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
