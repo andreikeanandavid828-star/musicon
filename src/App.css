@@ -34,7 +34,7 @@ html, body {
 /* 🌙 2. When dark mode is active, turn the absolute root canvas dark too! */
 .dark-mode-active html, 
 html:has(.dark-mode) {
-  background-color: #000000 !important;
+  background-color: #121212 !important;
 }
 
 /* 🛑 3. Stop the annoying left-and-right scroll canvas leaks */
@@ -71,6 +71,7 @@ html, body {
 }
 
 
+
 /* Styles that kick in ONLY when .dark-mode is applied */
 .app-container.dark-mode {
   background-color: #121212 !important;
@@ -78,7 +79,7 @@ html, body {
 
 .app-container.dark-mode h1,
 .app-container.dark-mode p {
-  color: #ffffff !important;
+  color: #f8f9fa !important;
 }
 
 /* Optional styling for your switch button */
