@@ -47,6 +47,12 @@
   text-align: left;
 }
 
+.login-page h1 {
+  margin-top: 20px;
+  font-size: 36px;
+  white-space: nowrap;
+}
+
 .back-link {
   color: inherit;
 }
