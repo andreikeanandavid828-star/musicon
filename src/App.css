@@ -216,6 +216,7 @@ body {
 }
 
 
+
 /* Styles that kick in ONLY when .dark-mode is applied */
 .app-container.dark-mode {
   background-color: #2a2323 !important;
