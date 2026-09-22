@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import LightSwitch from './LightSwitch.jsx';
 import FooterMusicPlayer from './Footer.jsx';
@@ -16,6 +16,7 @@ function App() {
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const location = useLocation();
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -32,7 +33,7 @@ function AppShell() {
         <Route path="/login" element={<Login />} />
       </Routes>
 
-      <FooterMusicPlayer />
+      {location.pathname !== '/login' && <FooterMusicPlayer />}
     </div>
   );
 }

@@ -66,6 +66,8 @@
 .login-form input {
   margin-bottom: 12px;
   padding: 10px;
+  background: #fff;
+  color:#08060d;
   border: 1px solid #ccc;
   border-radius: 6px;
   font: inherit;
@@ -229,7 +231,7 @@ body {
 }
 
 .app-container.dark-mode h1,
-.app-container.dark-mode p {
+.app-container.dark-mode p, .login-page p {
   color: #f8f9fa !important;
 }
 
