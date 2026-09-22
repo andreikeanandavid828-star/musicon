@@ -1,3 +1,24 @@
+
+
+/*ISSUES THAT NEED TO BE FIXED:
+
+- the code needs to be cleaned up and organized, with comments explaining each section and its purpose.
+- the code needs to follow a single consistent style guide, including naming conventions, indentation, and formatting.
+  = the naming conventions in particular need a lot of work, as they are currently inconsistent and confusing.
+- absolutely need to stop creating new classes for every single element, and instead use existing classes and/or create reusable components.
+  = different pages should not be using unique classes for the same elements, as this is a waste of time and makes the code harder to maintain.
+    => for example, the login page should not be using unique classes for its buttons and inputs, as these are already styled in the main app.css file.
+      ==> for example, can't use dark/light mode toggle button without a lot of pain.
+- please make sure that code is located in the correct files and is not duplicated
+- PLEASE CLAIM WORK FROM JIRA TICKETS AND DO NOT JUST START WORKING ON RANDOM THINGS, AS THIS IS A WASTE OF TIME AND MAKES IT HARDER TO TRACK PROGRESS.
+  = also if currently working on something, please add a comment in the code as well, just for redundancy
+  
+*/
+
+/* ================================================================================ */
+/* ================================================================================ */
+/* ================================================================================ */
+
 /* Add this snippet to the top of your App.css */
 * {
   box-sizing: border-box;
