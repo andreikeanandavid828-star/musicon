@@ -1,3 +1,29 @@
+<<<<<<< HEAD
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -216,6 +242,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+<<<<<<< HEAD
 
 # Node / React / Frontend dependencies
 node_modules/
@@ -234,3 +261,6 @@ dist-ssr/
 Thumbs.db
 .vscode/
 .idea/
+=======
+>>>>>>> 8b82ac5f3e43b479bb3831c8411e165d9a3c942a
+>>>>>>> mariamFrontEnd
