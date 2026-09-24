@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import Button from './Button.jsx';
 import track from './assets/TempMusic/Neon Dawn Fade (4).mp3';
 // track is temp music file for testing purposes
-const trackName = 'Neon Dawn Fade (4).mp3';
+const trackName = 'Neon Dawn Fade';
 
 export default function FooterMusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
