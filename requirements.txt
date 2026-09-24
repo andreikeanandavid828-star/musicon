@@ -1,4 +1,5 @@
 Flask
+flask-cors
 supabase
 python-dotenv
 Werkzeug

@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "register.py"]
+CMD ["python", "main.py"]
