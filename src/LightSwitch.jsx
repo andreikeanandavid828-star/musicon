@@ -1,9 +1,9 @@
-// This is a button for the light switch component
+import Button from './Button.jsx';
+
 export default function LightSwitch({ toggleTheme, isDarkMode }) {
   return (
-    <button onClick={toggleTheme} className="theme-toggle-btn">
-      {/* Change the text or emoji on the button based on the mode */}
+    <Button onClick={toggleTheme} aria-pressed={isDarkMode}>
       {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-    </button>
+    </Button>
   );
 }
