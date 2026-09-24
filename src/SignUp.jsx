@@ -1,3 +1,5 @@
+// sends a POST request to /api/auth/register with the email and password, JSON in format {email: string, password: string}. Returns 201 for success, 409 if the email is already registered, or 404 if the endpoint is not found.
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
