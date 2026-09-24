@@ -2,7 +2,9 @@
   "dependencies": {
     "@supabase/server": "^1.5.2",
     "@supabase/supabase-js": "^2.114.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "flask": "^0.2.10"
+    "flask": "^0.2.10",
+    "flask-cors": "^0.0.1"
   }
 }
