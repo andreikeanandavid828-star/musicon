@@ -243,6 +243,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Node / React / Frontend dependencies
 node_modules/
@@ -264,3 +265,6 @@ Thumbs.db
 =======
 >>>>>>> 8b82ac5f3e43b479bb3831c8411e165d9a3c942a
 >>>>>>> mariamFrontEnd
+=======
+/node_modules
+>>>>>>> 5f018952fbfd187e0b62890746b1d1a26364a1f4
