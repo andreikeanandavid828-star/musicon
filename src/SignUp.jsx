@@ -29,12 +29,15 @@ export default function SignUp() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/routes/auth/register',
+        'http://localhost:5000/register',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+
+          credentials: "include",
+
           body: JSON.stringify({
             email,
             password,
