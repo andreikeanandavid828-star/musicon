@@ -1,8 +1,7 @@
-// This is a reusable button component
-export default function Button({ text }) {
+export default function Button({ children, className = '', type = 'button', ...props }) {
   return (
-    <button className="primary-btn">
-      {text}
+    <button className={['button', className].filter(Boolean).join(' ')} type={type} {...props}>
+      {children}
     </button>
   );
 }
