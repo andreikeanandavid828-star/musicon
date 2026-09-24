@@ -13,7 +13,7 @@ key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
 supabase: Client = create_client(url, key)
 
-#login route
+# Login Route
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()

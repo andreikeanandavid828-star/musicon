@@ -13,7 +13,7 @@ key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
 supabase: Client = create_client(url, key)
 
-# Register route
+# Register Route
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
