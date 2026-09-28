@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 CORS(
     app,
-    origins="http://localhost:5174",
+    origins="http://localhost:5173",
     supports_credentials=True
 )
 
