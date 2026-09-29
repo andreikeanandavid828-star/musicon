@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import HomeButton from './HomeButton.jsx';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import FooterMusicPlayer from './Footer.jsx';
@@ -33,7 +34,9 @@ function AppShell() {
       </header>
 
       <aside className="app-sidebar" aria-label="Main menu">
+        <HomeButton />
         <TierlistButton />
+        <ForumButton />
       </aside>
 
       <Routes>
