@@ -11,6 +11,7 @@ services:
       - .env
     environment:
       - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
 
   frontend:
     build:
