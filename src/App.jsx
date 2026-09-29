@@ -7,6 +7,8 @@ import LightSwitch from './LightSwitch.jsx';
 import Login from './Login.jsx';
 import LoginButton from './LoginButton.jsx';
 import SignUp from './SignUp.jsx';
+import Tierlist from './TierList.jsx';
+import TierlistButton from './TierListButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,6 +24,7 @@ function AppShell() {
     <div className="app-container">
       <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
         {!isAuthPage && <LoginButton />}
+        {<TierlistButton />}
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
@@ -32,6 +35,7 @@ function AppShell() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/tierlist" element={<Tierlist />} />
       </Routes>
 
       {!isAuthPage && <FooterMusicPlayer />}

@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import Button from './Button.jsx';
 import track from './assets/TempMusic/Neon Dawn Fade (4).mp3';
+// track is temp music file for testing purposes
+const trackName = 'Neon Dawn Fade';
 
 export default function FooterMusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -17,12 +19,12 @@ export default function FooterMusicPlayer() {
     }
   };
 
-  
+
   return (
     <footer className="footer-panel" aria-label="Music player">
       <div className="footer-track">
         <span className="footer-eyebrow">Now playing</span>
-        <strong>Choose a track to begin</strong>
+        <strong>{trackName}</strong>
       </div>
       <Button
         className="footer-action"
