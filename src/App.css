@@ -22,6 +22,7 @@
   text-align: center;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 .app-header {
   display: flex;
   align-items: center;
@@ -29,7 +30,10 @@
   gap: 12px;
   min-height: 38px;
 }
-.app-header--login { justify-content: flex-end; }
+
+.app-header--login {
+  justify-content: flex-end;
+}
 
 /* Shared button styles for links and interactive controls. */
 .button {
@@ -44,11 +48,19 @@
   text-decoration: none;
   cursor: pointer;
 }
-.button:hover { border-color: var(--muted); }
-.button:focus-visible, .back-link:focus-visible, .form-input:focus-visible, .footer-volume:focus-visible {
+
+.button:hover {
+  border-color: var(--muted);
+}
+
+.button:focus-visible,
+.back-link:focus-visible,
+.form-input:focus-visible,
+.footer-volume:focus-visible {
   outline: 2px solid #aa3bff;
   outline-offset: 2px;
 }
+
 .button--primary {
   padding: 10px 14px;
   border-color: var(--primary-bg);
@@ -58,13 +70,43 @@
 }
 
 /* Home and login pages. */
-.home-page h1, .login-page h1 { color: var(--heading); font-weight: 500; }
-.home-page h1 { margin: 32px 0; font-size: 56px; letter-spacing: -0.03em; }
-.home-page p { margin: 0; }
-.login-page { max-width: 420px; margin: 80px auto 0; text-align: left; }
-.login-page h1 { margin: 20px 0 32px; font-size: 36px; }
-.back-link { color: inherit; }
-.login-form { display: flex; flex-direction: column; gap: 8px; }
+.home-page h1,
+.login-page h1 {
+  color: var(--heading);
+  font-weight: 500;
+}
+
+.home-page h1 {
+  margin: 32px 0;
+  font-size: 56px;
+  letter-spacing: -0.03em;
+}
+
+.home-page p {
+  margin: 0;
+}
+
+.login-page {
+  max-width: 420px;
+  margin: 80px auto 0;
+  text-align: left;
+}
+
+.login-page h1 {
+  margin: 20px 0 32px;
+  font-size: 36px;
+}
+
+.back-link {
+  color: inherit;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .form-input {
   margin-bottom: 12px;
   padding: 10px;
@@ -73,6 +115,36 @@
   background: var(--control-bg);
   color: var(--control-text);
 }
+
+/* Tier list page and buttonstyles. */
+.tierlist-page {
+  max-width: 800px;
+  margin: 80px auto 0;
+  text-align: left;
+}
+
+.tierlist-page h1 {
+  margin: 20px 0 32px;
+  font-size: 36px;
+}
+
+.tierlist-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tierlist-button:hover {
+  border-color: var(--muted);
+}
+
 
 /* Footer music player. */
 .footer-panel {
@@ -94,9 +166,29 @@
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
 }
-.footer-track { display: flex; min-width: 0; flex-direction: column; gap: 2px; text-align: left; }
-.footer-eyebrow { color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-.footer-track strong { overflow: hidden; color: var(--heading); text-overflow: ellipsis; white-space: nowrap; }
+
+.footer-track {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.footer-eyebrow {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.footer-track strong {
+  overflow: hidden;
+  color: var(--heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .footer-action {
   flex: 0 0 auto;
   width: 40px;
@@ -107,6 +199,7 @@
   background: var(--primary-bg);
   color: var(--primary-text);
 }
+
 .play-icon {
   width: 0;
   height: 0;
@@ -115,11 +208,13 @@
   border-bottom: 7px solid transparent;
   border-left: 10px solid currentColor;
 }
+
 .pause-icon {
   width: 12px;
   height: 14px;
   background: linear-gradient(to right, currentColor 0 4px, transparent 4px 8px, currentColor 8px 12px);
 }
+
 .footer-volume {
   flex: 1 1 auto;
   width: 100%;
@@ -130,9 +225,27 @@
   appearance: none;
   cursor: pointer;
 }
+
 @media (max-width: 520px) {
-  .app-container { padding-right: 20px; padding-left: 20px; }
-  .home-page h1 { margin: 20px 0; font-size: 36px; }
-  .login-page h1 { font-size: 30px; }
-  .footer-panel { right: 12px; bottom: 12px; left: 12px; gap: 12px; padding: 14px 16px; }
+  .app-container {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .home-page h1 {
+    margin: 20px 0;
+    font-size: 36px;
+  }
+
+  .login-page h1 {
+    font-size: 30px;
+  }
+
+  .footer-panel {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    gap: 12px;
+    padding: 14px 16px;
+  }
 }
