@@ -137,6 +137,18 @@
   color: var(--control-text);
 }
 
+/* Forum page styles. */
+.forum-page {
+  max-width: 800px;
+  margin: 80px auto 0;
+  text-align: left;
+}
+
+.forum-page h1 {
+  margin: 20px 0 32px;
+  font-size: 36px;
+}
+
 /* Tier list page and buttonstyles. */
 .tierlist-page {
   max-width: 800px;

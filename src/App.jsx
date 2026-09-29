@@ -9,6 +9,8 @@ import LoginButton from './LoginButton.jsx';
 import SignUp from './SignUp.jsx';
 import Tierlist from './TierList.jsx';
 import TierlistButton from './TierListButton.jsx';
+import Forum from './Forum.jsx';
+import ForumButton from './ForumButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -39,6 +41,7 @@ function AppShell() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
+        <Route path="/forum" element={<Forum />} />
       </Routes>
 
       {!isAuthPage && <FooterMusicPlayer />}
