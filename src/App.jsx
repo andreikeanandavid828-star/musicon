@@ -24,12 +24,15 @@ function AppShell() {
     <div className="app-container">
       <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
         {!isAuthPage && <LoginButton />}
-        {<TierlistButton />}
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
         />
       </header>
+
+      <aside className="app-sidebar" aria-label="Main menu">
+        <TierlistButton />
+      </aside>
 
       <Routes>
         <Route path="/" element={<Home />} />
