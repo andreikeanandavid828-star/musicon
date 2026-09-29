@@ -1,20 +1,14 @@
-#Base node:20-alpine
-FROM node:20-alpine
+FROM python:3.11-slim
 
-#Set working directory inside container
 WORKDIR /app
 
-#Copy package management files
-COPY package*.json ./
+# Copy dependency list and install requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-#Install dependencies
-RUN npm install
-
-#Copy application code
+# Copy application files
 COPY . .
 
-#Expose Vite dev server port 
-EXPOSE 5173
+EXPOSE 5000
 
-#Start Vite with host binding for Docker networking
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["python", "main.py"]

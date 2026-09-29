@@ -11,10 +11,11 @@ export default function SignUp() {
     event.preventDefault();
 
     const form = event.currentTarget;
-    const data = new FormData(form);
-    const email = String(data.get('email')).trim();
-    const password = String(data.get('password'));
-    const confirmation = String(data.get('confirmPassword'));
+    const formData = new FormData(form);
+
+    const email = String(formData.get('email')).trim();
+    const password = String(formData.get('password'));
+    const confirmation = String(formData.get('confirmPassword'));
 
     setError('');
     setCreated(false);
@@ -27,26 +28,40 @@ export default function SignUp() {
     setSubmitting(true);
 
     try {
-      // Backend: accept POST /api/auth/register with { email, password }.
-      // Return 201 for success or 409 if the email is already registered.
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        'http://localhost:5000/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
 
-      if (response.status === 201) {
-        form.reset();
-        setCreated(true);
-      } else if (response.status === 409) {
-        setError('An account already exists with that email.');
-      } else if (response.status === 404) {
-        setError('');
-      } else {
-        setError('Could not create your account. Please try again.');
+          credentials: "include",
+
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        },
+      );
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(
+          result.detail ||
+          result.message ||
+          'Could not create your account. Please try again.',
+        );
+        return;
       }
+
+      form.reset();
+      setCreated(true);
     } catch {
-      setError('.');
+      setError(
+        'Could not connect.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -54,7 +69,10 @@ export default function SignUp() {
 
   return (
     <main className="login-page">
-      <Link className="back-link" to="/">Back to home</Link>
+      <Link className="back-link" to="/">
+        Back to home
+      </Link>
+
       <h1>Create an account</h1>
 
       <form className="login-form" onSubmit={handleSubmit}>
@@ -90,14 +108,25 @@ export default function SignUp() {
           required
         />
 
-        <Button className="button--primary" type="submit" disabled={submitting}>
+        <Button
+          className="button--primary"
+          type="submit"
+          disabled={submitting}
+        >
           {submitting ? 'Creating account…' : 'Create account'}
         </Button>
       </form>
 
       {error && <p role="alert">{error}</p>}
-      {created && <p role="status">Account created.</p>}
-      <p>Already have an account? <Link to="/login">Log in</Link></p>
+      {created && (
+        <p role="status">
+          Your account has been created successfully.
+        </p>
+      )}
+
+      <p>
+        Already have an account? <Link to="/login">Log in</Link>
+      </p>
     </main>
   );
 }

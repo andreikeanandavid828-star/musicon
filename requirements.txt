@@ -1,0 +1,6 @@
+Flask
+flask-cors
+supabase
+python-dotenv
+Werkzeug
+pip==26.2.1
