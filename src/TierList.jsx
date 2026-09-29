@@ -5,10 +5,10 @@ export default function TierList() {
     return (
         <main className="tierlist-page">
             <Link className="back-link" to="/">Back to home</Link>
-            <h1>Album Tier List</h1>
-            <p>Here you can find the tier list for all the albums.</p>
+            <h1>Tier List</h1>
+            <p>Here you can make a tier list with any songs you like.</p>
 
-            <Button className="button--primary">Add New Album</Button>
+            <Button className="button--primary">Add New Song</Button>
 
         </main>
     );
