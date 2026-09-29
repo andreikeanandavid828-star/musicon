@@ -18,4 +18,8 @@ If you are developing a production application, we recommend using TypeScript wi
 =======
 # musicon
 COMP 490/491 Project
->>>>>>> 8b82ac5f3e43b479bb3831c8411e165d9a3c942a
+
+Requirements
+docker
+node.js
+supabase
