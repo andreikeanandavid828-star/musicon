@@ -35,6 +35,7 @@ function AppShell() {
 
       <aside className="app-sidebar" aria-label="Main menu">
         <HomeButton />
+        <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
       </aside>
