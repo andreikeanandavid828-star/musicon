@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton.jsx';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import FooterMusicPlayer from './Footer.jsx';
 import Home from './Home.jsx';
@@ -25,12 +25,13 @@ function AppShell() {
 
   return (
     <div className="app-container">
-      <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
-        {!isAuthPage && <LoginButton />}
-        <LightSwitch
-          isDarkMode={isDarkMode}
-          toggleTheme={() => setIsDarkMode((current) => !current)}
-        />
+      <header className="app-header">
+        {!isAuthPage && (
+          <>
+            <LoginButton />
+            <Link to="/signup" className="button">Sign up</Link>
+          </>
+        )}
       </header>
 
       <aside className="app-sidebar" aria-label="Main menu">
@@ -38,6 +39,10 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
+        <LightSwitch
+          isDarkMode={isDarkMode}
+          toggleTheme={() => setIsDarkMode((current) => !current)}
+        />
       </aside>
 
       <Routes>

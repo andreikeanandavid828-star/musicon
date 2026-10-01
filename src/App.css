@@ -44,6 +44,10 @@
   border-radius: 6px;
 }
 
+.app-sidebar > .button:last-child {
+  margin-top: auto;
+}
+
 .app-sidebar .button--sidebar-gradient {
   max-width: 150px;
   height: 60px;
@@ -79,13 +83,9 @@
 .app-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   min-height: 38px;
-}
-
-.app-header--login {
-  justify-content: flex-end;
 }
 
 /* Shared button styles for links and interactive controls. */
@@ -95,7 +95,7 @@
   justify-content: center;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 4px;
   background: var(--control-bg);
   color: var(--control-text);
   text-decoration: none;
@@ -120,6 +120,32 @@
   border-radius: 6px;
   background: var(--primary-bg);
   color: var(--primary-text);
+}
+
+.button--homebutton {
+  --bg: #000;
+  --hover-bg: #ff90e8;
+  --hover-text: #000;
+  padding: 0.8em 2em;
+  border: 1px solid var(--bg);
+  border-radius: 4px;
+  background: var(--bg);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button--homebutton:hover {
+  transform: translate(-0.25rem, -0.25rem);
+  border-color: var(--bg);
+  background: var(--hover-bg);
+  box-shadow: 0.25rem 0.25rem var(--bg);
+  color: var(--hover-text);
+}
+
+.button--homebutton:active {
+  transform: translate(0);
+  box-shadow: none;
 }
 
 /* Home and login pages. */
@@ -668,3 +694,4 @@
     padding: 14px 16px;
   }
 }
+
