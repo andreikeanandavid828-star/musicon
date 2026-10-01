@@ -15,12 +15,65 @@
 
 /* App layout and shared header. */
 .app-container {
+  --sidebar-width: 200px;
   min-height: 100vh;
-  padding: 20px 40px 124px;
+  padding: 20px 40px 124px calc(var(--sidebar-width) + 40px);
   background: var(--page-bg);
   color: var(--text);
   text-align: center;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app-sidebar {
+  position: fixed;
+  z-index: 11;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: var(--sidebar-width);
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 24px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.app-sidebar .button {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.app-sidebar .button--sidebar-gradient {
+  max-width: 150px;
+  height: 60px;
+  padding: 0;
+  border: 0;
+  border-radius: 50px;
+  background-image: linear-gradient(135deg, #feb692 0%, #ea5455 100%);
+  box-shadow: 0 20px 30px -6px rgba(238, 103, 97, 0.5);
+  color: #fff;
+  font-family: "Dosis", sans-serif;
+  font-size: 20px;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.app-sidebar .button--sidebar-gradient:hover {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.app-sidebar .button--sidebar-gradient:active {
+  opacity: 0.5;
+}
+
+.app-sidebar__divider {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--border);
 }
 
 .app-header {
@@ -397,8 +450,19 @@
 
 @media (max-width: 520px) {
   .app-container {
+    --sidebar-width: 120px;
     padding-right: 20px;
-    padding-left: 20px;
+    padding-left: calc(var(--sidebar-width) + 16px);
+  }
+
+  .app-sidebar {
+    padding: 16px;
+    justify-content: flex-start;
+  }
+
+  .app-sidebar .button--sidebar-gradient {
+    height: 48px;
+    font-size: 18px;
   }
 
   .home-page h1 {
