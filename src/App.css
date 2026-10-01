@@ -374,7 +374,7 @@
   z-index: 10;
   right: 20px;
   bottom: 20px;
-  left: 20px;
+  left: calc(var(--sidebar-width) + 40px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -502,4 +502,90 @@
     gap: 12px;
     padding: 14px 16px;
   }
+}
+
+/* Profile page styles. */
+.profile-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  font-size: 3rem;
+}
+
+.profile-header-info {
+  flex: 1;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-name-row h1 {
+  margin: 0;
+}
+
+.profile-bio {
+  margin: 0.75rem 0 1rem;
+}
+
+.artist-badge {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.profile-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-stat strong {
+  font-size: 1.25rem;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.profile-tab {
+  border: none;
+  background: none;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.profile-tab--active {
+  font-weight: bold;
+  border-bottom: 2px solid currentColor;
+}
+
+.profile-content {
+  padding: 2rem 0;
 }
