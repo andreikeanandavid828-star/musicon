@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import HomeButton from './HomeButton.jsx';
-import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import FooterMusicPlayer from './Footer.jsx';
 import Home from './Home.jsx';
@@ -12,6 +12,7 @@ import Tierlist from './TierList.jsx';
 import TierlistButton from './TierListButton.jsx';
 import Forum from './Forum.jsx';
 import ForumButton from './ForumButton.jsx';
+import SignupButton from './SignupButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -29,7 +30,7 @@ function AppShell() {
         {!isAuthPage && (
           <>
             <LoginButton />
-            <Link to="/signup" className="button">Sign up</Link>
+            <SignupButton />
           </>
         )}
       </header>
