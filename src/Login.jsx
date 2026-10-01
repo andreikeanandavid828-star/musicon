@@ -21,7 +21,7 @@ export default function Login() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/routes/auth/login',
+        'http://localhost:5000/login', 
         {
           method: 'POST',
           credentials: 'include',
