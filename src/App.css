@@ -16,8 +16,12 @@
 /* App layout and shared header. */
 .app-container {
   --sidebar-width: 200px;
+  --content-left-gap: 40px;
+  --content-right-gap: 40px;
+  --header-top-gap: 20px;
+  --header-height: 56px;
   min-height: 100vh;
-  padding: 20px 40px 124px calc(var(--sidebar-width) + 40px);
+  padding: calc(var(--header-top-gap) + var(--header-height)) var(--content-right-gap) 124px calc(var(--sidebar-width) + var(--content-left-gap));
   background: var(--page-bg);
   color: var(--text);
   text-align: center;
@@ -81,11 +85,30 @@
 }
 
 .app-header {
+  position: fixed;
+  z-index: 12;
+  top: 0;
+  right: var(--content-right-gap);
+  left: calc(var(--sidebar-width) + var(--content-left-gap));
   display: flex;
+  height: calc(var(--header-top-gap) + var(--header-height));
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  min-height: 38px;
+  padding: var(--header-top-gap) 0 12px;
+  background: var(--page-bg);
+  transition: background-color 0.3s ease;
+}
+
+.app-header::after {
+  position: absolute;
+  z-index: 12;
+  right: calc(0px - var(--content-right-gap));
+  bottom: 0;
+  left: calc(0px - var(--content-left-gap) - 1px);
+  height: 1px;
+  background: var(--border);
+  content: '';
 }
 
 /* Shared button styles for links and interactive controls. */
@@ -100,6 +123,11 @@
   color: var(--control-text);
   text-decoration: none;
   cursor: pointer;
+}
+
+.button--signup {
+  background: #7b2cbf;
+  color: #fff;
 }
 
 .button:hover {
@@ -751,8 +779,10 @@
 @media (max-width: 520px) {
   .app-container {
     --sidebar-width: 120px;
-    padding-right: 20px;
-    padding-left: calc(var(--sidebar-width) + 16px);
+    --content-left-gap: 16px;
+    --content-right-gap: 20px;
+    padding-right: var(--content-right-gap);
+    padding-left: calc(var(--sidebar-width) + var(--content-left-gap));
   }
 
   .app-sidebar {
