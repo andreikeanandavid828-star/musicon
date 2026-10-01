@@ -350,6 +350,157 @@
   font-size: 36px;
 }
 
+.tierlist-start {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.tierlist-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.tierlist-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tierlist-board h2 {
+  margin: 0 0 16px;
+  font-size: 24px;
+}
+
+.tierlist-titlebar h2 {
+  min-width: 0;
+  margin: 0;
+}
+
+.tierlist-title-button {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.tierlist-title-button:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.tierlist-title-input {
+  width: min(100%, 440px);
+  margin: 0;
+  padding: 4px 8px;
+  font: inherit;
+}
+
+.tierlist-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.tierlist-row {
+  display: grid;
+  min-height: 84px;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tierlist-row h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 18px;
+}
+
+.tierlist-row--s h3 {
+  background: #e66a64;
+  color: #fff;
+}
+
+.tierlist-row--a h3 {
+  background: #e9a45d;
+  color: #1e1e1e;
+}
+
+.tierlist-row--b h3 {
+  background: #e5cc68;
+  color: #1e1e1e;
+}
+
+.tierlist-row--c h3 {
+  background: #79b985;
+  color: #1e1e1e;
+}
+
+.tierlist-row--d h3 {
+  background: #6fa6c3;
+  color: #fff;
+}
+
+.tierlist-songs {
+  display: flex;
+  align-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 64px;
+  padding: 10px;
+}
+
+.tierlist-song {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  cursor: grab;
+  overflow-wrap: anywhere;
+}
+
+.tierlist-song:active {
+  cursor: grabbing;
+}
+
+.tierlist-neutral {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.tierlist-song-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tierlist-song-form .form-input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
 .tierlist-button {
   display: inline-flex;
   align-items: center;
@@ -365,6 +516,20 @@
 
 .tierlist-button:hover {
   border-color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .tierlist-page {
+    margin-top: 32px;
+  }
+
+  .tierlist-row {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .tierlist-song-form {
+    flex-direction: column;
+  }
 }
 
 
