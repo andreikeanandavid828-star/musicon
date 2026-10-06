@@ -12,6 +12,8 @@ import Tierlist from './TierList.jsx';
 import TierlistButton from './TierListButton.jsx';
 import Forum from './Forum.jsx';
 import ForumButton from './ForumButton.jsx';
+import Profile from './Profile.jsx';
+import ProfileButton from './ProfileButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,7 +28,6 @@ function AppShell() {
   return (
     <div className="app-container">
       <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
-        {!isAuthPage && <LoginButton />}
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
@@ -38,6 +39,9 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
+        <ProfileButton />
+        <hr className="app-sidebar__divider" />
+        {!isAuthPage && <LoginButton />}
       </aside>
 
       <Routes>
@@ -46,6 +50,7 @@ function AppShell() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
 
       {!isAuthPage && <FooterMusicPlayer />}
