@@ -418,9 +418,6 @@ export default function Profile() {
 
   return (
     <main className="profile-page">
-      <Link className="profile-back-link" to="/">
-        Back to home
-      </Link>
 
       <section className="profile-hero">
         <div className="profile-banner">

@@ -4,7 +4,6 @@ import Button from './Button.jsx';
 export default function TierList() {
     return (
         <main className="tierlist-page">
-            <Link className="back-link" to="/">Back to home</Link>
             <h1>Tier List</h1>
             <p>Here you can make a tier list with any songs you like.</p>
 

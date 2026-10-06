@@ -53,7 +53,6 @@ export default function Login() {
 
   return (
     <main className="login-page">
-      <Link className="back-link" to="/">Back to home</Link>
       <h1>Log in to Musicon</h1>
 
       <form className="login-form" onSubmit={handleSubmit}>
