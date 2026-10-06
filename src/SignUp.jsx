@@ -75,9 +75,6 @@ export default function SignUp() {
 
   return (
     <main className="login-page">
-      <Link className="back-link" to="/">
-        Back to home
-      </Link>
 
       <h1>Create an account</h1>
 
