@@ -1,10 +1,13 @@
-import os
+import os 
+import dotenv
 from supabase import create_client, Client
 
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+dotenv.load_dotenv()
 
-if not supabase_url or not supabase_key:
-    raise ValueError("Supabase URL and Key must be set in environment variables.")
+url: str = os.getenv("SUPABASE_URL")
+key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
 
-supabase: Client = create_client(supabase_url, supabase_key)
+if not url or not key: 
+    raise ValueError("SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set in environment variables.")
+
+supabase: Client = create_client(url, key)

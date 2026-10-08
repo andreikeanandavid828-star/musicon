@@ -1,6 +1,10 @@
-from flask import Flask, request, jsonify
-from routes.auth import auth
+import dotenv
+dotenv.load_dotenv() #Load environment variables first
+
+from flask import Flask
 from flask_cors import CORS
+from routes.auth import auth 
+from routes.profile import profile
 
 app = Flask(__name__)
 
@@ -14,8 +18,8 @@ CORS(
     supports_credentials=True
 )
 
+app.register_blueprint(auth, url_prefix="/api/auth")
+app.register_blueprint(profile, url_prefix="/profile") 
 
-app.register_blueprint(auth)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
