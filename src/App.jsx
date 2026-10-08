@@ -17,7 +17,7 @@ import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
 import Upload from './Upload.jsx';
 import UploadButton from './UploadButton.jsx';
-import { songs } from './songs.js';
+import { songs } from './songs.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
