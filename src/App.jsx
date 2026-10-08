@@ -20,8 +20,10 @@ import UploadButton from './UploadButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selectedSong, setSelectedSong] = useState(null);
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const handleSongSelection = (song) => setSelectedSong({ ...song });
 
   useEffect(() => {
     document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
@@ -53,7 +55,15 @@ function AppShell() {
       </aside>
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            <Home
+              selectedSong={selectedSong}
+              onSelectSong={handleSongSelection}
+            />
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
@@ -62,7 +72,7 @@ function AppShell() {
         <Route path="/upload" element={<Upload />} />
       </Routes>
 
-      {!isAuthPage && <FooterMusicPlayer />}
+      {!isAuthPage && <FooterMusicPlayer selectedSong={selectedSong} />}
     </div>
   );
 }
