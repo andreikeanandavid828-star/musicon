@@ -1,4 +1,7 @@
+import dotenv
+dotenv.load_dotenv() #Load environment variables first
 
+from flask import Flask
 from flask_cors import CORS
 from routes.auth import auth 
 from routes.profile import profile
@@ -10,10 +13,7 @@ CORS(
     origins=[
         "http://localhost:5173",
         "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://localhost:5178",
+        "http://localhost:5175"
     ],
     supports_credentials=True
 )
@@ -22,4 +22,4 @@ app.register_blueprint(auth, url_prefix="/api/auth")
 app.register_blueprint(profile, url_prefix="/profile") 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
