@@ -44,7 +44,6 @@ function AppShell() {
         <ForumButton />
         <ProfileButton />
         <hr className="app-sidebar__divider" />
-        {!isAuthPage && <LoginButton />}
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
