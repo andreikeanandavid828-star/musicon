@@ -1,0 +1,138 @@
+/*ISSUES THAT NEED TO BE FIXED:
+
+- the code needs to be cleaned up and organized, with comments explaining each section and its purpose.
+- the code needs to follow a single consistent style guide, including naming conventions, indentation, and formatting.
+  = the naming conventions in particular need a lot of work, as they are currently inconsistent and confusing.
+- absolutely need to stop creating new classes for every single element, and instead use existing classes and/or create reusable components.
+  = different pages should not be using unique classes for the same elements, as this is a waste of time and makes the code harder to maintain.
+    => for example, the login page should not be using unique classes for its buttons and inputs, as these are already styled in the main app.css file.
+      ==> for example, can't use dark/light mode toggle button without a lot of pain.
+- please make sure that code is located in the correct files and is not duplicated
+- PLEASE CLAIM WORK FROM JIRA TICKETS AND DO NOT JUST START WORKING ON RANDOM THINGS, AS THIS IS A WASTE OF TIME AND MAKES IT HARDER TO TRACK PROGRESS.
+  = also if currently working on something, please add a comment in the code as well, just for redundancy
+  
+*/
+
+/* App layout and shared header. */
+.app-container {
+  min-height: 100vh;
+  padding: 20px 40px 124px;
+  background: var(--page-bg);
+  color: var(--text);
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+}
+.app-header--login { justify-content: flex-end; }
+
+/* Shared button styles for links and interactive controls. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+.button:hover { border-color: var(--muted); }
+.button:focus-visible, .back-link:focus-visible, .form-input:focus-visible, .footer-volume:focus-visible {
+  outline: 2px solid #aa3bff;
+  outline-offset: 2px;
+}
+.button--primary {
+  padding: 10px 14px;
+  border-color: var(--primary-bg);
+  border-radius: 6px;
+  background: var(--primary-bg);
+  color: var(--primary-text);
+}
+
+/* Home and login pages. */
+.home-page h1, .login-page h1 { color: var(--heading); font-weight: 500; }
+.home-page h1 { margin: 32px 0; font-size: 56px; letter-spacing: -0.03em; }
+.home-page p { margin: 0; }
+.login-page { max-width: 420px; margin: 80px auto 0; text-align: left; }
+.login-page h1 { margin: 20px 0 32px; font-size: 36px; }
+.back-link { color: inherit; }
+.login-form { display: flex; flex-direction: column; gap: 8px; }
+.form-input {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--control-text);
+}
+
+/* Footer music player. */
+.footer-panel {
+  position: fixed;
+  z-index: 10;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1086px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+.footer-track { display: flex; min-width: 0; flex-direction: column; gap: 2px; text-align: left; }
+.footer-eyebrow { color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.footer-track strong { overflow: hidden; color: var(--heading); text-overflow: ellipsis; white-space: nowrap; }
+.footer-action {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border-color: var(--primary-bg);
+  background: var(--primary-bg);
+  color: var(--primary-text);
+}
+.play-icon {
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 10px solid currentColor;
+}
+.pause-icon {
+  width: 12px;
+  height: 14px;
+  background: linear-gradient(to right, currentColor 0 4px, transparent 4px 8px, currentColor 8px 12px);
+}
+.footer-volume {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 200px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  appearance: none;
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .app-container { padding-right: 20px; padding-left: 20px; }
+  .home-page h1 { margin: 20px 0; font-size: 36px; }
+  .login-page h1 { font-size: 30px; }
+  .footer-panel { right: 12px; bottom: 12px; left: 12px; gap: 12px; padding: 14px 16px; }
+}

@@ -1,0 +1,37 @@
+/* Global palette and document defaults. The toggle sets data-theme. */
+:root {
+  font: 18px/1.45 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+  --page-bg: #fff;
+  --text: #212529;
+  --heading: #08060d;
+  --muted: #6b6375;
+  --border: #e5e4e7;
+  --surface: rgba(255, 255, 255, 0.94);
+  --control-bg: #fff;
+  --control-text: #08060d;
+  --primary-bg: #08060d;
+  --primary-text: #fff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  background: var(--page-bg);
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page-bg: #2a2323;
+  --text: #f8f9fa;
+  --heading: #f8f9fa;
+  --muted: #b7b9c2;
+  --border: #3f414a;
+  --surface: rgba(30, 31, 38, 0.94);
+  --control-bg: #333;
+  --control-text: #fff;
+  --primary-bg: #f8f9fa;
+  --primary-text: #121212;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+* { box-sizing: border-box; }
+html { background: var(--page-bg); }
+body { margin: 0; min-width: 320px; }
+#root { min-height: 100vh; }
+button, input { font: inherit; }
+@media (max-width: 1024px) { :root { font-size: 16px; } }
