@@ -21,5 +21,5 @@ CORS(
 app.register_blueprint(auth, url_prefix="/api/auth")
 app.register_blueprint(profile, url_prefix="/profile") 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000, debug=True)
