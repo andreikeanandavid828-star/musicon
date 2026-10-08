@@ -17,6 +17,7 @@ import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
 import Upload from './Upload.jsx';
 import UploadButton from './UploadButton.jsx';
+import { songs } from './songs.js';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -24,6 +25,14 @@ function AppShell() {
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   const handleSongSelection = (song) => setSelectedSong({ ...song });
+  const handleTrackNavigation = (direction) => {
+    const currentIndex = songs.findIndex((song) => song.id === selectedSong?.id);
+    const nextIndex = currentIndex === -1
+      ? direction < 0 ? songs.length - 1 : 0
+      : (currentIndex + direction + songs.length) % songs.length;
+
+    handleSongSelection(songs[nextIndex]);
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
@@ -72,7 +81,13 @@ function AppShell() {
         <Route path="/upload" element={<Upload />} />
       </Routes>
 
-      {!isAuthPage && <FooterMusicPlayer selectedSong={selectedSong} />}
+      {!isAuthPage && (
+        <FooterMusicPlayer
+          selectedSong={selectedSong}
+          onPreviousSong={() => handleTrackNavigation(-1)}
+          onNextSong={() => handleTrackNavigation(1)}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from './Button.jsx';
 
-export default function FooterMusicPlayer({ selectedSong }) {
+export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [playbackError, setPlaybackError] = useState('');
@@ -51,15 +51,39 @@ export default function FooterMusicPlayer({ selectedSong }) {
         <span className="footer-eyebrow">Now playing</span>
         <strong>{selectedSong?.title ?? 'Select a song from Home'}</strong>
       </div>
-      <Button
-        className="footer-action"
-        aria-label={isPlaying ? 'Pause' : 'Play'}
-        title={isPlaying ? 'Pause' : 'Play'}
-        disabled={!selectedSong}
-        onClick={() => handlePlayPause()}
-      >
-        <span className={isPlaying ? 'pause-icon' : 'play-icon'} aria-hidden="true" />
-      </Button>
+      <div className="footer-controls" role="group" aria-label="Playback controls">
+        <Button
+          className="footer-action"
+          aria-label="Previous track"
+          title="Previous track"
+          onClick={onPreviousSong}
+        >
+          <span className="skip-icon skip-icon--previous" aria-hidden="true">
+            <span />
+            <span />
+          </span>
+        </Button>
+        <Button
+          className="footer-action"
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+          title={isPlaying ? 'Pause' : 'Play'}
+          disabled={!selectedSong}
+          onClick={() => handlePlayPause()}
+        >
+          <span className={isPlaying ? 'pause-icon' : 'play-icon'} aria-hidden="true" />
+        </Button>
+        <Button
+          className="footer-action"
+          aria-label="Next track"
+          title="Next track"
+          onClick={onNextSong}
+        >
+          <span className="skip-icon skip-icon--next" aria-hidden="true">
+            <span />
+            <span />
+          </span>
+        </Button>
+      </div>
       <input
         className="footer-volume"
         type="range"
