@@ -12,6 +12,7 @@ import Tierlist from './TierList.jsx';
 import TierlistButton from './TierListButton.jsx';
 import Forum from './Forum.jsx';
 import ForumButton from './ForumButton.jsx';
+import SignupButton from './SignupButton.jsx';
 import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
 
@@ -29,6 +30,13 @@ function AppShell() {
     <div className="app-container">
       <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
         {/* web app header bar at top of page (formerly contained log in and light switch buttons) */}
+      <header className="app-header">
+        {!isAuthPage && (
+          <>
+            <LoginButton />
+            <SignupButton />
+          </>
+        )}
       </header>
 
       <aside className="app-sidebar" aria-label="Main menu">
@@ -36,6 +44,10 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
+        <LightSwitch
+          isDarkMode={isDarkMode}
+          toggleTheme={() => setIsDarkMode((current) => !current)}
+        />
         <ProfileButton />
         <hr className="app-sidebar__divider" />
         {!isAuthPage && <LoginButton />}
