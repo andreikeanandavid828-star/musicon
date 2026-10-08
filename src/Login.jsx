@@ -1,13 +1,61 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
 
 export default function Login() {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const email = String(formData.get('email')).trim();
+    const password = String(formData.get('password'));
+
+    setError('');
+    setLoggedIn(false);
+    setSubmitting(true);
+
+    try {
+      const response = await fetch(
+        'http://localhost:5000/login', 
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        },
+      );
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const serverMessage = [result.error, result.detail, result.message]
+          .find((value) => typeof value === 'string');
+
+        setError(serverMessage || 'Could not log in. Please try again.');
+        return;
+      }
+
+      form.reset();
+      setLoggedIn(true);
+    } catch {
+      setError('Could not connect.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <main className="login-page">
-      <Link className="back-link" to="/">Back to home</Link>
       <h1>Log in to Musicon</h1>
 
-      <form className="login-form">
+      <form className="login-form" onSubmit={handleSubmit}>
         <label htmlFor="email">Email</label>
         <input
           className="form-input"
@@ -28,8 +76,13 @@ export default function Login() {
           required
         />
 
-        <Button className="button--primary" type="submit">Log in</Button>
+        <Button className="button--primary" type="submit" disabled={submitting}>
+          {submitting ? 'Logging in…' : 'Log in'}
+        </Button>
       </form>
+
+      {error && <p role="alert">{error}</p>}
+      {loggedIn && <p role="status">Login successful.</p>}
 
       <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
     </main>

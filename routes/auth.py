@@ -24,23 +24,23 @@ def register():
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+#    if not username or not password:
+#        return jsonify({"error": "Username and password are required"}), 400
 
-    if password != confirm_password:
-        return jsonify({"error": "Passwords do not match"}), 400
+#    if password != confirm_password:
+#        return jsonify({"error": "Passwords do not match"}), 400
 
     try:
         auth_response = supabase.auth.sign_up({
             "email": email,
             "password": password,
-            "options": {
-                "data": {
-                    "username": username,
-                    "first_name": first_name,
-                    "last_name": last_name
-                }
-            }
+#            "options": {
+#                "data": {
+#                    "username": username,
+#                    "first_name": first_name,
+#                    "last_name": last_name
+#                }
+#            }
         })
 
         user = auth_response.user

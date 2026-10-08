@@ -16,6 +16,9 @@ export default function SignUp() {
     const email = String(formData.get('email')).trim();
     const password = String(formData.get('password'));
     const confirmation = String(formData.get('confirmPassword'));
+    const username = String(formData.get('username')).trim();
+    const firstName = String(formData.get('firstName')).trim();
+    const lastName = String(formData.get('lastName')).trim();
 
     setError('');
     setCreated(false);
@@ -29,15 +32,21 @@ export default function SignUp() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/routes/auth/register',
+        'http://localhost:5000/register',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+
+          credentials: "include",
+
           body: JSON.stringify({
             email,
             password,
+            username,
+            firstName,
+            lastName,
           }),
         },
       );
@@ -66,9 +75,6 @@ export default function SignUp() {
 
   return (
     <main className="login-page">
-      <Link className="back-link" to="/">
-        Back to home
-      </Link>
 
       <h1>Create an account</h1>
 
@@ -80,6 +86,36 @@ export default function SignUp() {
           name="email"
           type="email"
           autoComplete="email"
+          required
+        />
+
+        <label htmlFor="signup-username">Username</label>
+        <input
+          className="form-input"
+          id="signup-username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          required
+        />
+
+        <label htmlFor="signup-first-name">First name</label>
+        <input
+          className="form-input"
+          id="signup-first-name"
+          name="firstName"
+          type="text"
+          autoComplete="given-name"
+          required
+        />
+
+        <label htmlFor="signup-last-name">Last name</label>
+        <input
+          className="form-input"
+          id="signup-last-name"
+          name="lastName"
+          type="text"
+          autoComplete="family-name"
           required
         />
 
