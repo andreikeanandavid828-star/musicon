@@ -29,7 +29,7 @@ export default function SignUp() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/register',
+        'http://localhost:5000/api/auth/register',
         {
           method: 'POST',
           headers: {
