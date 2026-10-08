@@ -15,6 +15,8 @@ import ForumButton from './ForumButton.jsx';
 import SignupButton from './SignupButton.jsx';
 import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
+import Upload from './Upload.jsx';
+import UploadButton from './UploadButton.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -45,7 +47,7 @@ function AppShell() {
         <TierlistButton />
         <ForumButton />
         <ProfileButton />
-        <hr className="app-sidebar__divider" />
+        <UploadButton />
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
@@ -67,6 +69,7 @@ function AppShell() {
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/upload" element={<Upload />} />
       </Routes>
 
       {!isAuthPage && <FooterMusicPlayer selectedSong={selectedSong} />}
