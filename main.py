@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from routes.auth import auth
 from routes.post import posts_bp
-from flask_cors import CORS
+from routes.profile import profile
 
 app = Flask(__name__)
 
@@ -19,27 +19,9 @@ CORS(
     supports_credentials=True
 )
 
-
-CORS(
-    app,
-    origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://localhost:5178",
-    ],
-    supports_credentials=True
-)
-
-
-CORS(
-    app,
-    origin="http://localhost:5173",
-    supports_credentials=True)
-
 app.register_blueprint(auth)
+
+app.register_blueprint(profile)
 
 app.register_blueprint(posts_bp, url_prefix= '/api/posts')
 
