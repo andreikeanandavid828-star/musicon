@@ -214,6 +214,16 @@
   gap: 8px;
 }
 
+.upload-page {
+  display: grid;
+  min-height: calc(100vh - 200px);
+  place-items: center;
+}
+
+.upload-button {
+  cursor: pointer;
+}
+
 .form-input {
   margin-bottom: 12px;
   padding: 10px;
