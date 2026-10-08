@@ -1,4 +1,4 @@
-import { songs } from './songs.js';
+import { songs } from './songs.jsx';
 
 export default function Home({ selectedSong, onSelectSong }) {
   return (
