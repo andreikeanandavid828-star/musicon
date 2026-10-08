@@ -1,3 +1,22 @@
+/* 
+need backend to provide a user's:
+- username
+- bio
+- profile picture URL
+- banner picture URL
+- verified artist/admin status
+
+User Profile Records should be tied to Supabase Auth UID?
+
+When Save is clicked, I can send the backend a multipart PATCH /profile 
+request containing username, bio, profile_picture, and banner_picture. 
+The pictures will already be cropped by the frontend, so backend just 
+needs to upload those files to Supabase Storage and save their URLs/paths
+in the user's profile row. Then I need the route to return the updated 
+profile data.
+I also need a GET /profile/... route so I can populate the page when it loads.
+*/
+
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
@@ -200,7 +219,12 @@ function CropEditor({ source, type, onApply, onCancel }) {
       }
 
       const croppedUrl = URL.createObjectURL(blob);
-      onApply(croppedUrl);
+
+      onApply({
+        previewUrl: croppedUrl,
+        blob,
+      });
+
       setSaving(false);
     }, 'image/png');
   }
@@ -318,7 +342,10 @@ export default function Profile() {
     username: profile.username,
     bio: profile.bio,
     profilePicture: profile.profilePicture,
+    profilePictureFile: null,
+
     bannerPicture: profile.bannerPicture,
+    bannerPictureFile: null,
   });
 
   const isOwnProfile = true;
@@ -334,7 +361,10 @@ export default function Profile() {
       username: profile.username,
       bio: profile.bio,
       profilePicture: profile.profilePicture,
+      profilePictureFile: null,
+
       bannerPicture: profile.bannerPicture,
+      bannerPictureFile: null,
     });
 
     setIsEditing(true);
@@ -371,21 +401,37 @@ export default function Profile() {
     event.target.value = '';
   }
 
-  function applyCroppedImage(croppedUrl) {
+  function applyCroppedImage({ previewUrl, blob }) {
     if (!cropEditor) {
       return;
     }
 
-    const field =
-      cropEditor.type === 'avatar'
-        ? 'profilePicture'
-        : 'bannerPicture';
+    const isAvatar = cropEditor.type === 'avatar';
+
+    const imageField = isAvatar
+      ? 'profilePicture'
+      : 'bannerPicture';
+
+    const fileField = isAvatar
+      ? 'profilePictureFile'
+      : 'bannerPictureFile';
+
+    const fileName = isAvatar
+      ? 'profile-picture.png'
+      : 'profile-banner.png';
+
+    const croppedFile = new File(
+      [blob],
+      fileName,
+      { type: blob.type || 'image/png' },
+    );
 
     URL.revokeObjectURL(cropEditor.source);
 
     setEditForm((current) => ({
       ...current,
-      [field]: croppedUrl,
+      [imageField]: previewUrl,
+      [fileField]: croppedFile,
     }));
 
     setCropEditor(null);
@@ -399,19 +445,83 @@ export default function Profile() {
     setCropEditor(null);
   }
 
-  function handleSaveProfile(event) {
+  function buildProfileFormData() {
+    const formData = new FormData();
+
+    formData.append('username', editForm.username);
+    formData.append('bio', editForm.bio);
+
+    if (editForm.profilePictureFile) {
+      formData.append(
+        'profile_picture',
+        editForm.profilePictureFile,
+      );
+    }
+
+    if (editForm.bannerPictureFile) {
+      formData.append(
+        'banner_picture',
+        editForm.bannerPictureFile,
+      );
+    }
+
+    return formData;
+  }
+
+
+  async function handleSaveProfile(event) {
     event.preventDefault();
 
-    /*
-      TODO:
-      Upload the cropped profilePicture/bannerPicture files to storage
-      and send the resulting URLs plus username/bio to the backend.
+    const formData = buildProfileFormData();
+
+    /*  FOR WHEN BACKEND PROFILE UPDATE PATCH ROUTE IS READY!!!!
+    
+    Prompt used to generate the fetch request below:
+    I want to send a PATCH request to the backend to update the user's profile. 
+    The request should be sent to 'http://localhost:5000/profile/me' and include the form data as multipart/form-data.
+======================================================================================================================
+
+      When update route is ready, replace the temporary local-save
+      section below with the following fetch request to send the form data to the backend:
+
+      const response = await fetch(
+        'http://localhost:5000/profile/me',
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          body: formData,
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || 'Failed to update profile',
+        );
+      }
+
+      setProfile(result.profile);
+      setIsEditing(false);
+
+      IMPORTANT:
+      Do NOT manually set a Content-Type header when sending FormData.
+      The browser adds the correct multipart/form-data boundary.
     */
 
+    // Temporary frontend-only save so the page still works
+    // before the backend route exists.
     setProfile((current) => ({
       ...current,
-      ...editForm,
+      username: editForm.username,
+      bio: editForm.bio,
+      profilePicture: editForm.profilePicture,
+      bannerPicture: editForm.bannerPicture,
     }));
+
+    // Keeps formData intentionally created and ready for the backend.
+    // Remove this line once the fetch request above is enabled.
+    void formData;
 
     setIsEditing(false);
   }

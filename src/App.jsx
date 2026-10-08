@@ -28,10 +28,7 @@ function AppShell() {
   return (
     <div className="app-container">
       <header className={isAuthPage ? 'app-header app-header--login' : 'app-header'}>
-        <LightSwitch
-          isDarkMode={isDarkMode}
-          toggleTheme={() => setIsDarkMode((current) => !current)}
-        />
+        {/* web app header bar at top of page (formerly contained log in and light switch buttons) */}
       </header>
 
       <aside className="app-sidebar" aria-label="Main menu">
@@ -42,6 +39,10 @@ function AppShell() {
         <ProfileButton />
         <hr className="app-sidebar__divider" />
         {!isAuthPage && <LoginButton />}
+        <LightSwitch
+          isDarkMode={isDarkMode}
+          toggleTheme={() => setIsDarkMode((current) => !current)}
+        />
       </aside>
 
       <Routes>
