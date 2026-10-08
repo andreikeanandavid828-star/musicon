@@ -1,20 +1,27 @@
 from flask import Blueprint, request, jsonify
-from supabase import create_client, Client
-import dotenv
-import os
-
-dotenv.load_dotenv()
+from utility import supabase, get_authenticated_user
 
 profile = Blueprint("profile", __name__)
 
-# Initialize Supabase client
-url: str = os.getenv("SUPABASE_URL")
-key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
-
-supabase: Client = create_client(url, key)
-
-@profile.route('/bioInput', methods=['GET'])
+@profile.route('/bioInput', methods=['POST'])
 def bioInput():
-    data = request.get_json()
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
     bio = data.get('bio')
-    
+
+    if not bio:
+        return jsonify({"error": "Bio is required"}), 400
+
+    try:
+        # Example Supabase update/upsert
+        response = supabase.table('profiles').upsert({
+            'id': user.id,
+            'bio': bio
+        }).execute()
+
+        return jsonify({"message": "Bio updated successfully", "data": response.data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
