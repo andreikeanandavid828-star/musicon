@@ -71,7 +71,6 @@ export default function Forum() {
 
     return (
         <main className="forum-page">
-            <Link className="back-link" to="/">Back to home</Link>
             <h1>Forum</h1>
             <p>Start a conversation about the music you love.</p>
 

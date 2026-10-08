@@ -62,7 +62,6 @@ export default function TierList() {
 
     return (
         <main className="tierlist-page">
-            <Link className="back-link" to="/">Back to home</Link>
             <h1>Tier List</h1>
             {!hasCreatedList ? (
                 <section className="tierlist-start" aria-label="Tier list options">
