@@ -1,8 +1,35 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import Button from './Button.jsx';
 
 const placeholderName = 'MusicBox listener';
+
+function LikeButton({ itemLabel }) {
+    const inputId = useId();
+    const [isLiked, setIsLiked] = useState(false);
+
+    return (
+        <div className="like-button">
+            <input
+                className="on"
+                id={inputId}
+                type="checkbox"
+                checked={isLiked}
+                onChange={(event) => setIsLiked(event.target.checked)}
+                aria-label={`Like ${itemLabel}`}
+            />
+            <label className="like" htmlFor={inputId}>
+                <svg className="like-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    {/* This path draws the heart shape. */}
+                    <path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.51L12 21.35Z" />
+                </svg>
+                <span className="like-text">Like</span>
+            </label>
+            <span className="like-count one" aria-hidden="true">0</span>
+            <span className="like-count two" aria-hidden="true">{isLiked ? 1 : 0}</span>
+        </div>
+    );
+}
 
 export default function Forum() {
     const [posts, setPosts] = useState([]);
@@ -77,20 +104,23 @@ export default function Forum() {
                     <p className="forum-empty">No discussions yet. Your post will be the first.</p>
                 ) : sortedPosts.map((post) => (
                     <article className="forum-post" key={post.id}>
-                        <button
-                            className="forum-post-toggle"
-                            type="button"
-                            aria-expanded={expandedPostId === post.id}
-                            aria-controls={`comments-${post.id}`}
-                            onClick={() => setExpandedPostId((currentId) => currentId === post.id ? null : post.id)}
-                        >
-                            <span className="forum-post-title">{post.title}</span>
-                            <span className="forum-post-content">{post.content}</span>
-                            <span className="forum-post-meta">{post.author} | {post.comments.length} comments</span>
-                            <span className="forum-post-indicator" aria-hidden="true">
-                                {expandedPostId === post.id ? 'Hide' : 'Show'}
-                            </span>
-                        </button>
+                        <div className="forum-post-heading">
+                            <button
+                                className="forum-post-toggle"
+                                type="button"
+                                aria-expanded={expandedPostId === post.id}
+                                aria-controls={`comments-${post.id}`}
+                                onClick={() => setExpandedPostId((currentId) => currentId === post.id ? null : post.id)}
+                            >
+                                <span className="forum-post-title">{post.title}</span>
+                                <span className="forum-post-content">{post.content}</span>
+                                <span className="forum-post-meta">{post.author} | {post.comments.length} comments</span>
+                                <span className="forum-post-indicator" aria-hidden="true">
+                                    {expandedPostId === post.id ? 'Hide' : 'Show'}
+                                </span>
+                            </button>
+                            <LikeButton itemLabel={`post ${post.title}`} />
+                        </div>
                         <section
                             className="forum-comments"
                             id={`comments-${post.id}`}
@@ -99,9 +129,12 @@ export default function Forum() {
                         >
                             <h4>Comments ({post.comments.length})</h4>
                             {post.comments.map((comment) => (
-                                <p className="forum-comment" key={comment.id}>
-                                    <strong>{comment.author}:</strong> {comment.content}
-                                </p>
+                                <div className="forum-comment-row" key={comment.id}>
+                                    <p className="forum-comment">
+                                        <strong>{comment.author}:</strong> {comment.content}
+                                    </p>
+                                    <LikeButton itemLabel={`comment by ${comment.author}`} />
+                                </div>
                             ))}
                             <form className="forum-comment-form" onSubmit={(event) => addComment(event, post.id)}>
                                 <label className="visually-hidden" htmlFor={`comment-${post.id}`}>Add a comment</label>

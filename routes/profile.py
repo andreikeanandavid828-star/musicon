@@ -1,9 +1,5 @@
 from flask import Blueprint, request, jsonify
-from supabase import create_client, Client
-import dotenv
-import os
-
-dotenv.load_dotenv()
+from utility import supabase, get_authenticated_user
 
 profile = Blueprint("profile", __name__)
 

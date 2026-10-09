@@ -17,11 +17,11 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --page-bg: #2a2323;
+  --page-bg: #07070D;
   --text: #f8f9fa;
   --heading: #f8f9fa;
   --muted: #b7b9c2;
-  --border: #3f414a;
+  --border: #2b1a32;
   --surface: rgba(30, 31, 38, 0.94);
   --control-bg: #333;
   --control-text: #fff;
