@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
-from routes.auth import supabase  # Reuses the initialized client from auth.py
+from utility import supabase, get_authenticated_user
 
 posts_bp = Blueprint('posts', __name__)
 
 # 1. Fetch all forum posts (Feed)
-@posts_bp.route('/', methods=['GET'], strict_slashes=False)
+@posts_bp.route('/', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_posts():
+    if request.method == 'OPTIONS':
+        return '', 200
+
     try:
         response = supabase.table('posts').select(
             '*, users!posts_user_id_fkey(username), albums(*)'
@@ -16,20 +19,26 @@ def get_posts():
 
 
 # 2. Create a new post
-@posts_bp.route('/', methods=['POST'], strict_slashes=False)
+@posts_bp.route('/', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def create_post():
-    data = request.get_json()
-    user_id = data.get('user_id')
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
     title = data.get('title')
     body = data.get('body')
     album_id = data.get('album_id')  # Optional UUID
 
-    if not user_id or not title or not body:
+    if not title or not body:
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
         response = supabase.table('posts').insert({
-            'user_id': user_id,
+            'user_id': user.id,
             'title': title,
             'body': body,
             'album_id': album_id
@@ -40,8 +49,11 @@ def create_post():
 
 
 # 3. Get single post details and its comments
-@posts_bp.route('/<post_id>', methods=['GET'], strict_slashes=False)
+@posts_bp.route('/<post_id>', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_post_detail(post_id):
+    if request.method == 'OPTIONS':
+        return '', 200
+
     try:
         post_res = supabase.table('posts').select(
             '*, users!posts_user_id_fkey(username), albums(*)'
@@ -60,20 +72,26 @@ def get_post_detail(post_id):
 
 
 # 4. Add a comment or reply to a comment
-@posts_bp.route('/<post_id>/comments', methods=['POST'], strict_slashes=False)
+@posts_bp.route('/<post_id>/comments', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def add_comment(post_id):
-    data = request.get_json()
-    user_id = data.get('user_id')
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
     body = data.get('body')
     parent_id = data.get('parent_id')  # NULL for top-level, UUID string if reply
 
-    if not user_id or not body:
+    if not body:
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
         response = supabase.table('comments').insert({
             'post_id': post_id,
-            'user_id': user_id,
+            'user_id': user.id,
             'parent_id': parent_id,
             'body': body
         }).execute()
