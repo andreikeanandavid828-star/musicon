@@ -5,7 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from routes.auth import auth 
 from routes.profile import profile
-from routes.post import posts_bp
+from forum import posts_bp
 
 app = Flask(__name__)
 
