@@ -1,36 +1,15 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from utility import supabase, get_authenticated_user
 
 profile = Blueprint("profile", __name__)
-
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_PUBLISHABLE_KEY")
-
-supabase: Client = create_client(url, key)
-
-
-def get_current_user():
-    token = request.cookies.get("supabase-auth-token")
-
-    if not token:
-        return None
-
-    try:
-        response = supabase.auth.get_user(token)
-        return response.user
-
-    except Exception as e:
-        print("AUTH ERROR:", e)
-        return None
 
 
 def serialize_profile(user_data, profile_data):
     return {
         "username": user_data["username"],
-        "bio": profile_data.get("bio", ""),
+        "bio": profile_data.get("bio") or "",
         "profilePicture": None,
         "bannerPicture": None,
-
         "isArtist": profile_data.get("is_artist", False),
 
         # These will come from their respective tables later
@@ -42,15 +21,13 @@ def serialize_profile(user_data, profile_data):
         "posts": 0
     }
 
-# GET Profile
+
 @profile.route("/me", methods=["GET"])
 def get_my_profile():
-    user = get_current_user()
+    user = get_authenticated_user()
 
     if not user:
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
+        return jsonify({"error": "Unauthorized"}), 401
 
     try:
         user_response = (
@@ -63,9 +40,7 @@ def get_my_profile():
         )
 
         if not user_response.data:
-            return jsonify({
-                "error": "User not found"
-            }), 404
+            return jsonify({"error": "User not found"}), 404
 
         profile_response = (
             supabase
@@ -76,130 +51,124 @@ def get_my_profile():
             .execute()
         )
 
-        # Create a default profile if one doesn't exist
-
         if not profile_response.data:
-            return jsonify({
-                "error": "Profile not found"
-            }), 404
-
-        else:
-            profile_data = profile_response.data
+            return jsonify({"error": "Profile not found"}), 404
 
         return jsonify({
             "profile": serialize_profile(
                 user_response.data,
-                profile_data
+                profile_response.data
             )
         }), 200
 
-    except Exception as e:
-        print("GET PROFILE ERROR:", e)
-
+    except Exception:
+        current_app.logger.exception("GET PROFILE ERROR")
         return jsonify({
-            "error": "Failed to retrieve profile",
-            "details": str(e)
+            "error": "Failed to retrieve profile"
         }), 500
 
 
-# UPDATE profile
 @profile.route("/me", methods=["PATCH"])
 def update_my_profile():
-    user = get_current_user()
+    user = get_authenticated_user()
 
     if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
         return jsonify({
-            "error": "Unauthorized"
-        }), 401
+            "error": "A valid JSON object is required"
+        }), 400
+
+    username = data.get("username")
+    bio = data.get("bio")
+
+    # Validate username
+    if username is not None:
+        if not isinstance(username, str):
+            return jsonify({
+                "error": "Username must be a string"
+            }), 400
+
+        username = username.strip()
+
+        if len(username) < 3:
+            return jsonify({
+                "error": "Username must be at least 3 characters"
+            }), 400
+
+        if len(username) > 30:
+            return jsonify({
+                "error": "Username cannot exceed 30 characters"
+            }), 400
+
+    # Validate bio
+    if bio is not None:
+        if not isinstance(bio, str):
+            return jsonify({
+                "error": "Bio must be a string"
+            }), 400
+
+        bio = bio.strip()
+
+        if len(bio) > 300:
+            return jsonify({
+                "error": "Bio cannot exceed 300 characters"
+            }), 400
+
+    if username is None and bio is None:
+        return jsonify({
+            "error": "No fields provided to update"
+        }), 400
 
     try:
-        username = request.form.get("username")
-        bio = request.form.get("bio")
-
-#        profile_picture = request.files.get("profile_picture")
-#        banner_picture = request.files.get("banner_picture")
-
-        # -------------------------
-        # Username
-        # -------------------------
-
+        # Update username
         if username is not None:
-            username = username.strip()
-
-            if len(username) < 3:
-                return jsonify({
-                    "error": "Username must be at least 3 characters"
-                }), 400
-
-            if len(username) > 30:
-                return jsonify({
-                    "error": "Username cannot exceed 30 characters"
-                }), 400
-
             (
                 supabase
                 .table("users")
-                .update({
-                    "username": username
-                })
+                .update({"username": username})
                 .eq("id", user.id)
                 .execute()
             )
 
-        # -------------------------
-        # Bio
-        # -------------------------
-
+        # Update bio
         if bio is not None:
-            bio = bio.strip()
-
-            if len(bio) > 300:
-                return jsonify({
-                    "error": "Bio cannot exceed 300 characters"
-                }), 400
-
             (
                 supabase
                 .table("profiles")
-                .update({
-                    "bio": bio
-                })
+                .update({"bio": bio})
                 .eq("user_id", user.id)
                 .execute()
             )
 
-        # -------------------------
-        # Images
-        # -------------------------
-        # Intentionally ignored for now.
-        #
-        # profile_picture contains the cropped avatar file.
-        # banner_picture contains the cropped banner file.
-        #
-        # When you're ready for Supabase Storage, this is
-        # where we'll upload them.
-
-        # -------------------------
-        # Return fresh profile
-        # -------------------------
-
+        # Retrieve updated user data
         user_response = (
             supabase
             .table("users")
             .select("id, username")
             .eq("id", user.id)
-            .single()
+            .maybe_single()
             .execute()
         )
 
+        if not user_response.data:
+            return jsonify({"error": "User not found"}), 404
+
+        # Retrieve updated profile data
         profile_response = (
             supabase
             .table("profiles")
             .select("*")
             .eq("user_id", user.id)
-            .single()
+            .maybe_single()
             .execute()
         )
+
+        if not profile_response.data:
+            return jsonify({"error": "Profile not found"}), 404
 
         return jsonify({
             "message": "Profile updated successfully",
@@ -209,10 +178,8 @@ def update_my_profile():
             )
         }), 200
 
-    except Exception as e:
-        print("UPDATE PROFILE ERROR:", e)
-
+    except Exception:
+        current_app.logger.exception("UPDATE PROFILE ERROR")
         return jsonify({
-            "error": "Failed to update profile",
-            "details": str(e)
+            "error": "Failed to update profile"
         }), 500
