@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 1. Import useNavigate
 import Button from './Button.jsx';
 
 export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate(); // 2. Initialize the hook
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -16,7 +16,6 @@ export default function Login() {
     const password = String(formData.get('password'));
 
     setError('');
-    setLoggedIn(false);
     setSubmitting(true);
 
     try {
@@ -43,7 +42,7 @@ export default function Login() {
       }
 
       form.reset();
-      setLoggedIn(true);
+      navigate('/feed'); // 3. Redirect user to your main feed/dashboard route
     } catch {
       setError('Could not connect.');
     } finally {
@@ -82,7 +81,6 @@ export default function Login() {
       </form>
 
       {error && <p role="alert">{error}</p>}
-      {loggedIn && <p role="status">Login successful.</p>}
 
       <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
     </main>
