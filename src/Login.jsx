@@ -42,7 +42,7 @@ export default function Login() {
       }
 
       form.reset();
-      navigate('/feed'); // 3. Redirect user to your main feed/dashboard route
+      navigate('/forum'); // 3. Redirect user to your main feed/dashboard route
     } catch {
       setError('Could not connect.');
     } finally {
