@@ -1,74 +1,67 @@
 from flask import Blueprint, request, jsonify
-from supabase import create_client, Client
-import dotenv
-import os
-
-dotenv.load_dotenv()
+from utility import supabase
 
 auth = Blueprint("auth", __name__)
 
-# Initialize Supabase client
-url: str = os.getenv("SUPABASE_URL")
-key: str = os.getenv("SUPABASE_PUBLISHABLE_KEY")
-
-supabase: Client = create_client(url, key)
-
-# Register Route
-@auth.route('/register', methods=['POST'])
+#Register Route
+@auth.route('/register', methods=['POST', 'OPTIONS'])
 def register():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    confirm_password = data.get('confirm_password')
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    data = request.get_json() or {}
     email = data.get('email')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
+    password = data.get('password')
+    confirm_password = data.get('confirmPassword')
+    username = data.get('username')
+    email = data.get('email')
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
 
-#    if not username or not password:
-#        return jsonify({"error": "Username and password are required"}), 400
-
-#    if password != confirm_password:
-#        return jsonify({"error": "Passwords do not match"}), 400
+    # Enfore validation checks from your friend's code 
+    if not username or not password or not email:
+        return jsonify({"error": "Username, email, and password are required"}), 400
+    
+    if password != confirm_password:
+        return jsonify({"error": "Passwords do not match"}), 400 
 
     try:
+        # Sign up user and pass extra info into Supabase metadata options
         auth_response = supabase.auth.sign_up({
             "email": email,
             "password": password,
-#            "options": {
-#                "data": {
-#                    "username": username,
-#                    "first_name": first_name,
-#                    "last_name": last_name
-#                }
-#            }
+            "options": {
+                "data": {
+                    "username": username,
+                    "first_name": first_name,
+                    "last_name": last_name
+                }
+            }
         })
 
         user = auth_response.user
-
         if not user:
-            return jsonify({
-                "error": "Failed to create user"
-            }), 400
+            return jsonify({"error": "Failed to create user"}), 400
 
         return jsonify({
             "message": "User registered successfully",
             "user_id": user.id
         }), 201
 
-        print("Auth user created:", user.id)    
-    
     except Exception as e:
         print("REGISTER ERROR:", e)
-
         return jsonify({
             "error": "Failed to register user",
             "details": str(e)
         }), 500
 
-# Login Route
-@auth.route('/login', methods=['POST'])
+#Login Route
+@auth.route('/login', methods=['POST', 'OPTIONS'])
 def login():
-    data = request.get_json()
+    if request.method == 'OPTIONS':
+        return '', 200
+
+    data = request.get_json() or {}
     email = data.get('email')
     password = data.get('password')
 
@@ -78,7 +71,7 @@ def login():
             "password": password
         })
 
-        if auth_response.user or auth_response.session:
+        if auth_response.user and auth_response.session:
             flask_response = jsonify({
                 "message": "Login successful",
                 "user_id": auth_response.user.id,
@@ -88,33 +81,28 @@ def login():
                 "supabase-auth-token",
                 auth_response.session.access_token,
                 httponly=True,
+                samesite="Lax"
             )
 
             return flask_response, 200
 
-        else:
-            return jsonify({
-                "error": "Invalid credentials"
-            }), 401
+        return jsonify({"error": "Invalid credentials"}), 401
 
     except Exception as e:
         print("LOGIN ERROR:", e)
-        return jsonify({
-            "error": "Failed to login"
-        }), 500
+        return jsonify({"error": "Failed to login"}), 500
 
-# Logout Route
-@auth.route('/logout', methods=['POST'])
+
+#Logout Route
+@auth.route('/logout', methods=['POST', 'OPTIONS'])
 def logout():
+    if request.method == 'OPTIONS':
+        return '', 200
+
     try:
-        # Clear the Supabase auth token cookie
         response = jsonify({"message": "Logout successful"})
         response.set_cookie("supabase-auth-token", "", expires=0, httponly=True)
         return response, 200
-
     except Exception as e:
         print("LOGOUT ERROR:", e)
-        return jsonify({
-            "error": "Failed to logout"
-        }), 500
-
+        return jsonify({"error": "Failed to logout"}), 500
