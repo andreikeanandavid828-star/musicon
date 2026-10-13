@@ -18,13 +18,6 @@ def register():
     first_name = data.get('firstName')
     last_name = data.get('lastName')
 
-    # Enfore validation checks from your friend's code 
-    if not username or not password or not email:
-        return jsonify({"error": "Username, email, and password are required"}), 400
-    
-    if password != confirm_password:
-        return jsonify({"error": "Passwords do not match"}), 400 
-
     try:
         # Sign up user and pass extra info into Supabase metadata options
         auth_response = supabase.auth.sign_up({
