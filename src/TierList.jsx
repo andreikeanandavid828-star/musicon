@@ -3,6 +3,8 @@ import Button from './Button.jsx';
 import { songs as availableSongs } from './songs.jsx';
 import SongArtwork from './SongArtwork.jsx';
 
+const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
+
 const emptyTierList = () => ({
     S: [],
     A: [],
@@ -16,9 +18,10 @@ export default function TierList() {
     const [hasCreatedList, setHasCreatedList] = useState(false);
     const [tiers, setTiers] = useState(emptyTierList);
     const [isSongPickerOpen, setIsSongPickerOpen] = useState(false);
-    const [listTitle, setListTitle] = useState('Untitled Tier List');
-    const [titleDraft, setTitleDraft] = useState('Untitled Tier List');
+    const [listTitle, setListTitle] = useState(DEFAULT_TIER_LIST_TITLE);
+    const [titleDraft, setTitleDraft] = useState(DEFAULT_TIER_LIST_TITLE);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [shareNotice, setShareNotice] = useState('');
     const songPickerRef = useRef(null);
 
     useEffect(() => {
@@ -37,6 +40,17 @@ export default function TierList() {
         const title = titleDraft.trim();
         if (title) setListTitle(title);
         setIsEditingTitle(false);
+    }
+
+    function handleShare() {
+        if (listTitle === DEFAULT_TIER_LIST_TITLE) {
+            setShareNotice('Name your tier list before sharing.');
+            setTitleDraft(listTitle);
+            setIsEditingTitle(true);
+            return;
+        }
+
+        setShareNotice('Sharing will be available soon.');
     }
 
     function addSong(song) {
@@ -106,7 +120,10 @@ export default function TierList() {
                                     aria-label="Tier list title"
                                     autoFocus
                                     value={titleDraft}
-                                    onChange={(event) => setTitleDraft(event.target.value)}
+                                    onChange={(event) => {
+                                        setTitleDraft(event.target.value);
+                                        setShareNotice('');
+                                    }}
                                     onBlur={finishTitleEdit}
                                     onKeyDown={(event) => {
                                         if (event.key === 'Enter') finishTitleEdit();
@@ -127,11 +144,23 @@ export default function TierList() {
                                     aria-label={`Edit tier list title: ${listTitle}`}
                                 >
                                     {listTitle}
+                                    <svg
+                                        className="tierlist-title-pencil"
+                                        viewBox="0 0 16 16"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M11.7 1.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-9.2 9.2-3.5.7.7-3.5 9-9.4ZM2.9 11.2l-.3 1.3 1.3-.3 7.7-7.7-1-1-7.7 7.7Z" />
+                                    </svg>
                                 </button>
                             )}
                         </h2>
-                        <Button type="button">Share</Button>
+                        <Button type="button" onClick={handleShare}>Share</Button>
                     </div>
+                    {shareNotice && (
+                        <p className="tierlist-share-notice" role="status">
+                            {shareNotice}
+                        </p>
+                    )}
                     <div className="tierlist-rows">
                         {['S', 'A', 'B', 'C', 'D'].map((tierName) => (
                             <div
@@ -144,12 +173,15 @@ export default function TierList() {
                                 <div className="tierlist-songs" aria-label={`${tierName} tier`}>
                                     {tiers[tierName].map((song) => (
                                         <div
-                                            className="tierlist-song"
+                                            className="tierlist-song tierlist-song--artwork"
+                                            title={song.title}
+                                            aria-label={song.title}
+                                            role="img"
                                             draggable
                                             key={song.id}
                                             onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
                                         >
-                                            {song.title}
+                                            <SongArtwork song={song} className="tierlist-song__artwork" />
                                         </div>
                                     ))}
                                 </div>
@@ -164,12 +196,15 @@ export default function TierList() {
                         <div className="tierlist-songs">
                             {tiers.neutral.map((song) => (
                                 <div
-                                    className="tierlist-song"
+                                    className="tierlist-song tierlist-song--artwork"
+                                    title={song.title}
+                                    aria-label={song.title}
+                                    role="img"
                                     draggable
                                     key={song.id}
                                     onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
                                 >
-                                    {song.title}
+                                    <SongArtwork song={song} className="tierlist-song__artwork" />
                                 </div>
                             ))}
                         </div>

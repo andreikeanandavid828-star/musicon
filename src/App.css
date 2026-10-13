@@ -625,6 +625,9 @@
 }
 
 .tierlist-title-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   max-width: 100%;
   padding: 0;
   border: 0;
@@ -636,10 +639,22 @@
   cursor: pointer;
 }
 
+.tierlist-title-pencil {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: currentColor;
+  opacity: 0.65;
+}
+
 .tierlist-title-button:hover {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
+}
+
+.tierlist-title-button:hover .tierlist-title-pencil {
+  opacity: 1;
 }
 
 .tierlist-title-input {
@@ -647,6 +662,12 @@
   margin: 0;
   padding: 4px 8px;
   font: inherit;
+}
+
+.tierlist-share-notice {
+  margin: -8px 0 16px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .tierlist-rows {
@@ -720,6 +741,21 @@
 
 .tierlist-song:active {
   cursor: grabbing;
+}
+
+.tierlist-song--artwork {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--border);
+}
+
+.tierlist-song__artwork {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
 }
 
 .tierlist-neutral {
@@ -927,6 +963,25 @@
   color: var(--heading);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.footer-empty-link {
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer-empty-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer-empty-link:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #aa3bff;
+  outline-offset: 3px;
 }
 
 .footer-controls {
