@@ -1,3 +1,4 @@
+// Static sample catalog; when the backend is connected, fetch song metadata from its API.
 import neonDawnFade from './assets/TempMusic/Neon Dawn Fade.mp3';
 import neonDawnFadeAlternate from './assets/TempMusic/Neon Dawn Fade (4).mp3';
 import neonSkyTrain from './assets/TempMusic/Neon SkyTrain.mp3';
