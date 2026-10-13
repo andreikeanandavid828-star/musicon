@@ -1,54 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import jsmediatags from 'jsmediatags/dist/jsmediatags.min.js';
 import Button from './Button.jsx';
+import SongArtwork from './SongArtwork.jsx';
 
 export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [playbackError, setPlaybackError] = useState('');
-  const [artworkUrl, setArtworkUrl] = useState(null);
   const audioRef = useRef(null);
-  const artworkUrlRef = useRef(null);
-
-  useEffect(() => {
-    let isCurrentTrack = true;
-
-    if (artworkUrlRef.current) {
-      URL.revokeObjectURL(artworkUrlRef.current);
-      artworkUrlRef.current = null;
-    }
-    setArtworkUrl(null);
-
-    if (!selectedSong?.src) {
-      return () => { isCurrentTrack = false; };
-    }
-
-    const trackUrl = new URL(selectedSong.src, window.location.href).href;
-    jsmediatags.read(trackUrl, {
-      onSuccess: ({ tags }) => {
-        const picture = tags.picture;
-        if (!isCurrentTrack || !picture?.data?.length) return;
-
-        const image = new Blob([new Uint8Array(picture.data)], {
-          type: picture.format || 'image/jpeg',
-        });
-        const nextArtworkUrl = URL.createObjectURL(image);
-        artworkUrlRef.current = nextArtworkUrl;
-        setArtworkUrl(nextArtworkUrl);
-      },
-      onError: () => {
-        if (isCurrentTrack) setArtworkUrl(null);
-      },
-    });
-
-    return () => {
-      isCurrentTrack = false;
-      if (artworkUrlRef.current) {
-        URL.revokeObjectURL(artworkUrlRef.current);
-        artworkUrlRef.current = null;
-      }
-    };
-  }, [selectedSong]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -91,9 +49,7 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
   return (
     <footer className="footer-panel" aria-label="Music player">
       <div className="footer-track">
-        <div className="footer-artwork" aria-hidden={!artworkUrl}>
-          {artworkUrl && <img src={artworkUrl} alt="" />}
-        </div>
+        <SongArtwork song={selectedSong} className="footer-artwork" />
         <div className="footer-track__text">
           <span className="footer-eyebrow">Now playing</span>
           <strong>{selectedSong?.title ?? 'Select a song from Home'}</strong>

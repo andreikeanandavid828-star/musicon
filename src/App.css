@@ -213,8 +213,9 @@
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -236,8 +237,28 @@
 }
 
 .song-list__action {
+  margin-left: auto;
   color: var(--muted);
   font-size: 14px;
+}
+
+.song-artwork {
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--border);
+}
+
+.song-artwork img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.song-artwork--home {
+  width: 56px;
+  height: 56px;
 }
 
 .login-page {
@@ -760,7 +781,7 @@
   display: flex;
   min-height: 76px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   padding: 16px;
   border: 1px solid var(--border);
@@ -771,6 +792,18 @@
   text-align: left;
   cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tierlist-song-picker__title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.song-artwork--picker {
+  width: 56px;
+  height: 56px;
 }
 
 .tierlist-song-picker__option:not(:disabled):hover {
@@ -791,6 +824,7 @@
 
 .tierlist-song-picker__status {
   flex: 0 0 auto;
+  margin-left: auto;
   color: var(--muted);
   font-size: 13px;
 }
@@ -872,16 +906,6 @@
   width: 56px;
   height: 56px;
   flex: 0 0 56px;
-  overflow: hidden;
-  border-radius: 4px;
-  background: var(--border);
-}
-
-.footer-artwork img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .footer-track__text {

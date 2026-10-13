@@ -1,4 +1,5 @@
 import { songs } from './songs.jsx';
+import SongArtwork from './SongArtwork.jsx';
 
 export default function Home({ selectedSong, onSelectSong }) {
   return (
@@ -14,6 +15,7 @@ export default function Home({ selectedSong, onSelectSong }) {
               aria-pressed={selectedSong?.id === song.id}
               onClick={() => onSelectSong(song)}
             >
+              <SongArtwork song={song} className="song-artwork--home" />
               <span>{song.title}</span>
               <span className="song-list__action">Play</span>
             </button>

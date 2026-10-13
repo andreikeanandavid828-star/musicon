@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from './Button.jsx';
 import { songs as availableSongs } from './songs.jsx';
+import SongArtwork from './SongArtwork.jsx';
 
 const emptyTierList = () => ({
     S: [],
@@ -213,7 +214,10 @@ export default function TierList() {
                                 disabled={isAdded}
                                 onClick={() => addSong(song)}
                             >
-                                <span>{song.title}</span>
+                                <span className="tierlist-song-picker__title">
+                                    <SongArtwork song={song} className="song-artwork--picker" />
+                                    <span>{song.title}</span>
+                                </span>
                                 <span className="tierlist-song-picker__status">
                                     {isAdded ? 'Added' : 'Add to tier list'}
                                 </span>
