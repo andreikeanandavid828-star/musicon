@@ -1,21 +1,8 @@
-/* 
-need backend to provide a user's:
-- username
-- bio
-- profile picture URL
-- banner picture URL
-- verified artist/admin status
-
-User Profile Records should be tied to Supabase Auth UID?
-
-When Save is clicked, I can send the backend a multipart PATCH /profile 
-request containing username, bio, profile_picture, and banner_picture. 
-The pictures will already be cropped by the frontend, so backend just 
-needs to upload those files to Supabase Storage and save their URLs/paths
-in the user's profile row. Then I need the route to return the updated 
-profile data.
-I also need a GET /profile/... route so I can populate the page when it loads.
-*/
+/*
+ * Profile integration: GET/PATCH http://localhost:5000/profile/me.
+ * The backend currently supports JSON username/bio updates only.
+ * Image cropping remains a preview; uploads require backend work.
+ */
 
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -324,39 +311,63 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [cropEditor, setCropEditor] = useState(null);
 
-  const [profile, setProfile] = useState({
-    username: 'sampleUser',
-    bio: 'This is where the user bio will go.',
-    profilePicture: null,
-    bannerPicture: null,
-    isArtist: true,
-    followers: 0,
-    following: 0,
-    friends: 0,
-    ratings: 0,
-    tierLists: 0,
-    posts: 0,
-  });
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveNotice, setSaveNotice] = useState('');
 
   const [editForm, setEditForm] = useState({
-    username: profile.username,
-    bio: profile.bio,
-    profilePicture: profile.profilePicture,
+    username: '',
+    bio: '',
+    profilePicture: null,
     profilePictureFile: null,
-
-    bannerPicture: profile.bannerPicture,
+    bannerPicture: null,
     bannerPictureFile: null,
   });
+
+  useEffect(() => {
+    let active = true;
+    async function loadProfile() {
+      try {
+        const response = await fetch('http://localhost:5000/profile/me', {
+          credentials: 'include',
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!active) return;
+        if (response.status === 401) {
+          setIsUnauthorized(true);
+          setLoadError('Log in to view your profile.');
+        } else if (!response.ok) {
+          setLoadError(result.error || 'Could not load your profile.');
+        } else if (!result.profile) {
+          setLoadError('The server returned no profile data.');
+        } else {
+          setProfile(result.profile);
+        }
+      } catch {
+        if (active) setLoadError('Could not contact the server.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    void loadProfile();
+    return () => { active = false; };
+  }, []);
 
   const isOwnProfile = true;
 
   const tabs = ['Overview', 'Ratings', 'Tier Lists', 'Posts'];
 
-  if (profile.isArtist) {
+  if (profile?.isArtist) {
     tabs.push('Music');
   }
 
   function openEditProfile() {
+    setSaveError('');
+    setSaveNotice('');
     setEditForm({
       username: profile.username,
       bio: profile.bio,
@@ -370,7 +381,17 @@ export default function Profile() {
     setIsEditing(true);
   }
 
+  function releaseDraftPreviews() {
+    if (editForm.profilePictureFile && editForm.profilePicture?.startsWith('blob:')) {
+      URL.revokeObjectURL(editForm.profilePicture);
+    }
+    if (editForm.bannerPictureFile && editForm.bannerPicture?.startsWith('blob:')) {
+      URL.revokeObjectURL(editForm.bannerPicture);
+    }
+  }
+
   function closeEditProfile() {
+    releaseDraftPreviews();
     setCropEditor(null);
     setIsEditing(false);
   }
@@ -445,90 +466,61 @@ export default function Profile() {
     setCropEditor(null);
   }
 
-  function buildProfileFormData() {
-    const formData = new FormData();
-
-    formData.append('username', editForm.username);
-    formData.append('bio', editForm.bio);
-
-    if (editForm.profilePictureFile) {
-      formData.append(
-        'profile_picture',
-        editForm.profilePictureFile,
-      );
-    }
-
-    if (editForm.bannerPictureFile) {
-      formData.append(
-        'banner_picture',
-        editForm.bannerPictureFile,
-      );
-    }
-
-    return formData;
-  }
-
-
   async function handleSaveProfile(event) {
     event.preventDefault();
-
-    const formData = buildProfileFormData();
-
-    /*  FOR WHEN BACKEND PROFILE UPDATE PATCH ROUTE IS READY!!!!
-    
-    Prompt used to generate the fetch request below:
-    I want to send a PATCH request to the backend to update the user's profile. 
-    The request should be sent to 'http://localhost:5000/profile/me' and include the form data as multipart/form-data.
-======================================================================================================================
-
-      When update route is ready, replace the temporary local-save
-      section below with the following fetch request to send the form data to the backend:
-
-      const response = await fetch(
-        'http://localhost:5000/profile/me',
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          body: formData,
-        },
-      );
-
-      const result = await response.json();
-
+    setSaveError('');
+    setSaveNotice('');
+    setSaving(true);
+    try {
+      // Existing Flask endpoint expects application/json, NOT FormData.
+      const response = await fetch('http://localhost:5000/profile/me', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: editForm.username,
+          bio: editForm.bio,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(
-          result.error || 'Failed to update profile',
-        );
+        throw new Error(result.error || 'Could not save profile.');
       }
-
+      if (!result.profile) {
+        throw new Error('The server did not return an updated profile.');
+      }
+      const imagesNotUploaded = Boolean(
+        editForm.profilePictureFile || editForm.bannerPictureFile,
+      );
       setProfile(result.profile);
+      releaseDraftPreviews();
       setIsEditing(false);
+      setSaveNotice(imagesNotUploaded
+        ? 'Username and bio saved. Selected pictures were NOT uploaded; image uploads require backend support.'
+        : 'Profile saved.');
+    } catch (error) {
+      setSaveError(error.message || 'Could not save profile.');
+    } finally {
+      setSaving(false);
+    }
+  }
 
-      IMPORTANT:
-      Do NOT manually set a Content-Type header when sending FormData.
-      The browser adds the correct multipart/form-data boundary.
-    */
-
-    // Temporary frontend-only save so the page still works
-    // before the backend route exists.
-    setProfile((current) => ({
-      ...current,
-      username: editForm.username,
-      bio: editForm.bio,
-      profilePicture: editForm.profilePicture,
-      bannerPicture: editForm.bannerPicture,
-    }));
-
-    // Keeps formData intentionally created and ready for the backend.
-    // Remove this line once the fetch request above is enabled.
-    void formData;
-
-    setIsEditing(false);
+  if (loading) {
+    return <main className="profile-page"><p role="status">Loading profile…</p></main>;
+  }
+  if (loadError) {
+    return (
+      <main className="profile-page">
+        <h1>Profile unavailable</h1>
+        <p role="alert">{loadError}</p>
+        {isUnauthorized && <Link to="/login">Log in</Link>}
+      </main>
+    );
   }
 
   return (
     <main className="profile-page">
-
+      {saveNotice && <p role="status">{saveNotice}</p>}
       <section className="profile-hero">
         <div className="profile-banner">
           {profile.bannerPicture && (
@@ -678,6 +670,8 @@ export default function Profile() {
                 type="text"
                 value={editForm.username}
                 onChange={handleInputChange}
+                minLength={3}
+                maxLength={30}
                 required
               />
 
@@ -687,6 +681,7 @@ export default function Profile() {
                 name="bio"
                 value={editForm.bio}
                 onChange={handleInputChange}
+                maxLength={300}
                 rows="4"
               />
 
@@ -738,15 +733,20 @@ export default function Profile() {
                 </label>
               </div>
 
+              {(editForm.profilePictureFile || editForm.bannerPictureFile) && (
+                <p role="status">Picture changes are preview-only. They won't be uploaded or saved yet.</p>
+              )}
+              {saveError && <p role="alert">{saveError}</p>}
               <div className="profile-edit-actions">
-                <Button className="button--primary" type="submit">
-                  Save
+                <Button className="button--primary" type="submit" disabled={saving}>
+                  {saving ? 'Saving…' : 'Save'}
                 </Button>
 
                 <Button
                   className="button--secondary"
                   type="button"
                   onClick={closeEditProfile}
+                  disabled={saving}
                 >
                   Cancel
                 </Button>
