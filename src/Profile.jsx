@@ -1,9 +1,3 @@
-/*
- * Profile integration: GET/PATCH http://localhost:5000/profile/me.
- * The backend currently supports JSON username/bio updates only.
- * Image cropping remains a preview; uploads require backend work.
- */
-
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
@@ -359,7 +353,7 @@ export default function Profile() {
 
   const isOwnProfile = true;
 
-  const tabs = ['Overview', 'Ratings', 'Tier Lists', 'Posts'];
+  const tabs = ['Overview', 'Ratings', 'Tier Lists', 'Posts', 'Playlists'];
 
   if (profile?.isArtist) {
     tabs.push('Music');
@@ -592,6 +586,11 @@ export default function Profile() {
             <strong>{profile.posts}</strong>
             <span>Posts</span>
           </div>
+
+          <div className="profile-stat">
+            <strong>{profile.playlists}</strong>
+            <span>Playlists</span>
+          </div>
         </section>
       </section>
 
@@ -641,6 +640,13 @@ export default function Profile() {
           <div className="profile-section">
             <h2>Posts</h2>
             <p>Forum posts made by this user will appear here.</p>
+          </div>
+        )}
+
+        {activeTab === 'Playlists' && (
+          <div className="profile-section">
+            <h2>Playlists</h2>
+            <p>Playlists created by this user will appear here.</p>
           </div>
         )}
 
