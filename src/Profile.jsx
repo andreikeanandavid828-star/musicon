@@ -1,3 +1,9 @@
+/*
+ * Profile integration: GET/PATCH http://localhost:5000/profile/me.
+ * The backend currently supports JSON username/bio updates only.
+ * Image cropping remains a preview; uploads require backend work.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
