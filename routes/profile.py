@@ -8,9 +8,12 @@ def serialize_profile(user_data, profile_data):
     return {
         "username": user_data["username"],
         "bio": profile_data.get("bio") or "",
-        "profilePicture": None,
-        "bannerPicture": None,
-        "isArtist": profile_data.get("is_artist", False),
+        "profilePicture": profile_data.get("profile_picture_path"),
+        "bannerPicture": profile_data.get("banner_picture_path"),
+
+        # These come from users, NOT profiles
+        "isArtist": user_data.get("is_artist", False),
+        "isAdmin": user_data.get("is_admin", False),
 
         # These will come from their respective tables later
         "followers": 0,
@@ -30,10 +33,11 @@ def get_my_profile():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
+        # Retrieve user information
         user_response = (
             supabase
             .table("users")
-            .select("id, username")
+            .select("id, username, is_admin, is_artist")
             .eq("id", user.id)
             .maybe_single()
             .execute()
@@ -42,6 +46,7 @@ def get_my_profile():
         if not user_response.data:
             return jsonify({"error": "User not found"}), 404
 
+        # Retrieve profile information
         profile_response = (
             supabase
             .table("profiles")
@@ -124,7 +129,7 @@ def update_my_profile():
         }), 400
 
     try:
-        # Update username
+        # Update username in users table
         if username is not None:
             (
                 supabase
@@ -134,7 +139,7 @@ def update_my_profile():
                 .execute()
             )
 
-        # Update bio
+        # Update bio in profiles table
         if bio is not None:
             (
                 supabase
@@ -144,11 +149,11 @@ def update_my_profile():
                 .execute()
             )
 
-        # Retrieve updated user data
+        # Retrieve updated user information
         user_response = (
             supabase
             .table("users")
-            .select("id, username")
+            .select("id, username, is_admin, is_artist")
             .eq("id", user.id)
             .maybe_single()
             .execute()
@@ -157,7 +162,7 @@ def update_my_profile():
         if not user_response.data:
             return jsonify({"error": "User not found"}), 404
 
-        # Retrieve updated profile data
+        # Retrieve updated profile information
         profile_response = (
             supabase
             .table("profiles")
