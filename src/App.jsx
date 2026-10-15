@@ -15,6 +15,8 @@ import ForumButton from './ForumButton.jsx';
 import SignupButton from './SignupButton.jsx';
 import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
+import Albums from './Albums.jsx';
+import AlbumButton from './AlbumButton.jsx';
 import Upload from './Upload.jsx';
 import UploadButton from './UploadButton.jsx';
 import { songs } from './songs.jsx';
@@ -22,6 +24,9 @@ import { songs } from './songs.jsx';
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
+  const [userSongs, setUserSongs] = useState([]);
+  const [albums, setAlbums] = useState([]);
+  const availableSongs = [...songs, ...userSongs];
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   const handleSongSelection = (song) => setSelectedSong({ ...song });
@@ -57,6 +62,7 @@ function AppShell() {
         <ForumButton />
         <ProfileButton />
         <UploadButton />
+        <AlbumButton />
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
@@ -68,6 +74,7 @@ function AppShell() {
           path="/"
           element={
             <Home
+              songs={availableSongs}
               selectedSong={selectedSong}
               onSelectSong={handleSongSelection}
             />
@@ -78,7 +85,37 @@ function AppShell() {
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/upload" element={<Upload />} />
+        <Route path="/upload" element={<Upload onPostSong={(song) => setUserSongs((current) => [...current, song])} />} />
+        <Route
+          path="/albums"
+          element={
+            <Albums
+              albums={albums}
+              songs={availableSongs}
+              onCreateAlbum={(album) => setAlbums((current) => [album, ...current])}
+              onAddSongs={(albumId, songIds) => setAlbums((current) => current.map((album) => (
+                album.id === albumId
+                  ? { ...album, songIds: [...new Set([...(album.songIds || []), ...songIds])] }
+                  : album
+              )))}
+            />
+          }
+        />
+        <Route
+          path="/albums/:albumId"
+          element={
+            <Albums
+              albums={albums}
+              songs={availableSongs}
+              onCreateAlbum={(album) => setAlbums((current) => [album, ...current])}
+              onAddSongs={(albumId, songIds) => setAlbums((current) => current.map((album) => (
+                album.id === albumId
+                  ? { ...album, songIds: [...new Set([...(album.songIds || []), ...songIds])] }
+                  : album
+              )))}
+            />
+          }
+        />
       </Routes>
 
       {!isAuthPage && (
