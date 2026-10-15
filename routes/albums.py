@@ -52,17 +52,17 @@ def create_album():
 
     data = request.get_json() or {}
     title = data.get('title')
-    artist = data.get('artist')
+    artist_name = data.get('artist') or data.get('artist_name') # Handles both frontend field names safely
     cover_image_url = data.get('cover_image_url')
     release_year = data.get('release_year')
 
-    if not title or not artist:
+    if not title or not artist_name:
         return jsonify({'error': 'Title and artist are required fields'}), 400
 
     try:
         response = supabase.table('albums').insert({
             'title': title,
-            'artist': artist,
+            'artist_name': artist_name,  # Updated to match Supabase column name
             'cover_image_url': cover_image_url,
             'release_year': release_year,
             'user_id': user.id
