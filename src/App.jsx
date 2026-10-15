@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import HomeButton from './HomeButton.jsx';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import FooterMusicPlayer from './Footer.jsx';
 import Home from './Home.jsx';
@@ -18,10 +18,62 @@ import ProfileButton from './ProfileButton.jsx';
 import Upload from './Upload.jsx';
 import UploadButton from './UploadButton.jsx';
 import { songs } from './songs.jsx';
+import Button from './Button.jsx';
 
 function AppShell() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedSong, setSelectedSong] = useState(null);
+  // Treat the backend's HttpOnly cookie as the source of truth.
+  const [authStatus, setAuthStatus] = useState('checking');
+  const [authError, setAuthError] = useState('');
+  const navigate = useNavigate();
+
+  // GET /profile/me authenticates via utility.get_authenticated_user().
+  // Its 404 responses occur after authentication, when a DB row is missing.
+  // In the long term, a dedicated GET /api/auth/me endpoint would be cleaner.
+  const verifySession = useCallback(async () => {
+    setAuthStatus('checking');
+    setAuthError('');
+    try {
+      const response = await fetch('http://localhost:5000/profile/me', {
+        credentials: 'include',
+      });
+      if (response.status === 401) {
+        setAuthStatus('guest');
+      } else if (response.ok || response.status === 404) {
+        setAuthStatus('authenticated');
+      } else {
+        setAuthStatus('error');
+        setAuthError('Unable to check your session.');
+      }
+    } catch {
+      setAuthStatus('error');
+      setAuthError('Unable to contact the server.');
+    }
+  }, []);
+
+  useEffect(() => { void verifySession(); }, [verifySession]);
+
+  function handleLoggedIn() {
+    setAuthError('');
+    setAuthStatus('authenticated');
+  }
+
+  async function handleLogout() {
+    setAuthError('');
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Logout failed');
+      setAuthStatus('guest');
+      navigate('/');
+    } catch {
+      setAuthError('Could not log out. Please try again.');
+    }
+  }
+
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   const handleSongSelection = (song) => setSelectedSong({ ...song });
@@ -44,8 +96,24 @@ function AppShell() {
       <header className="app-header">
         {!isAuthPage && (
           <>
-            <LoginButton />
-            <SignupButton />
+            {authStatus === 'guest' && (
+              <><LoginButton /><SignupButton /></>
+            )}
+            {authStatus === 'authenticated' && (
+              <>
+                <ProfileButton />
+                <Button onClick={handleLogout}>Log out</Button>
+              </>
+            )}
+            {authStatus === 'checking' && <span role="status">Checking session…</span>}
+            {authStatus === 'error' && (
+              <>
+                <LoginButton />
+                <SignupButton />
+                <Button onClick={() => void verifySession()}>Retry session check</Button>
+              </>
+            )}
+            {authError && <span role="alert">{authError}</span>}
           </>
         )}
       </header>
@@ -73,7 +141,7 @@ function AppShell() {
             />
           }
         />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onLoggedIn={handleLoggedIn} />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />

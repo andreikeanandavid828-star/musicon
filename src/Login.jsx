@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import Button from './Button.jsx';
 
-export default function Login() {
+export default function Login({ onLoggedIn }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // 2. Initialize the hook
+  const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -42,7 +42,8 @@ export default function Login() {
       }
 
       form.reset();
-      navigate('/forum'); // 3. Redirect user to your main feed/dashboard route
+      onLoggedIn?.(); // Update the site's navigation immediately.
+      navigate('/forum');
     } catch {
       setError('Could not connect.');
     } finally {
