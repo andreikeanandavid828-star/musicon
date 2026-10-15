@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from './Button.jsx';
+import { songs as availableSongs } from './songs.jsx';
+import SongArtwork from './SongArtwork.jsx';
+
+const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
 
 const emptyTierList = () => ({
     S: [],
@@ -14,10 +17,24 @@ const emptyTierList = () => ({
 export default function TierList() {
     const [hasCreatedList, setHasCreatedList] = useState(false);
     const [tiers, setTiers] = useState(emptyTierList);
-    const [songName, setSongName] = useState('');
-    const [listTitle, setListTitle] = useState('Untitled Tier List');
-    const [titleDraft, setTitleDraft] = useState('Untitled Tier List');
+    const [isSongPickerOpen, setIsSongPickerOpen] = useState(false);
+    const [listTitle, setListTitle] = useState(DEFAULT_TIER_LIST_TITLE);
+    const [titleDraft, setTitleDraft] = useState(DEFAULT_TIER_LIST_TITLE);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [shareNotice, setShareNotice] = useState('');
+    const songPickerRef = useRef(null);
+
+    useEffect(() => {
+        const dialog = songPickerRef.current;
+        if (!dialog) return;
+
+        if (isSongPickerOpen && !dialog.open) dialog.showModal();
+        if (!isSongPickerOpen && dialog.open) dialog.close();
+    }, [isSongPickerOpen]);
+
+    const addedSongIds = new Set(
+        Object.values(tiers).flat().map((song) => song.catalogId),
+    );
 
     function finishTitleEdit() {
         const title = titleDraft.trim();
@@ -25,16 +42,33 @@ export default function TierList() {
         setIsEditingTitle(false);
     }
 
-    function addSong(event) {
-        event.preventDefault();
-        const name = songName.trim();
-        if (!name) return;
+    function handleShare() {
+        if (listTitle === DEFAULT_TIER_LIST_TITLE) {
+            setShareNotice('Name your tier list before sharing.');
+            setTitleDraft(listTitle);
+            setIsEditingTitle(true);
+            return;
+        }
+
+        setShareNotice('Sharing will be available soon.');
+    }
+
+    function addSong(song) {
+        if (addedSongIds.has(song.id)) return;
 
         setTiers((currentTiers) => ({
             ...currentTiers,
-            neutral: [...currentTiers.neutral, { id: `${Date.now()}-${Math.random()}`, name }],
+            neutral: [
+                ...currentTiers.neutral,
+                {
+                    id: `${song.id}-${Date.now()}-${Math.random()}`,
+                    catalogId: song.id,
+                    title: song.title,
+                    src: song.src,
+                },
+            ],
         }));
-        setSongName('');
+        setIsSongPickerOpen(false);
     }
 
     function moveSong(event, destination) {
@@ -65,7 +99,7 @@ export default function TierList() {
             <h1>Tier List</h1>
             {!hasCreatedList ? (
                 <section className="tierlist-start" aria-label="Tier list options">
-                    <p>Make a tier list with any songs you like.</p>
+                    <p>Choose from the available songs and rank your favorites.</p>
                     <div className="tierlist-actions">
                         <Button className="button--primary" onClick={() => {
                             setTiers(emptyTierList());
@@ -86,7 +120,10 @@ export default function TierList() {
                                     aria-label="Tier list title"
                                     autoFocus
                                     value={titleDraft}
-                                    onChange={(event) => setTitleDraft(event.target.value)}
+                                    onChange={(event) => {
+                                        setTitleDraft(event.target.value);
+                                        setShareNotice('');
+                                    }}
                                     onBlur={finishTitleEdit}
                                     onKeyDown={(event) => {
                                         if (event.key === 'Enter') finishTitleEdit();
@@ -107,11 +144,23 @@ export default function TierList() {
                                     aria-label={`Edit tier list title: ${listTitle}`}
                                 >
                                     {listTitle}
+                                    <svg
+                                        className="tierlist-title-pencil"
+                                        viewBox="0 0 16 16"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M11.7 1.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-9.2 9.2-3.5.7.7-3.5 9-9.4ZM2.9 11.2l-.3 1.3 1.3-.3 7.7-7.7-1-1-7.7 7.7Z" />
+                                    </svg>
                                 </button>
                             )}
                         </h2>
-                        <Button type="button">Share</Button>
+                        <Button type="button" onClick={handleShare}>Share</Button>
                     </div>
+                    {shareNotice && (
+                        <p className="tierlist-share-notice" role="status">
+                            {shareNotice}
+                        </p>
+                    )}
                     <div className="tierlist-rows">
                         {['S', 'A', 'B', 'C', 'D'].map((tierName) => (
                             <div
@@ -124,12 +173,15 @@ export default function TierList() {
                                 <div className="tierlist-songs" aria-label={`${tierName} tier`}>
                                     {tiers[tierName].map((song) => (
                                         <div
-                                            className="tierlist-song"
+                                            className="tierlist-song tierlist-song--artwork"
+                                            title={song.title}
+                                            aria-label={song.title}
+                                            role="img"
                                             draggable
                                             key={song.id}
                                             onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
                                         >
-                                            {song.name}
+                                            <SongArtwork song={song} className="tierlist-song__artwork" />
                                         </div>
                                     ))}
                                 </div>
@@ -144,29 +196,71 @@ export default function TierList() {
                         <div className="tierlist-songs">
                             {tiers.neutral.map((song) => (
                                 <div
-                                    className="tierlist-song"
+                                    className="tierlist-song tierlist-song--artwork"
+                                    title={song.title}
+                                    aria-label={song.title}
+                                    role="img"
                                     draggable
                                     key={song.id}
                                     onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
                                 >
-                                    {song.name}
+                                    <SongArtwork song={song} className="tierlist-song__artwork" />
                                 </div>
                             ))}
                         </div>
-                        <form className="tierlist-song-form" onSubmit={addSong}>
-                            <label className="visually-hidden" htmlFor="tierlist-song-name">Song name</label>
-                            <input
-                                id="tierlist-song-name"
-                                className="form-input"
-                                value={songName}
-                                onChange={(event) => setSongName(event.target.value)}
-                                placeholder="Type a song name"
-                            />
-                            <Button className="button--primary" type="submit">Add Song</Button>
-                        </form>
+                        <Button
+                            className="button--primary"
+                            type="button"
+                            onClick={() => setIsSongPickerOpen(true)}
+                        >
+                            Add new song
+                        </Button>
                     </div>
                 </section>
             )}
+            <dialog
+                ref={songPickerRef}
+                className="tierlist-song-picker"
+                aria-labelledby="tierlist-song-picker-title"
+                onClose={() => setIsSongPickerOpen(false)}
+            >
+                <div className="tierlist-song-picker__header">
+                    <div>
+                        <h2 id="tierlist-song-picker-title">Choose a song</h2>
+                        <p>Select a song to add it to your tier list.</p>
+                    </div>
+                    <Button
+                        type="button"
+                        aria-label="Close song picker"
+                        onClick={() => setIsSongPickerOpen(false)}
+                    >
+                        Close
+                    </Button>
+                </div>
+                <div className="tierlist-song-picker__list">
+                    {availableSongs.map((song) => {
+                        const isAdded = addedSongIds.has(song.id);
+
+                        return (
+                            <button
+                                className="tierlist-song-picker__option"
+                                type="button"
+                                key={song.id}
+                                disabled={isAdded}
+                                onClick={() => addSong(song)}
+                            >
+                                <span className="tierlist-song-picker__title">
+                                    <SongArtwork song={song} className="song-artwork--picker" />
+                                    <span>{song.title}</span>
+                                </span>
+                                <span className="tierlist-song-picker__status">
+                                    {isAdded ? 'Added' : 'Add to tier list'}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </dialog>
         </main>
     );
 }
