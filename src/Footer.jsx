@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
+import SongArtwork from './SongArtwork.jsx';
 
 export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,8 +50,17 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
   return (
     <footer className="footer-panel" aria-label="Music player">
       <div className="footer-track">
-        <span className="footer-eyebrow">Now playing</span>
-        <strong>{selectedSong?.title ?? 'Select a song from Home'}</strong>
+        <SongArtwork song={selectedSong} className="footer-artwork" />
+        <div className="footer-track__text">
+          <span className="footer-eyebrow">Now playing</span>
+          {selectedSong ? (
+            <strong>{selectedSong.title}</strong>
+          ) : (
+            <Link className="footer-empty-link" to="/">
+              <strong>Select a song from Home</strong>
+            </Link>
+          )}
+        </div>
       </div>
       <div className="footer-controls" role="group" aria-label="Playback controls">
         <Button
