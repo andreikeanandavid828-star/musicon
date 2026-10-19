@@ -586,11 +586,6 @@ export default function Profile() {
             <strong>{profile.posts}</strong>
             <span>Posts</span>
           </div>
-
-          <div className="profile-stat">
-            <strong>{profile.playlists}</strong>
-            <span>Playlists</span>
-          </div>
         </section>
       </section>
 
