@@ -1,15 +1,81 @@
 from flask import Blueprint, request, jsonify, current_app
 from utility import supabase, get_authenticated_user
+# Adding some imports for profile picture and banner picture handling
+import os
+from uuid import uuid4
+from storage3 import SyncStorageClient
 
 profile = Blueprint("profile", __name__)
 
+# Adding some stuff for profile picture and banner picture handling
+# Supabase Storage bucket for profile images.
+PROFILE_IMAGE_BUCKET = "profile-images"
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+
+def upload_profile_image(image_file, user_id, image_type):
+    # Read the cropped image and validate it.
+    image_bytes = image_file.read(MAX_IMAGE_SIZE + 1)
+
+    if len(image_bytes) > MAX_IMAGE_SIZE:
+        raise ValueError("Image must be 5 MB or smaller.")
+
+    # Our frontend crop editor exports PNG files.
+    if not image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("Uploaded image must be a PNG.")
+
+    # Use the authenticated user's token for Storage RLS.
+    token = request.cookies.get("supabase-auth-token")
+
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+
+    if not token:
+        raise ValueError("Authentication token is missing.")
+
+    storage_client = SyncStorageClient(
+        f"{os.environ['SUPABASE_URL'].rstrip('/')}/storage/v1",
+        headers={
+            "apikey": os.environ["SUPABASE_PUBLISHABLE_KEY"],
+            "Authorization": f"Bearer {token}",
+        },
+    )
+
+    # Unique names avoid overwrites and browser cache problems.
+    file_path = f"{user_id}/{image_type}-{uuid4().hex}.png"
+
+    storage_client.from_(PROFILE_IMAGE_BUCKET).upload(
+        path=file_path,
+        file=image_bytes,
+        file_options={
+            "content-type": "image/png",
+            "upsert": "false",
+        },
+    )
+
+    return file_path
+# end of stuff added for profile picture and banner picture handling
 
 def serialize_profile(user_data, profile_data):
+    # Get stored image paths from the profiles table
+    avatar_path = profile_data.get("profile_picture_path")
+    banner_path = profile_data.get("banner_picture_path")
+
+    # Convert storage paths into public URLs
+    bucket = supabase.storage.from_(PROFILE_IMAGE_BUCKET)
+
+    avatar_url = bucket.get_public_url(avatar_path) if avatar_path else None
+    banner_url = bucket.get_public_url(banner_path) if banner_path else None
+    
     return {
         "username": user_data["username"],
         "bio": profile_data.get("bio") or "",
-        "profilePicture": profile_data.get("profile_picture_path"),
-        "bannerPicture": profile_data.get("banner_picture_path"),
+        "profilePicture": avatar_url,
+        "bannerPicture": banner_url,
+        #"profilePicture": profile_data.get("profile_picture_path"),
+        #"bannerPicture": profile_data.get("banner_picture_path"),        
 
         # These come from users, NOT profiles
         "isArtist": user_data.get("is_artist", False),
@@ -80,12 +146,29 @@ def update_my_profile():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
 
-    data = request.get_json(silent=True)
+    #data = request.get_json(silent=True)
+
+    #if not isinstance(data, dict):
+    #    return jsonify({
+    #        "error": "A valid JSON object is required"
+    #    }), 400
+
+    # replace the above lines with the following to support both JSON and multipart form data
+    # Support both the existing JSON requests and
+    # multipart form submissions containing images.
+    if request.mimetype == "multipart/form-data":
+        data = request.form.to_dict()
+    else:
+        data = request.get_json(silent=True)
 
     if not isinstance(data, dict):
         return jsonify({
-            "error": "A valid JSON object is required"
+            "error": "A valid JSON object or form data is required"
         }), 400
+
+    avatar_file = request.files.get("profile_picture")
+    banner_file = request.files.get("banner_picture")
+    # end of new stuff added for profile picture and banner picture handling
 
     username = data.get("username")
     bio = data.get("bio")
@@ -123,13 +206,43 @@ def update_my_profile():
                 "error": "Bio cannot exceed 300 characters"
             }), 400
 
-    if username is None and bio is None:
-        return jsonify({
-            "error": "No fields provided to update"
+        # added avatar and banner file validation
+        if ( username is None
+            and bio is None
+            and not avatar_file
+            and not banner_file
+        ):
+            return jsonify({
+                "error": "No fields provided to update"
         }), 400
 
     try:
-        # Update username in users table
+        # changed for profile picture and banner picture handling
+        # Collect changes to the profiles table.
+        profile_updates = {}
+
+        if bio is not None:
+            profile_updates["bio"] = bio
+
+        # Upload cropped profile picture.
+        if avatar_file:
+            avatar_path = upload_profile_image(
+                avatar_file,
+                user.id,
+                "avatar",
+            )
+            profile_updates["profile_picture_path"] = avatar_path
+
+        # Upload cropped banner picture.
+        if banner_file:
+            banner_path = upload_profile_image(
+                banner_file,
+                user.id,
+                "banner",
+            )
+            profile_updates["banner_picture_path"] = banner_path
+
+        # Preserve the existing username update.
         if username is not None:
             (
                 supabase
@@ -139,15 +252,16 @@ def update_my_profile():
                 .execute()
             )
 
-        # Update bio in profiles table
-        if bio is not None:
+        # Save bio and image paths to profiles.
+        if profile_updates:
             (
                 supabase
                 .table("profiles")
-                .update({"bio": bio})
+                .update(profile_updates)
                 .eq("user_id", user.id)
                 .execute()
             )
+
 
         # Retrieve updated user information
         user_response = (
@@ -182,6 +296,10 @@ def update_my_profile():
                 profile_response.data
             )
         }), 200
+    
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+
 
     except Exception:
         current_app.logger.exception("UPDATE PROFILE ERROR")

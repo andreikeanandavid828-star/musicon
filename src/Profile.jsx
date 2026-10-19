@@ -460,44 +460,78 @@ export default function Profile() {
     setCropEditor(null);
   }
 
-  async function handleSaveProfile(event) {
-    event.preventDefault();
-    setSaveError('');
-    setSaveNotice('');
-    setSaving(true);
-    try {
-      // Existing Flask endpoint expects application/json, NOT FormData.
-      const response = await fetch('http://localhost:5000/profile/me', {
+  
+async function handleSaveProfile(event) {
+  event.preventDefault();
+  setSaveError('');
+  setSaveNotice('');
+  setSaving(true);
+
+  try {
+    // Create form data containing profile details and images.
+    const formData = new FormData();
+
+    formData.append('username', editForm.username);
+    formData.append('bio', editForm.bio);
+
+    // Include cropped profile picture, if changed.
+    if (editForm.profilePictureFile) {
+      formData.append(
+        'profile_picture',
+        editForm.profilePictureFile
+      );
+    }
+
+    // Include cropped banner picture, if changed.
+    if (editForm.bannerPictureFile) {
+      formData.append(
+        'banner_picture',
+        editForm.bannerPictureFile
+      );
+    }
+
+    // Send profile changes to Flask.
+    const response = await fetch(
+      'http://localhost:5000/profile/me',
+      {
         method: 'PATCH',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: editForm.username,
-          bio: editForm.bio,
-        }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.error || 'Could not save profile.');
+        body: formData,
       }
-      if (!result.profile) {
-        throw new Error('The server did not return an updated profile.');
-      }
-      const imagesNotUploaded = Boolean(
-        editForm.profilePictureFile || editForm.bannerPictureFile,
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || 'Could not save profile.'
       );
-      setProfile(result.profile);
-      releaseDraftPreviews();
-      setIsEditing(false);
-      setSaveNotice(imagesNotUploaded
-        ? 'Username and bio saved. Selected pictures were NOT uploaded; image uploads require backend support.'
-        : 'Profile saved.');
-    } catch (error) {
-      setSaveError(error.message || 'Could not save profile.');
-    } finally {
-      setSaving(false);
     }
+
+    if (!result.profile) {
+      throw new Error(
+        'The server did not return an updated profile.'
+      );
+    }
+
+    // Update profile using the saved database values.
+    setProfile(result.profile);
+
+    // Clean up temporary image previews.
+    releaseDraftPreviews();
+
+    setIsEditing(false);
+    setSaveNotice('Profile saved successfully!');
+
+  } catch (error) {
+    setSaveError(
+      error.message || 'Could not save profile.'
+    );
+  } finally {
+    setSaving(false);
   }
+}
+
 
   if (loading) {
     return <main className="profile-page"><p role="status">Loading profile…</p></main>;
@@ -586,6 +620,7 @@ export default function Profile() {
             <strong>{profile.posts}</strong>
             <span>Posts</span>
           </div>
+
         </section>
       </section>
 
@@ -735,7 +770,7 @@ export default function Profile() {
               </div>
 
               {(editForm.profilePictureFile || editForm.bannerPictureFile) && (
-                <p role="status">Picture changes are preview-only. They won't be uploaded or saved yet.</p>
+                <p role="status">Selected pictures will upload when you press Save.</p>
               )}
               {saveError && <p role="alert">{saveError}</p>}
               <div className="profile-edit-actions">
