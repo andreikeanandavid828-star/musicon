@@ -18,7 +18,6 @@ import ProfileButton from './ProfileButton.jsx';
 import Albums from './Albums.jsx';
 import AlbumButton from './AlbumButton.jsx';
 import Upload from './Upload.jsx';
-import UploadButton from './UploadButton.jsx';
 import { songs } from './songs.jsx';
 import Button from './Button.jsx';
 import { DEFAULT_PALETTE, readPalette, readDefaultMode, savePalette, saveDefaultMode } from './Appearance.js';
@@ -156,7 +155,6 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
-        <UploadButton />
         <AlbumButton />
         <LightSwitch
           isDarkMode={isDarkMode}
@@ -191,7 +189,14 @@ function AppShell() {
             />
           }
         />
-        <Route path="/upload" element={<Upload />} />
+        <Route
+          path="/upload"
+          element={
+            <Upload
+              onPostSong={(song) => setUserSongs((currentSongs) => [...currentSongs, song])}
+            />
+          }
+        />
       </Routes>
 
       {!isAuthPage && (

@@ -3,18 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import Button from './Button.jsx';
 
 export default function Upload({ onPostSong }) {
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [error, setError] = useState('');
 	const dialogRef = useRef(null);
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const dialog = dialogRef.current;
-		if (!dialog) return;
-
-		if (isDialogOpen && !dialog.open) dialog.showModal();
-		if (!isDialogOpen && dialog.open) dialog.close();
-	}, [isDialogOpen]);
+		if (dialog && !dialog.open) dialog.showModal();
+	}, []);
 
 	function handlePostSong(event) {
 		event.preventDefault();
@@ -32,27 +28,23 @@ export default function Upload({ onPostSong }) {
 			title: songName,
 			artist: artistName,
 		});
-		setIsDialogOpen(false);
 		navigate('/');
 	}
 
 	return (
 		<main className="upload-page">
-			<Button className="button--primary upload-button" onClick={() => setIsDialogOpen(true)}>
-				Upload a song
-			</Button>
 			<dialog
 				ref={dialogRef}
 				className="tierlist-song-picker album-dialog"
 				aria-labelledby="song-dialog-title"
-				onClose={() => setIsDialogOpen(false)}
+				onClose={() => navigate('/')}
 			>
 				<div className="tierlist-song-picker__header">
 					<div>
 						<h2 id="song-dialog-title">Upload a song</h2>
 						<p>Add a song and artist to the Home catalog.</p>
 					</div>
-					<Button type="button" onClick={() => setIsDialogOpen(false)}>
+					<Button type="button" onClick={() => dialogRef.current?.close()}>
 						Close
 					</Button>
 				</div>
