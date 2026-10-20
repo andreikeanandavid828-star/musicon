@@ -109,7 +109,7 @@ def get_my_profile():
             .execute()
         )
 
-        if not user_response.data:
+        if not user_response or not user_response.data:
             return jsonify({"error": "User not found"}), 404
 
         # Retrieve profile information
@@ -122,7 +122,8 @@ def get_my_profile():
             .execute()
         )
 
-        if not profile_response.data:
+        # Safely check if response is None or data is empty
+        if not profile_response or not profile_response.data:
             return jsonify({"error": "Profile not found"}), 404
 
         return jsonify({
@@ -138,8 +139,8 @@ def get_my_profile():
             "error": "Failed to retrieve profile"
         }), 500
 
-
 @profile.route("/me", methods=["PATCH"])
+
 def update_my_profile():
     try:
         user = get_authenticated_user()
@@ -255,6 +256,7 @@ def update_my_profile():
         return jsonify({
             "error": "Failed to update profile"
         }), 500
+    
 def update_my_profile():
     user = get_authenticated_user()
 
