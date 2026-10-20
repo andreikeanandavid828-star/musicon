@@ -1116,24 +1116,53 @@
 
 
 /* Footer music player. */
-.footer-panel {
+.footer-player-shell {
   position: fixed;
   z-index: 10;
   right: 20px;
   bottom: 20px;
   left: calc(var(--sidebar-width) + 40px);
+  display: flex;
+  max-width: 1086px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.footer-collapse-toggle {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.footer-panel {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 24px;
-  max-width: 1086px;
-  margin: 0 auto;
+  margin: 0;
   padding: 16px 20px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
+  pointer-events: auto;
+  transition: transform 0.35s ease;
+}
+
+.footer-panel--collapsed {
+  transform: translateY(calc(100% + 60px));
 }
 
 .footer-track {
@@ -1350,17 +1379,27 @@
   }
 
   .footer-panel {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .footer-player-shell {
     right: 12px;
     bottom: 12px;
     left: 12px;
-    gap: 12px;
-    padding: 14px 16px;
   }
 
   .footer-artwork {
     width: 44px;
     height: 44px;
     flex-basis: 44px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-panel {
+    transition: none;
   }
 }
 
