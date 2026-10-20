@@ -76,6 +76,201 @@
 }
 
 
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  flex: 0 0 auto;
+  margin-top: auto;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: #2196f3;
+  transition: background-color 0.4s;
+}
+
+.switch input:checked + .slider {
+  background-color: #000;
+}
+
+.switch input:focus-visible + .slider {
+  outline: 2px solid #2196f3;
+  outline-offset: 3px;
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.sun-moon {
+  position: absolute;
+  z-index: 2;
+  bottom: 4px;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #ffeb3b;
+  transition: transform 0.4s, background-color 0.4s;
+}
+
+.sun-moon::before {
+  position: absolute;
+  inset: -8px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  content: '';
+}
+
+.moon-dot {
+  position: absolute;
+  z-index: 4;
+  border-radius: 50%;
+  background: #888;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+#moon-dot-1 {
+  top: 3px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+}
+
+#moon-dot-2 {
+  top: 10px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+}
+
+#moon-dot-3 {
+  top: 18px;
+  left: 16px;
+  width: 3px;
+  height: 3px;
+}
+
+.cloud {
+  position: absolute;
+  z-index: 1;
+  fill: #eee;
+  animation: cloud-move 6s infinite;
+}
+
+.cloud-dark {
+  fill: #ccc;
+  animation-delay: 1s;
+}
+
+#cloud-1,
+#cloud-4 {
+  top: 15px;
+  left: 30px;
+  width: 40px;
+}
+
+#cloud-2,
+#cloud-5 {
+  top: 10px;
+  left: 44px;
+  width: 20px;
+}
+
+#cloud-3,
+#cloud-6 {
+  top: 24px;
+  left: 18px;
+  width: 30px;
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  transform: translateY(-32px);
+  opacity: 0;
+  transition: transform 0.4s, opacity 0.4s;
+}
+
+.star {
+  position: absolute;
+  fill: #fff;
+  animation: star-twinkle 2s infinite;
+  transition: transform 0.4s;
+}
+
+#star-1 {
+  top: 2px;
+  left: 3px;
+  width: 20px;
+  animation-delay: 0.3s;
+}
+
+#star-2 {
+  top: 16px;
+  left: 3px;
+  width: 6px;
+}
+
+#star-3 {
+  top: 20px;
+  left: 10px;
+  width: 12px;
+  animation-delay: 0.6s;
+}
+
+#star-4 {
+  top: 0;
+  left: 18px;
+  width: 18px;
+  animation-delay: 1.3s;
+}
+
+.switch input:checked + .slider .sun-moon {
+  transform: translateX(26px);
+  background-color: #fff;
+  animation: rotate-center 0.6s ease-in-out both;
+}
+
+.switch input:checked + .slider .moon-dot,
+.switch input:checked + .slider .stars {
+  opacity: 1;
+}
+
+.switch input:checked + .slider .stars {
+  transform: translateY(0);
+}
+
+@keyframes cloud-move {
+  0%, 100% { transform: translateX(0); }
+  40% { transform: translateX(4px); }
+  80% { transform: translateX(-4px); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.2); }
+  80% { transform: scale(0.8); }
+}
+
+@keyframes rotate-center {
+  from { transform: translateX(26px) rotate(0); }
+  to { transform: translateX(26px) rotate(360deg); }
+}
+
 .app-sidebar>.button:last-child {
   margin-top: auto;
 }
@@ -1092,24 +1287,53 @@
 
 
 /* Footer music player. */
-.footer-panel {
+.footer-player-shell {
   position: fixed;
   z-index: 10;
   right: 20px;
   bottom: 20px;
   left: calc(var(--sidebar-width) + 40px);
+  display: flex;
+  max-width: 1086px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.footer-collapse-toggle {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.footer-panel {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 24px;
-  max-width: 1086px;
-  margin: 0 auto;
+  margin: 0;
   padding: 16px 20px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
+  pointer-events: auto;
+  transition: transform 0.35s ease;
+}
+
+.footer-panel--collapsed {
+  transform: translateY(calc(100% + 60px));
 }
 
 .footer-track {
@@ -1326,17 +1550,27 @@
   }
 
   .footer-panel {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .footer-player-shell {
     right: 12px;
     bottom: 12px;
     left: 12px;
-    gap: 12px;
-    padding: 14px 16px;
   }
 
   .footer-artwork {
     width: 44px;
     height: 44px;
     flex-basis: 44px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-panel {
+    transition: none;
   }
 }
 
