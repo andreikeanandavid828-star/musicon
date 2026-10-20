@@ -15,8 +15,9 @@ import ForumButton from './ForumButton.jsx';
 import SignupButton from './SignupButton.jsx';
 import Profile from './Profile.jsx';
 import ProfileButton from './ProfileButton.jsx';
+import Albums from './Albums.jsx';
+import AlbumButton from './AlbumButton.jsx';
 import Upload from './Upload.jsx';
-import UploadButton from './UploadButton.jsx';
 import { songs } from './songs.jsx';
 import Button from './Button.jsx';
 import { DEFAULT_PALETTE, readPalette, readDefaultMode, savePalette, saveDefaultMode } from './Appearance.js';
@@ -100,6 +101,9 @@ function AppShell() {
     }
   }
 
+  const [userSongs, setUserSongs] = useState([]);
+  const [albums, setAlbums] = useState([]);
+  const availableSongs = [...songs, ...userSongs];
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   const handleSongSelection = (song) => setSelectedSong({ ...song });
@@ -151,7 +155,7 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
-        <UploadButton />
+        <AlbumButton />
         <LightSwitch
           isDarkMode={isDarkMode}
           toggleTheme={() => setIsDarkMode((current) => !current)}
@@ -163,6 +167,7 @@ function AppShell() {
           path="/"
           element={
             <Home
+              songs={availableSongs}
               selectedSong={selectedSong}
               onSelectSong={handleSongSelection}
             />
@@ -184,7 +189,14 @@ function AppShell() {
             />
           }
         />
-        <Route path="/upload" element={<Upload />} />
+        <Route
+          path="/upload"
+          element={
+            <Upload
+              onPostSong={(song) => setUserSongs((currentSongs) => [...currentSongs, song])}
+            />
+          }
+        />
       </Routes>
 
       {!isAuthPage && (
