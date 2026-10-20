@@ -18,4 +18,3 @@ def get_authenticated_user():
         return user_res.user if user_res else None
     except Exception:
         return None
-    
