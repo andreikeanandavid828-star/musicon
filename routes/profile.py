@@ -75,6 +75,121 @@ def get_my_profile():
 
 @profile.route("/me", methods=["PATCH"])
 def update_my_profile():
+    try:
+        user = get_authenticated_user()
+
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        data = request.get_json(silent=True)
+
+        if not isinstance(data, dict):
+            return jsonify({
+                "error": "A valid JSON object is required"
+            }), 400
+
+        username = data.get("username")
+        bio = data.get("bio")
+
+        if username is not None:
+            if not isinstance(username, str):
+                return jsonify({
+                    "error": "Username must be a string"
+                }), 400
+
+            username = username.strip()
+
+            if not 3 <= len(username) <= 30:
+                return jsonify({
+                    "error": "Username must be 3-30 characters"
+                }), 400
+
+        if bio is not None:
+            if not isinstance(bio, str):
+                return jsonify({
+                    "error": "Bio must be a string"
+                }), 400
+
+            bio = bio.strip()
+
+            if len(bio) > 300:
+                return jsonify({
+                    "error": "Bio cannot exceed 300 characters"
+                }), 400
+
+        if username is None and bio is None:
+            return jsonify({
+                "error": "No fields provided to update"
+            }), 400
+
+        # Verify both records exist before updating
+        user_data = get_first_record(
+            "users",
+            "id, username, is_admin, is_artist",
+            "id",
+            user.id
+        )
+
+        if user_data is None:
+            return jsonify({"error": "User not found"}), 404
+
+        profile_data = get_first_record(
+            "profiles",
+            "*",
+            "user_id",
+            user.id
+        )
+
+        if profile_data is None:
+            return jsonify({"error": "Profile not found"}), 404
+
+        # Update username
+        if username is not None:
+            supabase.table("users").update({
+                "username": username
+            }).eq("id", str(user.id)).execute()
+
+        # Update bio
+        if bio is not None:
+            supabase.table("profiles").update({
+                "bio": bio
+            }).eq("user_id", str(user.id)).execute()
+
+        # Retrieve updated information
+        user_data = get_first_record(
+            "users",
+            "id, username, is_admin, is_artist",
+            "id",
+            user.id
+        )
+
+        profile_data = get_first_record(
+            "profiles",
+            "*",
+            "user_id",
+            user.id
+        )
+
+        if user_data is None or profile_data is None:
+            return jsonify({
+                "error": "Updated profile could not be retrieved"
+            }), 500
+
+        return jsonify({
+            "message": "Profile updated successfully",
+            "profile": serialize_profile(
+                user_data,
+                profile_data
+            )
+        }), 200
+
+    except Exception:
+        current_app.logger.exception("UPDATE PROFILE ERROR")
+
+        return jsonify({
+            "error": "Failed to update profile"
+        }), 500
+def update_my_profile():
     user = get_authenticated_user()
 
     if not user:
