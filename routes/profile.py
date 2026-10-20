@@ -114,12 +114,30 @@ def get_my_profile():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        user_data, profile_data = get_profile_records(user.id)
+        # Retrieve user information
+        user_response = (
+            supabase
+            .table("users")
+            .select("id, username, is_admin, is_artist")
+            .eq("id", user.id)
+            .maybe_single()
+            .execute()
+        )
 
-        if user_data is None:
+        if not user_response or not user_response.data:
             return jsonify({"error": "User not found"}), 404
 
-        if profile_data is None:
+        # Retrieve profile information
+        profile_response = (
+            supabase
+            .table("profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .maybe_single()
+            .execute()
+        )
+
+        if not profile_response or not profile_response.data:
             return jsonify({"error": "Profile not found"}), 404
         
         # Count the user's posts dynamically from the posts table
@@ -132,15 +150,14 @@ def get_my_profile():
         )
         total_posts = post_count_res.count if post_count_res.count is not None else 0
 
-        return jsonify({
-            "profile": serialize_profile(user_data, profile_data)
-        }), 200
-
-    except Exception:
-        current_app.logger.exception("GET PROFILE ERROR")
-        return jsonify({
-            "error": "Failed to retrieve profile"
-        }), 500
+        # Serialize profile and inject the real post count 
+        profile_data = serialize_profile(
+            user_response.data,
+            profile_response.data
+        )
+        profile_data["posts"] = total_posts
+        
+        return jsonify({"profile": profile_data}), 200
 
     except Exception:
         current_app.logger.exception("GET PROFILE ERROR")
