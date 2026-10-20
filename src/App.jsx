@@ -123,7 +123,6 @@ function AppShell() {
         <hr className="app-sidebar__divider" />
         <TierlistButton />
         <ForumButton />
-        <ProfileButton />
         <UploadButton />
         <LightSwitch
           isDarkMode={isDarkMode}
