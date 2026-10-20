@@ -121,6 +121,16 @@ def get_my_profile():
 
         if profile_data is None:
             return jsonify({"error": "Profile not found"}), 404
+        
+        # Count the user's posts dynamically from the posts table
+        post_count_res = (
+            supabase
+            .table("posts")
+            .select("*", count="exact", head=True)
+            .eq("user_id", user.id)
+            .execute()
+        )
+        total_posts = post_count_res.count if post_count_res.count is not None else 0
 
         return jsonify({
             "profile": serialize_profile(user_data, profile_data)
@@ -132,8 +142,14 @@ def get_my_profile():
             "error": "Failed to retrieve profile"
         }), 500
 
+    except Exception:
+        current_app.logger.exception("GET PROFILE ERROR")
+        return jsonify({
+            "error": "Failed to retrieve profile"
+        }), 500
 
 @profile.route("/me", methods=["PATCH"])
+
 def update_my_profile():
     user = get_authenticated_user()
 

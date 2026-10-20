@@ -6,6 +6,7 @@ from flask_cors import CORS
 from routes.auth import auth 
 from routes.profile import profile
 from routes.forum import posts_bp
+from routes.albums import albums_bp
 
 app = Flask(__name__)
 
@@ -22,7 +23,7 @@ CORS(
 app.register_blueprint(auth, url_prefix="/api/auth")
 app.register_blueprint(profile, url_prefix="/profile") 
 app.register_blueprint(posts_bp, url_prefix="/api/posts")
-#app.register_blueprint()
+app.register_blueprint(albums_bp, url_prefix="/api/albums")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
