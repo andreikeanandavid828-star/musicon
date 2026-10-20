@@ -44,37 +44,59 @@
 }
 
 .app-sidebar .button {
+  display: flex;
   width: 100%;
-  border-radius: 6px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 550;
+  text-align: left;
+  text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
+
+.app-sidebar .button:hover {
+  background: var(--nav-hover-bg);
+  color: var(--heading);
+}
+
+.app-sidebar .button[aria-current='page'] {
+  border-color: var(--border);
+  background: var(--nav-active-bg);
+  color: var(--heading);
+  font-weight: 700;
+}
+
 
 .app-sidebar>.button:last-child {
   margin-top: auto;
 }
 
+/* Old pill gradient replaced with one reusable sidebar nav style. */
 .app-sidebar .button--sidebar-gradient {
-  max-width: 150px;
-  height: 60px;
-  padding: 0;
-  border: 0;
-  border-radius: 50px;
-  background-image: linear-gradient(135deg, #feb692 0%, #ea5455 100%);
-  box-shadow: 0 20px 30px -6px rgba(238, 103, 97, 0.5);
-  color: #fff;
-  font-family: "Dosis", sans-serif;
-  font-size: 20px;
-  text-decoration: none;
-  transition: all 0.3s ease-in-out;
+  max-width: none;
+  height: auto;
+  background-image: none;
+  font-family: inherit;
 }
 
+
 .app-sidebar .button--sidebar-gradient:hover {
-  transform: translateY(3px);
+  transform: none;
   box-shadow: none;
 }
 
-.app-sidebar .button--sidebar-gradient:active {
-  opacity: 0.5;
-}
+
+.app-sidebar .button--sidebar-gradient:active { opacity: .8; }
+
 
 .app-sidebar__divider {
   width: 100%;
@@ -126,9 +148,12 @@
 }
 
 .button--signup {
-  background: #7b2cbf;
-  color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
 }
+.button--signup:hover { border-color: var(--accent-hover); background: var(--accent-hover); color: var(--accent-on); }
+
 
 .button:hover {
   border-color: var(--muted);
@@ -138,7 +163,7 @@
 .back-link:focus-visible,
 .form-input:focus-visible,
 .footer-volume:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -150,31 +175,18 @@
   color: var(--primary-text);
 }
 
+/* Home is the brand link, but uses the same theme-aware navigation system. */
 .button--homebutton {
-  --bg: #000;
-  --hover-bg: #ff90e8;
-  --hover-text: #000;
-  padding: 0.8em 2em;
-  border: 1px solid var(--bg);
-  border-radius: 4px;
-  background: var(--bg);
-  color: #fff;
-  cursor: pointer;
-  transition: 0.2s;
+  font-weight: 800;
+  letter-spacing: .02em;
 }
 
-.button--homebutton:hover {
-  transform: translate(-0.25rem, -0.25rem);
-  border-color: var(--bg);
-  background: var(--hover-bg);
-  box-shadow: 0.25rem 0.25rem var(--bg);
-  color: var(--hover-text);
-}
 
-.button--homebutton:active {
-  transform: translate(0);
-  box-shadow: none;
-}
+.button--homebutton:hover { transform: none; box-shadow: none; }
+
+
+.button--homebutton:active { transform: none; box-shadow: none; }
+
 
 /* Home and login pages. */
 .home-page h1,
@@ -228,11 +240,11 @@
 .song-list__item:hover,
 .song-list__item[aria-pressed='true'] {
   transform: translateY(-1px);
-  border-color: #7b2cbf;
+  border-color: var(--accent);
 }
 
 .song-list__item:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -406,7 +418,7 @@
 }
 
 .forum-post-toggle:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -844,11 +856,11 @@
 
 .tierlist-song-picker__option:not(:disabled):hover {
   transform: translateY(-2px);
-  border-color: #7b2cbf;
+  border-color: var(--accent);
 }
 
 .tierlist-song-picker__option:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -980,7 +992,7 @@
 
 .footer-empty-link:focus-visible {
   border-radius: 2px;
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
@@ -1080,8 +1092,9 @@
   }
 
   .app-sidebar .button--sidebar-gradient {
-    height: 48px;
-    font-size: 18px;
+    min-height: 44px;
+    height: auto;
+    font-size: .8rem;
   }
 
   .home-page h1 {
@@ -1310,7 +1323,7 @@
 
 .profile-tab:focus-visible,
 .profile-back-link:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -1405,7 +1418,7 @@
 .profile-edit-modal input:focus-visible,
 .profile-edit-modal textarea:focus-visible,
 .profile-crop-dialog input:focus-visible {
-  outline: 2px solid #aa3bff;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -1574,4 +1587,164 @@
   .profile-tab {
     padding: 0.75rem;
   }
+}
+
+/* Theme-aware shared controls. Existing components keep their JSX. */
+.app-sidebar .button--homebutton { color: var(--accent); font-weight: 800; }
+.app-sidebar .button--homebutton[aria-current='page'] { color: var(--heading); }
+.button--primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.button--secondary { border-color: var(--border); background: var(--control-bg); color: var(--control-text); }
+.button--secondary:hover { border-color: var(--accent); background: var(--nav-hover-bg); }
+.profile-tab--active { border-bottom-color: var(--accent); }
+.profile-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .7rem; }
+/* Keep the picker input's focus ring theme-aware. */
+:where(button, a, input, textarea, select):focus-visible { outline-color: var(--focus-ring); }
+
+
+/* Themed music player volume slider */
+.footer-volume {
+  height: 6px;
+  border-radius: 99px;
+  appearance: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--volume-fill),
+    var(--border) var(--volume-fill),
+    var(--border) 100%
+  );
+}
+
+/* Chrome, Edge, Safari */
+.footer-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+/* Firefox */
+.footer-volume::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.footer-volume::-moz-range-track {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--border);
+}
+
+.footer-volume::-moz-range-progress {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--accent);
+}
+
+
+/* Account button and dropdown */
+.account-menu {
+  position: relative;
+  text-align: left;
+}
+
+.account-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.account-menu__trigger:hover,
+.account-menu__trigger[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: var(--nav-hover-bg);
+}
+
+.account-menu__trigger:focus-visible,
+.account-menu__list a:focus-visible,
+.account-menu__list button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.account-menu__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.account-menu__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-menu__username {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.account-menu__list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: 190px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.account-menu__list a,
+.account-menu__list button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-menu__list a:hover,
+.account-menu__list button:hover {
+  background: var(--nav-hover-bg);
+  color: var(--heading);
 }

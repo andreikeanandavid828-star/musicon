@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from './Button.jsx';
-
+import PersonalizeModal from './PersonalizeModal.jsx';
 function CropEditor({ source, type, onApply, onCancel }) {
   const viewportRef = useRef(null);
   const imageRef = useRef(null);
@@ -300,9 +300,33 @@ function CropEditor({ source, type, onApply, onCancel }) {
   );
 }
 
-export default function Profile() {
+export default function Profile({
+  paletteId,
+  defaultMode,
+  currentMode,
+  onPaletteChange,
+  onDefaultModeChange,
+}) {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
+  const [isPersonalizing, setIsPersonalizing] = useState(false);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Open Personalize when requested by the account dropdown.
+  useEffect(() => {
+    if (location.state?.openPersonalize) {
+      setIsPersonalizing(true);
+
+      // Clear the request so it doesn't reopen on refresh.
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [location.state, location.pathname, navigate]);
+
   const [cropEditor, setCropEditor] = useState(null);
 
   const [profile, setProfile] = useState(null);
@@ -577,12 +601,14 @@ async function handleSaveProfile(event) {
           <p className="profile-bio">{profile.bio}</p>
 
           {isOwnProfile ? (
-            <Button
-              className="button--secondary"
-              onClick={openEditProfile}
-            >
-              Edit profile
-            </Button>
+            <div className="profile-actions">
+              <Button className="button--secondary" onClick={openEditProfile}>
+                Edit profile
+              </Button>
+              <Button className="button--secondary" onClick={() => setIsPersonalizing(true)}>
+                Personalize
+              </Button>
+            </div>
           ) : (
             <Button className="button--primary">
               Follow
@@ -798,6 +824,17 @@ async function handleSaveProfile(event) {
           type={cropEditor.type}
           onApply={applyCroppedImage}
           onCancel={cancelCrop}
+        />
+      )}
+
+      {isPersonalizing && (
+        <PersonalizeModal
+          onClose={() => setIsPersonalizing(false)}
+          paletteId={paletteId}
+          defaultMode={defaultMode}
+          currentMode={currentMode}
+          onPaletteChange={onPaletteChange}
+          onDefaultModeChange={onDefaultModeChange}
         />
       )}
     </main>

@@ -19,9 +19,25 @@ import Upload from './Upload.jsx';
 import UploadButton from './UploadButton.jsx';
 import { songs } from './songs.jsx';
 import Button from './Button.jsx';
+import { DEFAULT_PALETTE, readPalette, readDefaultMode, savePalette, saveDefaultMode } from './Appearance.js';
 
 function AppShell() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Color family and preferred brightness are independent settings.
+  // only logged in users can get customized color families and brightness preferences. Guests always see Original Musicon / Light.
+  const [paletteId, setPaletteId] = useState(readPalette);
+  const [defaultMode, setDefaultMode] = useState(readDefaultMode);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  function changePalette(id) {
+    savePalette(id);
+    setPaletteId(id);
+  }
+
+  function changeDefaultMode(mode) {
+    saveDefaultMode(mode);
+    setDefaultMode(mode);
+    setIsDarkMode(mode === 'dark');
+  }
   const [selectedSong, setSelectedSong] = useState(null);
   // Treat the backend's HttpOnly cookie as the source of truth.
   const [authStatus, setAuthStatus] = useState('checking');
@@ -39,8 +55,12 @@ function AppShell() {
         credentials: 'include',
       });
       if (response.status === 401) {
+        // Don't erase the saved preference: guests simply see Original Musicon.
+        setIsDarkMode(true);
         setAuthStatus('guest');
       } else if (response.ok || response.status === 404) {
+        // Restore the saved brightness once the existing session is confirmed.
+        setIsDarkMode(readDefaultMode() === 'dark');
         setAuthStatus('authenticated');
       } else {
         setAuthStatus('error');
@@ -56,6 +76,10 @@ function AppShell() {
 
   function handleLoggedIn() {
     setAuthError('');
+    // Restore previous browser preferences; login itself doesn't change them.
+    setPaletteId(readPalette());
+    setDefaultMode(readDefaultMode());
+    setIsDarkMode(readDefaultMode() === 'dark');
     setAuthStatus('authenticated');
   }
 
@@ -67,6 +91,8 @@ function AppShell() {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Logout failed');
+      // Show the guest site in Original Musicon / Light without deleting preferences.
+      setIsDarkMode(true);
       setAuthStatus('guest');
       navigate('/');
     } catch {
@@ -87,9 +113,14 @@ function AppShell() {
   };
 
   useEffect(() => {
-    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
-    return () => { delete document.documentElement.dataset.theme; };
-  }, [isDarkMode]);
+    const root = document.documentElement;
+    // Guest pages always use the original color family. Only authenticated
+    // users see their saved palette; checking/error states use original light.
+    root.dataset.palette = authStatus === 'authenticated' ? paletteId : DEFAULT_PALETTE;
+    root.dataset.theme = (authStatus === 'checking' || authStatus === 'error')
+      ? 'dark'
+      : (isDarkMode ? 'dark' : 'light');
+  }, [authStatus, isDarkMode, paletteId]);
 
   return (
     <div className="app-container">
@@ -100,10 +131,7 @@ function AppShell() {
               <><LoginButton /><SignupButton /></>
             )}
             {authStatus === 'authenticated' && (
-              <>
-                <ProfileButton />
-                <Button onClick={handleLogout}>Log out</Button>
-              </>
+              <ProfileButton onLogout={handleLogout} />
             )}
             {authStatus === 'checking' && <span role="status">Checking session…</span>}
             {authStatus === 'error' && (
@@ -144,7 +172,18 @@ function AppShell() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/profile"
+          element={
+            <Profile
+              paletteId={paletteId}
+              defaultMode={defaultMode}
+              currentMode={isDarkMode ? 'dark' : 'light'}
+              onPaletteChange={changePalette}
+              onDefaultModeChange={changeDefaultMode}
+            />
+          }
+        />
         <Route path="/upload" element={<Upload />} />
       </Routes>
 
