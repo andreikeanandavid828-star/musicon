@@ -125,13 +125,25 @@ def get_my_profile():
         # Safely check if response is None or data is empty
         if not profile_response or not profile_response.data:
             return jsonify({"error": "Profile not found"}), 404
+        
+        # ----> NEW: Count the user's posts dynamically from the posts table
+        post_count_res = (
+            supabase
+            .table("posts")
+            .select("*", count="exact", head=True)
+            .eq("user_id", user.id)
+            .execute()
+        )
+        total_posts = post_count_res.count if post_count_res.count is not None else 0
 
-        return jsonify({
-            "profile": serialize_profile(
-                user_response.data,
-                profile_response.data
-            )
-        }), 200
+        # Serialize profile and inject the real post count 
+        profile_data = serialize_profile(
+            user_response.data,
+            profile_response.data
+        )
+        profile_data["posts"] = total_posts
+        
+        return jsonify({"profile": profile_data}), 200
 
     except Exception:
         current_app.logger.exception("GET PROFILE ERROR")
