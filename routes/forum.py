@@ -197,4 +197,22 @@ def delete_comment(comment_id):
         return jsonify({'message': 'Comment deleted successfully'}), 200
     except Exception as e:
         print("DELETE COMMENT ERROR:", e)
-        return jsonify({'error': str(r)}), 500
+        return jsonify({'error': str(e)}), 500
+    
+@posts_bp.route('/me', methods=['GET', 'OPTIONS'], strict_slashes=False)
+def get_my_posts():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unathorized'}), 401
+    
+    try:
+        response = supabase.table('posts').select(
+            '*, albums(*)'
+        ).eq('user_id', user.id).order('created_at', desc=True).execute()
+
+        return jsonify({'posts': response.data}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500 
