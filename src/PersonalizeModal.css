@@ -1,0 +1,82 @@
+/* Theme-aware profile popup; inherits ALL colors from index.css. */
+.personalize-modal {
+  position: fixed;
+  width: min(800px, calc(100vw - 24px));
+  max-height: min(86vh, 920px);
+  margin: auto;
+  overflow: auto;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+.personalize-modal::backdrop { background: rgba(0, 0, 0, .66); }
+.personalize-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.personalize-header h2 { margin: 0; font-size: 1.35rem; color: var(--heading); }
+.personalize-header p { margin: .35rem 0 0; font-size: .88rem; color: var(--muted); }
+.personalize-close {
+  flex: 0 0 auto;
+  width: 36px; height: 36px;
+  padding: 0; border: 1px solid var(--border); border-radius: 9px;
+  background: var(--control-bg); color: var(--control-text);
+  font-size: 1.35rem; cursor: pointer;
+}
+.personalize-close:hover { background: var(--nav-hover-bg); }
+.personalize-section { margin-top: 1.35rem; }
+.personalize-section h3 { margin: 0 0 .2rem; color: var(--heading); font-size: 1rem; }
+.personalize-section > p { margin: 0 0 .85rem; color: var(--muted); font-size: .82rem; }
+.personalize-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .7rem; }
+.personalize-palette {
+  display: flex; flex-direction: column; gap: .35rem;
+  min-width: 0; padding: .55rem;
+  border: 2px solid var(--border); border-radius: 12px;
+  background: var(--control-bg); color: var(--control-text); cursor: pointer;
+  text-align: left;
+}
+.personalize-palette:hover { border-color: var(--accent); }
+.personalize-palette.is-selected { border-color: var(--accent); background: var(--nav-hover-bg); }
+.personalize-mini-site {
+  display: flex; width: 100%; height: 68px; overflow: hidden;
+  border-radius: 8px; background: var(--sample-pale);
+  border: 1px solid color-mix(in srgb, var(--sample-middle) 30%, transparent);
+}
+.personalize-mini-sidebar { width: 25%; background: var(--sample-deep); }
+.personalize-mini-content { flex: 1; display: flex; flex-direction: column; gap: 5px; padding: 10px; }
+.personalize-mini-title { width: 66%; height: 6px; border-radius: 99px; background: var(--sample-dark); }
+.personalize-mini-card { width: 100%; flex: 1; border-radius: 4px; background: var(--sample-soft); }
+.personalize-mini-button { width: 55%; height: 8px; border-radius: 4px; background: var(--sample-middle); }
+.personalize-swatches { display: flex; width: 100%; height: 9px; border-radius: 3px; overflow: hidden; }
+.personalize-swatches span { flex: 1; }
+.personalize-palette-name { font-size: .82rem; font-weight: 700; overflow-wrap: anywhere; }
+.personalize-palette small { font-size: .7rem; color: var(--muted); }
+.personalize-selected { color: var(--accent); font-size: .74rem; font-weight: 700; }
+.personalize-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.personalize-mode {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 58px;
+  border: 2px solid var(--border); border-radius: 11px;
+  background: var(--control-bg); color: var(--control-text);
+  font: inherit; cursor: pointer;
+}
+.personalize-mode span { font-size: 1.25rem; }
+.personalize-mode.is-selected { border-color: var(--accent); background: var(--nav-hover-bg); font-weight: 700; }
+.personalize-override-note { margin-top: .8rem !important; }
+.personalize-footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem;
+  margin-top: 1.5rem; padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.personalize-footer > span { font-size: .75rem; color: var(--muted); }
+.personalize-actions { display: flex; align-items: center; gap: .6rem; }
+.personalize-modal button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+@media (max-width: 680px) {
+  .personalize-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .personalize-modal { padding: 14px; }
+}
+@media (max-width: 420px) {
+  .personalize-grid { grid-template-columns: 1fr; }
+  .personalize-footer { justify-content: flex-end; }
+}

@@ -95,6 +95,7 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
           </span>
         </Button>
       </div>
+      
       <input
         className="footer-volume"
         type="range"
@@ -103,8 +104,10 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
         step="0.01"
         value={volume}
         aria-label="Volume"
+        style={{ '--volume-fill': `${volume * 100}%` }}
         onChange={(event) => setVolume(Number(event.target.value))}
       />
+
       <audio
         ref={audioRef}
         src={selectedSong?.src}

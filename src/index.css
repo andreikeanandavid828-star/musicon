@@ -1,37 +1,157 @@
-/* Global palette and document defaults. The toggle sets data-theme. */
+/* Musicon theme tokens. Two independent attributes:
+   data-palette controls color family; data-theme controls brightness.
+   Add new palettes by defining five --tone-* values. */
+/* Original Musicon (light): white background with violet and blue accents. */
 :root {
   font: 18px/1.45 system-ui, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light;
-  --page-bg: #fff;
-  --text: #212529;
-  --heading: #08060d;
-  --muted: #6b6375;
-  --border: #e5e4e7;
-  --surface: rgba(255, 255, 255, 0.94);
-  --control-bg: #fff;
-  --control-text: #08060d;
-  --primary-bg: #08060d;
-  --primary-text: #fff;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --page-bg: #ffffff;
+  --surface: color-mix(in srgb, #9b34f0 5%, #ffffff);
+  --text: #120a2e;
+  --heading: #0a0f23;
+  --muted: color-mix(in srgb, #25164a 76%, #ffffff);
+  --border: color-mix(in srgb, #6a0dad 29%, #ffffff);
+  --control-bg: color-mix(in srgb, #9b34f0 8%, #ffffff);
+  --control-text: #120a2e;
+  --accent: #6a0dad;
+  --accent-hover: #1a2bff;
+  --accent-on: #ffffff;
+  --focus-ring: #d200ff;
+  --primary-bg: var(--accent);
+  --primary-text: var(--accent-on);
+  --nav-hover-bg: color-mix(in srgb, #9b34f0 12%, #ffffff);
+  --nav-active-bg: color-mix(in srgb, #00e5ff 22%, #ffffff);
+  --shadow: 0 10px 30px rgba(18, 10, 46, 0.12);
   background: var(--page-bg);
 }
+
+/* Original Musicon (dark): black background and rich indigo surfaces. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --page-bg: #07070D;
-  --text: #f8f9fa;
-  --heading: #f8f9fa;
-  --muted: #b7b9c2;
-  --border: #2b1a32;
-  --surface: rgba(30, 31, 38, 0.94);
-  --control-bg: #333;
-  --control-text: #fff;
-  --primary-bg: #f8f9fa;
-  --primary-text: #121212;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --page-bg: #000000;
+  --surface: #120a2e;
+  --text: #f7f4ff;
+  --heading: #ffffff;
+  --muted: #c8b6ea;
+  --border: color-mix(in srgb, #6a0dad 65%, #25164a);
+  --control-bg: #25164a;
+  --control-text: #ffffff;
+  --accent: #00e5ff;
+  --accent-hover: #d200ff;
+  --accent-on: #0a0f23;
+  --focus-ring: #9b34f0;
+  --primary-bg: var(--accent);
+  --primary-text: var(--accent-on);
+  --nav-hover-bg: #25164a;
+  --nav-active-bg: color-mix(in srgb, #1a2bff 25%, #25164a);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.36);
 }
+
+/* Palette definitions are independent of brightness: no duplicated color schemes. */
+:root[data-palette='nocturne'] {
+  --tone-deep: #1a1026;
+  --tone-dark: #4b2a46;
+  --tone-middle: #7e496b;
+  --tone-soft: #b79ab4;
+  --tone-pale: #ede6ee;
+}
+:root[data-palette='lagoon'] {
+  --tone-deep: #0d2b36;
+  --tone-dark: #1f5f63;
+  --tone-middle: #4ca7a1;
+  --tone-soft: #a6d6c9;
+  --tone-pale: #e6d6ea;
+}
+:root[data-palette='jade'] {
+  --tone-deep: #1b2e28;
+  --tone-dark: #336b5c;
+  --tone-middle: #71a897;
+  --tone-soft: #b6d8c7;
+  --tone-pale: #ecf3e9;
+}
+:root[data-palette='amber'] {
+  --tone-deep: #4a2c1a;
+  --tone-dark: #a35c1e;
+  --tone-middle: #d99a4e;
+  --tone-soft: #ebcb9c;
+  --tone-pale: #fff3e0;
+}
+:root[data-palette='crimson'] {
+  --tone-deep: #2b0a12;
+  --tone-dark: #6e1d2f;
+  --tone-middle: #9e3f57;
+  --tone-soft: #c77d88;
+  --tone-pale: #e7d7d9;
+}
+:root[data-palette='winter'] {
+  --tone-deep: #1d3445;
+  --tone-dark: #416785;
+  --tone-middle: #6e9ec1;
+  --tone-soft: #a9cbde;
+  --tone-pale: #e7f3fa;
+}
+:root[data-palette='peach'] {
+  --tone-deep: #743f3c;
+  --tone-dark: #a85c52;
+  --tone-middle: #e58f79;
+  --tone-soft: #f4b9a4;
+  --tone-pale: #ffe3d3;
+}
+:root[data-palette='slate'] {
+  --tone-deep: #22232a;
+  --tone-dark: #43454f;
+  --tone-middle: #727580;
+  --tone-soft: #b5b6bf;
+  --tone-pale: #f0f0f2;
+}
+
+/* Light: pure white canvas, with palette-colored text, controls, and surfaces. */
+:root[data-palette]:not([data-palette='original']) {
+  color-scheme: light;
+  --page-bg: #ffffff;
+  --surface: color-mix(in srgb, var(--tone-pale) 22%, white);
+  --text: var(--tone-deep);
+  --heading: var(--tone-deep);
+  --muted: color-mix(in srgb, var(--tone-deep) 75%, var(--tone-middle));
+  --border: color-mix(in srgb, var(--tone-middle) 38%, white);
+  --control-bg: color-mix(in srgb, var(--tone-pale) 42%, white);
+  --control-text: var(--tone-deep);
+  --accent: var(--tone-dark);
+  --accent-hover: var(--tone-deep);
+  --accent-on: #ffffff;
+  --focus-ring: var(--tone-dark);
+  --primary-bg: var(--accent);
+  --primary-text: var(--accent-on);
+  --nav-hover-bg: color-mix(in srgb, var(--tone-soft) 28%, white);
+  --nav-active-bg: color-mix(in srgb, var(--tone-soft) 62%, white);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.11);
+}
+
+/* Dark: pure black canvas, palette-tinted surfaces, and brighter accents. */
+:root[data-theme='dark'][data-palette]:not([data-palette='original']) {
+  color-scheme: dark;
+  --page-bg: #000000;
+  --surface: color-mix(in srgb, var(--tone-deep) 58%, var(--tone-dark));
+  --text: var(--tone-pale);
+  --heading: var(--tone-pale);
+  --muted: color-mix(in srgb, var(--tone-soft) 75%, var(--tone-pale));
+  --border: color-mix(in srgb, var(--tone-middle) 46%, var(--tone-dark));
+  --control-bg: color-mix(in srgb, var(--tone-dark) 70%, var(--tone-deep));
+  --control-text: var(--tone-pale);
+  --accent: var(--tone-soft);
+  --accent-hover: var(--tone-pale);
+  --accent-on: var(--tone-deep);
+  --focus-ring: var(--tone-soft);
+  --primary-bg: var(--accent);
+  --primary-text: var(--accent-on);
+  --nav-hover-bg: color-mix(in srgb, var(--tone-dark) 76%, var(--tone-middle));
+  --nav-active-bg: color-mix(in srgb, var(--tone-dark) 48%, var(--tone-middle));
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.33);
+}
+
 * { box-sizing: border-box; }
 html { background: var(--page-bg); }
 body { margin: 0; min-width: 320px; }
 #root { min-height: 100vh; }
-button, input { font: inherit; }
+button, input, textarea, select { font: inherit; }
 @media (max-width: 1024px) { :root { font-size: 16px; } }
