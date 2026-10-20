@@ -122,6 +122,13 @@ export default function ProfileButton({ onLogout }) {
             My Profile
           </Link>
 
+          <Link
+            to="/upload"
+            onClick={() => setOpen(false)}
+          >
+            Upload
+          </Link>
+
           <button
             type="button"
             onClick={openPersonalize}

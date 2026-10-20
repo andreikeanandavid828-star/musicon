@@ -1,10 +1,8 @@
-import { Link } from 'react-router-dom';
 import { useId, useState, useEffect } from 'react';
 import Button from './Button.jsx';
 
-function LikeButton({ itemLabel }) {
+function LikeButton({ itemLabel, isLiked, likeCount, onToggle, disabled }) {
     const inputId = useId();
-    const [isLiked, setIsLiked] = useState(false);
 
     return (
         <div className="like-button">
@@ -13,7 +11,8 @@ function LikeButton({ itemLabel }) {
                 id={inputId}
                 type="checkbox"
                 checked={isLiked}
-                onChange={(event) => setIsLiked(event.target.checked)}
+                onChange={onToggle}
+                disabled={disabled}
                 aria-label={`Like ${itemLabel}`}
             />
             <label className="like" htmlFor={inputId}>
@@ -22,8 +21,7 @@ function LikeButton({ itemLabel }) {
                 </svg>
                 <span className="like-text">Like</span>
             </label>
-            <span className="like-count one" aria-hidden="true">0</span>
-            <span className="like-count two" aria-hidden="true">{isLiked ? 1 : 0}</span>
+            <span className="like-count" aria-label={`${likeCount} likes`}>{likeCount}</span>
         </div>
     );
 }
@@ -34,10 +32,15 @@ export default function Forum() {
     const [expandedPostId, setExpandedPostId] = useState(null);
     const [commentsMap, setCommentsMap] = useState({}); // Stores comments per post ID
     const [error, setError] = useState('');
+    const [likeCounts, setLikeCounts] = useState({});
+    const [likedPostIds, setLikedPostIds] = useState([]);
+    const [pendingLikes, setPendingLikes] = useState([]);
+    const [likesLoaded, setLikesLoaded] = useState(false);
 
     // Fetch posts on component mount
     useEffect(() => {
         fetchPosts();
+        fetchLikes();
     }, []);
 
     async function fetchPosts() {
@@ -53,6 +56,48 @@ export default function Forum() {
             }
         } catch (err) {
             setError('Could not connect to server.');
+        }
+    }
+
+    async function fetchLikes() {
+        try {
+            const response = await fetch('http://localhost:5000/api/posts/likes/status', {
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Failed to load likes');
+            const data = await response.json();
+            setLikeCounts(data.counts || {});
+            setLikedPostIds(data.liked_post_ids || []);
+            setLikesLoaded(true);
+        } catch (err) {
+            console.error('Failed to load likes:', err);
+            setError('Could not load post likes.');
+        }
+    }
+
+    async function toggleLike(postId) {
+        if (!likesLoaded || pendingLikes.includes(postId)) return;
+
+        const isLiked = likedPostIds.includes(postId);
+        setPendingLikes(prev => [...prev, postId]);
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/posts/${postId}/like`, {
+                method: isLiked ? 'DELETE' : 'POST',
+                credentials: 'include',
+            });
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(response.status === 401
+                    ? 'Please log in to like posts.'
+                    : (data.error || 'Could not update like.'));
+            }
+            // Reload authoritative counts, including changes made by other users.
+            await fetchLikes();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setPendingLikes(prev => prev.filter(id => id !== postId));
         }
     }
 
@@ -212,7 +257,13 @@ export default function Forum() {
                                         {expandedPostId === post.id ? 'Hide' : 'Show'}
                                     </span>
                                 </button>
-                                <LikeButton itemLabel={`post ${post.title}`} />
+                                <LikeButton
+                                    itemLabel={`post ${post.title}`}
+                                    isLiked={likedPostIds.includes(post.id)}
+                                    likeCount={likeCounts[post.id] || 0}
+                                    onToggle={() => toggleLike(post.id)}
+                                    disabled={!likesLoaded || pendingLikes.includes(post.id)}
+                                />
                             </div>
                             <section
                                 className="forum-comments"
@@ -228,7 +279,6 @@ export default function Forum() {
                                             <p className="forum-comment">
                                                 <strong>{commentAuthor}:</strong> {comment.body}
                                             </p>
-                                            <LikeButton itemLabel={`comment by ${commentAuthor}`} />
                                         </div>
                                     );
                                 })}

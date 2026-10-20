@@ -47,6 +47,78 @@ def create_post():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Like status: use post_votes as the single source of truth.
+# The backend's Supabase client must have permission to read vote rows.
+# For large forums, replace this with server-side aggregate queries/pagination.
+@posts_bp.route('/likes/status', methods=['GET', 'OPTIONS'], strict_slashes=False)
+def get_likes_status():
+    if request.method == 'OPTIONS':
+        return '', 200
+    try:
+        user = get_authenticated_user()
+        # Supabase/PostgREST defaults may cap results at 1,000 rows.
+        # Fetch in pages to avoid silently undercounting larger forums.
+        counts = {}
+        liked_post_ids = []
+        page_size = 1000
+        start = 0
+        while True:
+            result = (supabase.table('post_votes')
+                      .select('post_id,user_id')
+                      .eq('vote_type', 1)
+                      .order('post_id')
+                      .order('user_id')
+                      .range(start, start + page_size - 1)
+                      .execute())
+            rows = result.data or []
+            for row in rows:
+                post_id = row['post_id']
+                counts[post_id] = counts.get(post_id, 0) + 1
+                if user and row['user_id'] == str(user.id):
+                    liked_post_ids.append(post_id)
+            if len(rows) < page_size:
+                break
+            start += page_size
+        return jsonify({'counts': counts, 'liked_post_ids': liked_post_ids}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@posts_bp.route('/<post_id>/like', methods=['POST', 'OPTIONS'], strict_slashes=False)
+def like_post(post_id):
+    if request.method == 'OPTIONS':
+        return '', 200
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        # Composite PK (user_id, post_id) prevents duplicate likes.
+        supabase.table('post_votes').upsert({
+            'user_id': str(user.id),
+            'post_id': post_id,
+            'vote_type': 1
+        }, on_conflict='user_id,post_id').execute()
+        return jsonify({'message': 'Post liked'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@posts_bp.route('/<post_id>/like', methods=['DELETE', 'OPTIONS'], strict_slashes=False)
+def unlike_post(post_id):
+    if request.method == 'OPTIONS':
+        return '', 200
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        supabase.table('post_votes').delete() \
+            .eq('user_id', str(user.id)) \
+            .eq('post_id', post_id) \
+            .eq('vote_type', 1).execute()
+        return jsonify({'message': 'Post unliked'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # 3. Get single post details and its comments
 @posts_bp.route('/<post_id>', methods=['GET', 'OPTIONS'], strict_slashes=False)
