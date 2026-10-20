@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default function ForumButton() {
-    return <Link to="/forum" className="button button--sidebar-gradient">Forum</Link>;
+    return <NavLink to="/forum" className="button button--sidebar-gradient">Forum</NavLink>;
 }

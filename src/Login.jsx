@@ -43,7 +43,7 @@ export default function Login({ onLoggedIn }) {
 
       form.reset();
       onLoggedIn?.(); // Update the site's navigation immediately.
-      navigate('/forum');
+      navigate('/profile', { replace: true });
     } catch {
       setError('Could not connect.');
     } finally {

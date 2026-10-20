@@ -1,13 +1,7 @@
-/*
- * Profile integration: GET/PATCH http://localhost:5000/profile/me.
- * The backend currently supports JSON username/bio updates only.
- * Image cropping remains a preview; uploads require backend work.
- */
-
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from './Button.jsx';
-
+import PersonalizeModal from './PersonalizeModal.jsx';
 function CropEditor({ source, type, onApply, onCancel }) {
   const viewportRef = useRef(null);
   const imageRef = useRef(null);
@@ -306,9 +300,33 @@ function CropEditor({ source, type, onApply, onCancel }) {
   );
 }
 
-export default function Profile() {
+export default function Profile({
+  paletteId,
+  defaultMode,
+  currentMode,
+  onPaletteChange,
+  onDefaultModeChange,
+}) {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
+  const [isPersonalizing, setIsPersonalizing] = useState(false);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Open Personalize when requested by the account dropdown.
+  useEffect(() => {
+    if (location.state?.openPersonalize) {
+      setIsPersonalizing(true);
+
+      // Clear the request so it doesn't reopen on refresh.
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [location.state, location.pathname, navigate]);
+
   const [cropEditor, setCropEditor] = useState(null);
 
   const [profile, setProfile] = useState(null);
@@ -359,7 +377,7 @@ export default function Profile() {
 
   const isOwnProfile = true;
 
-  const tabs = ['Overview', 'Ratings', 'Tier Lists', 'Posts'];
+  const tabs = ['Overview', 'Ratings', 'Tier Lists', 'Posts', 'Playlists'];
 
   if (profile?.isArtist) {
     tabs.push('Music');
@@ -466,44 +484,78 @@ export default function Profile() {
     setCropEditor(null);
   }
 
-  async function handleSaveProfile(event) {
-    event.preventDefault();
-    setSaveError('');
-    setSaveNotice('');
-    setSaving(true);
-    try {
-      // Existing Flask endpoint expects application/json, NOT FormData.
-      const response = await fetch('http://localhost:5000/profile/me', {
+  
+async function handleSaveProfile(event) {
+  event.preventDefault();
+  setSaveError('');
+  setSaveNotice('');
+  setSaving(true);
+
+  try {
+    // Create form data containing profile details and images.
+    const formData = new FormData();
+
+    formData.append('username', editForm.username);
+    formData.append('bio', editForm.bio);
+
+    // Include cropped profile picture, if changed.
+    if (editForm.profilePictureFile) {
+      formData.append(
+        'profile_picture',
+        editForm.profilePictureFile
+      );
+    }
+
+    // Include cropped banner picture, if changed.
+    if (editForm.bannerPictureFile) {
+      formData.append(
+        'banner_picture',
+        editForm.bannerPictureFile
+      );
+    }
+
+    // Send profile changes to Flask.
+    const response = await fetch(
+      'http://localhost:5000/profile/me',
+      {
         method: 'PATCH',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: editForm.username,
-          bio: editForm.bio,
-        }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.error || 'Could not save profile.');
+        body: formData,
       }
-      if (!result.profile) {
-        throw new Error('The server did not return an updated profile.');
-      }
-      const imagesNotUploaded = Boolean(
-        editForm.profilePictureFile || editForm.bannerPictureFile,
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || 'Could not save profile.'
       );
-      setProfile(result.profile);
-      releaseDraftPreviews();
-      setIsEditing(false);
-      setSaveNotice(imagesNotUploaded
-        ? 'Username and bio saved. Selected pictures were NOT uploaded; image uploads require backend support.'
-        : 'Profile saved.');
-    } catch (error) {
-      setSaveError(error.message || 'Could not save profile.');
-    } finally {
-      setSaving(false);
     }
+
+    if (!result.profile) {
+      throw new Error(
+        'The server did not return an updated profile.'
+      );
+    }
+
+    // Update profile using the saved database values.
+    setProfile(result.profile);
+
+    // Clean up temporary image previews.
+    releaseDraftPreviews();
+
+    setIsEditing(false);
+    setSaveNotice('Profile saved successfully!');
+
+  } catch (error) {
+    setSaveError(
+      error.message || 'Could not save profile.'
+    );
+  } finally {
+    setSaving(false);
   }
+}
+
 
   if (loading) {
     return <main className="profile-page"><p role="status">Loading profile…</p></main>;
@@ -549,12 +601,14 @@ export default function Profile() {
           <p className="profile-bio">{profile.bio}</p>
 
           {isOwnProfile ? (
-            <Button
-              className="button--secondary"
-              onClick={openEditProfile}
-            >
-              Edit profile
-            </Button>
+            <div className="profile-actions">
+              <Button className="button--secondary" onClick={openEditProfile}>
+                Edit profile
+              </Button>
+              <Button className="button--secondary" onClick={() => setIsPersonalizing(true)}>
+                Personalize
+              </Button>
+            </div>
           ) : (
             <Button className="button--primary">
               Follow
@@ -592,6 +646,7 @@ export default function Profile() {
             <strong>{profile.posts}</strong>
             <span>Posts</span>
           </div>
+
         </section>
       </section>
 
@@ -641,6 +696,13 @@ export default function Profile() {
           <div className="profile-section">
             <h2>Posts</h2>
             <p>Forum posts made by this user will appear here.</p>
+          </div>
+        )}
+
+        {activeTab === 'Playlists' && (
+          <div className="profile-section">
+            <h2>Playlists</h2>
+            <p>Playlists created by this user will appear here.</p>
           </div>
         )}
 
@@ -734,7 +796,7 @@ export default function Profile() {
               </div>
 
               {(editForm.profilePictureFile || editForm.bannerPictureFile) && (
-                <p role="status">Picture changes are preview-only. They won't be uploaded or saved yet.</p>
+                <p role="status">Selected pictures will upload when you press Save.</p>
               )}
               {saveError && <p role="alert">{saveError}</p>}
               <div className="profile-edit-actions">
@@ -762,6 +824,17 @@ export default function Profile() {
           type={cropEditor.type}
           onApply={applyCroppedImage}
           onCancel={cancelCrop}
+        />
+      )}
+
+      {isPersonalizing && (
+        <PersonalizeModal
+          onClose={() => setIsPersonalizing(false)}
+          paletteId={paletteId}
+          defaultMode={defaultMode}
+          currentMode={currentMode}
+          onPaletteChange={onPaletteChange}
+          onDefaultModeChange={onDefaultModeChange}
         />
       )}
     </main>
