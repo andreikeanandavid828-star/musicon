@@ -125,4 +125,4 @@ def delete_comment(comment_id):
         return jsonify({'message': 'Comment deleted successfully'}), 200
     except Exception as e:
         print("DELETE COMMENT ERROR:", e)
-        return jsonify({'error': str(r)}), 500
+        return jsonify({'error': str(e)}), 500
