@@ -18,4 +18,15 @@ def get_authenticated_user():
         return user_res.user if user_res else None
     except Exception:
         return None
-    
+
+def get_first_record(table, columns, filter_column, filter_value):
+    response = (
+        supabase
+        .table(table)
+        .select(columns)
+        .eq(filter_column, str(filter_value))
+        .maybe_single()
+        .execute()
+    )
+
+    return response.data

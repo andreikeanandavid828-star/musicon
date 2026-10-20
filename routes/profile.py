@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app
-from utility import supabase, get_authenticated_user
+from utility import supabase, get_authenticated_user, get_first_record
 # Adding some imports for profile picture and banner picture handling
 import os
 from uuid import uuid4
