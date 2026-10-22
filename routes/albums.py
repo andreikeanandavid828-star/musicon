@@ -73,3 +73,44 @@ def create_album():
     except Exception as e:
         print("CREATE ALBUM ERROR:", e)
         return jsonify({'error': str(e)}), 500
+    
+# Add a Sing to an Album Route
+@albums_bp.route('/<album_id>/songs', methods=['POST','OPTIONS'], strict_slashes=False)
+def add_song_to_album(album_id):
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    # 1. Ensure the user is logged in
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    # 2. Grab the JSON payload sent from the frontend JSX after it uploaded the file
+    data = request.get_json() or {}
+    title = data.get('title')
+    audio_url = data.get('audio_url') # The cloud storage link from supabase
+    track_number = data.get('track_number')
+
+    # 3. Validate required fields 
+    if not title or not audio_url:
+        return jsonify({'error': 'Song title and audio URL are required fields'}), 400
+    
+    try:
+        # 4. Insert the text record into your PostgreSQL songs table
+        response = supabase.table('songs').insert({
+            'album_id': album_id,
+            'title': title,
+            'audio_url': audio_url,
+            'track_number': track_number,
+            'user_id': user.id
+        }).execute()
+
+        created_song = response.data[0] if response.data else {}
+        return jsonify({
+            'message': 'Song uploaded successfully',
+            'song': created_song
+        }), 201
+    
+    except Exception as e:
+        print("ADD SONG ERROR:", e)
+        return jsonify({'error': str(e)}), 500
