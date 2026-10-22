@@ -357,7 +357,8 @@
 .button:focus-visible,
 .back-link:focus-visible,
 .form-input:focus-visible,
-.footer-volume:focus-visible {
+.footer-volume:focus-visible,
+.footer-progress:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -651,7 +652,9 @@
 }
 
 .albums-list__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   padding: 16px 20px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -678,6 +681,10 @@
   margin: 0;
 }
 
+.albums-list__details {
+  display: block;
+}
+
 .albums-list__item p,
 .albums-list__item span,
 .albums-empty {
@@ -691,7 +698,36 @@
 }
 
 .albums-back-link {
+  display: block;
+  width: fit-content;
+  margin: 0 0 28px;
   color: inherit;
+}
+
+.album-cover {
+  box-sizing: border-box;
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--muted);
+  border-radius: 8px;
+}
+
+.album-detail-heading {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.album-detail-heading h1 {
+  margin: 0;
+}
+
+.album-cover--detail {
+  width: 120px;
+  height: 120px;
+  border: 2px solid var(--border);
+  box-shadow: 0 0 0 1px var(--surface), 0 0 0 3px var(--border);
 }
 
 .albums-byline {
@@ -709,14 +745,34 @@
 
 .album-songs__item {
   display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding: 12px 16px;
+  border: 0;
   border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.album-songs__item span:last-child {
+.album-songs__item:hover,
+.album-songs__item[aria-pressed='true'] {
+  background: var(--surface);
+}
+
+.album-songs__item:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.album-songs__title {
+  min-width: 0;
+}
+
+.album-songs__artist {
+  margin-left: auto;
   color: var(--muted);
 }
 
@@ -1421,6 +1477,24 @@
   transform: translateY(calc(100% + 60px));
 }
 
+.footer-progress {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 12px;
+  width: calc(100% - 24px);
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.footer-progress:disabled {
+  cursor: not-allowed;
+}
+
 .footer-track {
   display: flex;
   grid-column: 1;
@@ -2104,6 +2178,59 @@
     var(--border) var(--volume-fill),
     var(--border) 100%
   );
+}
+
+/* Seekable timeline placed along the top edge of the player. */
+.footer-progress {
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--progress-fill),
+    var(--border) var(--progress-fill),
+    var(--border) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 4px;
+  background-position: center;
+}
+
+.footer-progress::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: transparent;
+}
+
+.footer-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  appearance: none;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.footer-progress::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border);
+}
+
+.footer-progress::-moz-range-progress {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--accent);
+}
+
+.footer-progress::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 /* Chrome, Edge, Safari */

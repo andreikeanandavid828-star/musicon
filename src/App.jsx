@@ -40,6 +40,7 @@ function AppShell() {
     setIsDarkMode(mode === 'dark');
   }
   const [selectedSong, setSelectedSong] = useState(null);
+  const [activeAlbumId, setActiveAlbumId] = useState(null);
   // Treat the backend's HttpOnly cookie as the source of truth.
   const [authStatus, setAuthStatus] = useState('checking');
   const [authError, setAuthError] = useState('');
@@ -104,16 +105,44 @@ function AppShell() {
   const [userSongs, setUserSongs] = useState([]);
   const [albums, setAlbums] = useState([]);
   const availableSongs = [...songs, ...userSongs];
+  const handleCreateAlbum = (album) => {
+    setAlbums((currentAlbums) => [...currentAlbums, album]);
+  };
+  const handleAddSongs = (albumId, songIds) => {
+    setAlbums((currentAlbums) =>
+      currentAlbums.map((album) =>
+        album.id === albumId
+          ? { ...album, songIds: [...album.songIds, ...songIds] }
+          : album,
+      ),
+    );
+  };
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
-  const handleSongSelection = (song) => setSelectedSong({ ...song });
+  const handleSongSelection = (song) => {
+    setActiveAlbumId(null);
+    setSelectedSong({ ...song });
+  };
+  const handleAlbumSongSelection = (song, albumId) => {
+    setActiveAlbumId(albumId);
+    setSelectedSong({ ...song });
+  };
   const handleTrackNavigation = (direction) => {
-    const currentIndex = songs.findIndex((song) => song.id === selectedSong?.id);
-    const nextIndex = currentIndex === -1
-      ? direction < 0 ? songs.length - 1 : 0
-      : (currentIndex + direction + songs.length) % songs.length;
+    const activeAlbum = albums.find((album) => album.id === activeAlbumId);
+    const trackList = activeAlbum
+      ? activeAlbum.songIds
+        .map((songId) => availableSongs.find((song) => song.id === songId))
+        .filter(Boolean)
+      : availableSongs;
 
-    handleSongSelection(songs[nextIndex]);
+    if (trackList.length === 0) return;
+
+    const currentIndex = trackList.findIndex((song) => song.id === selectedSong?.id);
+    const nextIndex = currentIndex === -1
+      ? (direction < 0 ? trackList.length - 1 : 0)
+      : (currentIndex + direction + trackList.length) % trackList.length;
+
+    setSelectedSong({ ...trackList[nextIndex] });
   };
 
   useEffect(() => {
@@ -178,6 +207,32 @@ function AppShell() {
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
         <Route
+          path="/albums"
+          element={
+            <Albums
+              albums={albums}
+              songs={availableSongs}
+              onCreateAlbum={handleCreateAlbum}
+              onAddSongs={handleAddSongs}
+              selectedSong={selectedSong}
+              onSelectSong={handleAlbumSongSelection}
+            />
+          }
+        />
+        <Route
+          path="/albums/:albumId"
+          element={
+            <Albums
+              albums={albums}
+              songs={availableSongs}
+              onCreateAlbum={handleCreateAlbum}
+              onAddSongs={handleAddSongs}
+              selectedSong={selectedSong}
+              onSelectSong={handleAlbumSongSelection}
+            />
+          }
+        />
+        <Route
           path="/profile"
           element={
             <Profile
@@ -204,6 +259,7 @@ function AppShell() {
           selectedSong={selectedSong}
           onPreviousSong={() => handleTrackNavigation(-1)}
           onNextSong={() => handleTrackNavigation(1)}
+          onSongEnded={() => handleTrackNavigation(1)}
         />
       )}
     </div>
