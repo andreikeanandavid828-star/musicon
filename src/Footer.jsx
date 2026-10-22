@@ -11,6 +11,8 @@ export default function FooterMusicPlayer({
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [playbackError, setPlaybackError] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const audioRef = useRef(null);
@@ -20,6 +22,8 @@ export default function FooterMusicPlayer({
     if (!audio || !selectedSong) return undefined;
 
     setPlaybackError('');
+    setCurrentTime(0);
+    setDuration(0);
     audio.currentTime = 0;
     audio.play().catch((error) => {
       setIsPlaying(false);
@@ -52,6 +56,14 @@ export default function FooterMusicPlayer({
     }
   };
 
+  const handleSeek = (event) => {
+    const nextTime = Number(event.target.value);
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(nextTime)) return;
+
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
 
   return (
     <div className="footer-player-shell">
@@ -72,6 +84,18 @@ export default function FooterMusicPlayer({
         aria-hidden={isCollapsed}
         inert={isCollapsed}
       >
+        <input
+          className="footer-progress"
+          type="range"
+          min="0"
+          max={duration || 0}
+          step="0.1"
+          value={currentTime}
+          disabled={!selectedSong || !duration}
+          aria-label="Song progress"
+          style={{ '--progress-fill': `${duration ? (currentTime / duration) * 100 : 0}%` }}
+          onChange={handleSeek}
+        />
         <div className="footer-track">
           <SongArtwork song={selectedSong} className="footer-artwork" />
           <div className="footer-track__text">
@@ -136,10 +160,12 @@ export default function FooterMusicPlayer({
           src={selectedSong?.src}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onEnded={() => {
-            setIsPlaying(false);
-            onSongEnded();
+          onEnded={() => setIsPlaying(false)}
+          onLoadedMetadata={(event) => {
+            const audioDuration = event.currentTarget.duration;
+            setDuration(Number.isFinite(audioDuration) ? audioDuration : 0);
           }}
+          onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
           preload="metadata"
         />
         {playbackError && (

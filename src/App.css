@@ -357,7 +357,8 @@
 .button:focus-visible,
 .back-link:focus-visible,
 .form-input:focus-visible,
-.footer-volume:focus-visible {
+.footer-volume:focus-visible,
+.footer-progress:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -1391,6 +1392,24 @@
   transform: translateY(calc(100% + 60px));
 }
 
+.footer-progress {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 12px;
+  width: calc(100% - 24px);
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.footer-progress:disabled {
+  cursor: not-allowed;
+}
+
 .footer-track {
   display: flex;
   grid-column: 1;
@@ -2074,6 +2093,59 @@
     var(--border) var(--volume-fill),
     var(--border) 100%
   );
+}
+
+/* Seekable timeline placed along the top edge of the player. */
+.footer-progress {
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--progress-fill),
+    var(--border) var(--progress-fill),
+    var(--border) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 4px;
+  background-position: center;
+}
+
+.footer-progress::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: transparent;
+}
+
+.footer-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  appearance: none;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.footer-progress::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border);
+}
+
+.footer-progress::-moz-range-progress {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--accent);
+}
+
+.footer-progress::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 /* Chrome, Edge, Safari */
