@@ -1,8 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from './Button.jsx';
+import SongArtwork from './SongArtwork.jsx';
 
-export default function Albums({ albums, songs, onCreateAlbum, onAddSongs }) {
+export default function Albums({
+    albums,
+    songs,
+    onCreateAlbum,
+    onAddSongs,
+    selectedSong,
+    onSelectSong,
+}) {
     const { albumId } = useParams();
     const navigate = useNavigate();
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -13,7 +21,8 @@ export default function Albums({ albums, songs, onCreateAlbum, onAddSongs }) {
     const selectedSongIds = selectedAlbum?.songIds || [];
     const albumSongs = selectedSongIds
         .map((songId) => songs.find((song) => song.id === songId))
-        .filter(Boolean) || [];
+        .filter(Boolean);
+    const albumCoverSong = albumSongs[0];
     const songsNotInAlbum = songs.filter((song) => !selectedSongIds.includes(song.id));
 
     useEffect(() => {
@@ -62,7 +71,10 @@ export default function Albums({ albums, songs, onCreateAlbum, onAddSongs }) {
                     <p className="albums-empty">Album not found.</p>
                 ) : (
                     <>
-                        <h1>{selectedAlbum.name}</h1>
+                        <div className="album-detail-heading">
+                            <SongArtwork song={albumCoverSong} className="album-cover album-cover--detail" />
+                            <h1>{selectedAlbum.name}</h1>
+                        </div>
                         <div className="album-detail-actions">
                             <Button className="button--primary" onClick={() => setIsAddSongDialogOpen(true)}>
                                 Add song
@@ -75,9 +87,17 @@ export default function Albums({ albums, songs, onCreateAlbum, onAddSongs }) {
                         ) : (
                             <ul className="album-songs" aria-label={`Songs in ${selectedAlbum.name}`}>
                                 {albumSongs.map((song) => (
-                                    <li className="album-songs__item" key={song.id}>
-                                        <span>{song.title}</span>
-                                        <span>{song.artist || 'Unknown artist'}</span>
+                                    <li key={song.id}>
+                                        <button
+                                            className="album-songs__item"
+                                            type="button"
+                                            aria-pressed={selectedSong?.id === song.id}
+                                            onClick={() => onSelectSong(song, albumId)}
+                                        >
+                                            <SongArtwork song={song} className="song-artwork--home" />
+                                            <span className="album-songs__title">{song.title}</span>
+                                            <span className="album-songs__artist">{song.artist || 'Unknown artist'}</span>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -136,14 +156,23 @@ export default function Albums({ albums, songs, onCreateAlbum, onAddSongs }) {
                 <p className="albums-empty">No albums yet. Create an album and choose songs from the catalog.</p>
             ) : (
                 <ul className="albums-list" aria-label="Posted albums">
-                    {albums.map((album) => (
-                        <li key={album.id}>
-                            <Link className="albums-list__item" to={`/albums/${album.id}`}>
-                                <h2>{album.name}</h2>
-                                <span>{(album.songIds || []).length} songs</span>
-                            </Link>
-                        </li>
-                    ))}
+                    {albums.map((album) => {
+                        const firstSong = (album.songIds || [])
+                            .map((songId) => songs.find((song) => song.id === songId))
+                            .find(Boolean);
+
+                        return (
+                            <li key={album.id}>
+                                <Link className="albums-list__item" to={`/albums/${album.id}`}>
+                                    <SongArtwork song={firstSong} className="album-cover" />
+                                    <div className="albums-list__details">
+                                        <h2>{album.name}</h2>
+                                        <span>{(album.songIds || []).length} songs</span>
+                                    </div>
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </ul>
             )}
             <dialog
