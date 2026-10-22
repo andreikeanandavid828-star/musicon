@@ -19,11 +19,20 @@ export default function FooterMusicPlayer({
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !selectedSong) return undefined;
+    if (!audio) return undefined;
 
     setPlaybackError('');
     setCurrentTime(0);
     setDuration(0);
+
+    if (!selectedSong?.src) {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      setIsPlaying(false);
+      return undefined;
+    }
+
     audio.currentTime = 0;
     audio.play().catch((error) => {
       setIsPlaying(false);
@@ -40,7 +49,7 @@ export default function FooterMusicPlayer({
 
   const handlePlayPause = async () => {
     const audio = audioRef.current;
-    if (!audio || !selectedSong) return;
+    if (!audio || !selectedSong?.src) return;
 
     setPlaybackError('');
     try {
@@ -125,7 +134,7 @@ export default function FooterMusicPlayer({
             className="footer-action"
             aria-label={isPlaying ? 'Pause' : 'Play'}
             title={isPlaying ? 'Pause' : 'Play'}
-            disabled={!selectedSong}
+            disabled={!selectedSong?.src}
             onClick={() => handlePlayPause()}
           >
             <span className={isPlaying ? 'pause-icon' : 'play-icon'} aria-hidden="true" />
@@ -157,7 +166,7 @@ export default function FooterMusicPlayer({
 
         <audio
           ref={audioRef}
-          src={selectedSong?.src}
+          src={selectedSong?.src || undefined}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
