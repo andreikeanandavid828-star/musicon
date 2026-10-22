@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
 import SongArtwork from './SongArtwork.jsx';
 
-export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong }) {
+export default function FooterMusicPlayer({
+  selectedSong,
+  onPreviousSong,
+  onNextSong,
+  onSongEnded,
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [playbackError, setPlaybackError] = useState('');
@@ -131,7 +136,10 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
           src={selectedSong?.src}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onEnded={() => setIsPlaying(false)}
+          onEnded={() => {
+            setIsPlaying(false);
+            onSongEnded();
+          }}
           preload="metadata"
         />
         {playbackError && (
