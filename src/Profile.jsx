@@ -314,12 +314,10 @@ export default function Profile({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Open Personalize when requested by the account dropdown.
   useEffect(() => {
     if (location.state?.openPersonalize) {
       setIsPersonalizing(true);
 
-      // Clear the request so it doesn't reopen on refresh.
       navigate(location.pathname, {
         replace: true,
         state: null,
@@ -336,10 +334,16 @@ export default function Profile({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [saveNotice, setSaveNotice] = useState('');
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
+  const [locationMessage, setLocationMessage] = useState('');
+  const locationRequestRef = useRef(0);
 
   const [editForm, setEditForm] = useState({
     username: '',
     bio: '',
+    location: '',
+    showLocation: false,
     profilePicture: null,
     profilePictureFile: null,
     bannerPicture: null,
@@ -386,9 +390,13 @@ export default function Profile({
   function openEditProfile() {
     setSaveError('');
     setSaveNotice('');
+    setLocationError('');
+    setLocationMessage('');
     setEditForm({
       username: profile.username,
       bio: profile.bio,
+      location: profile.location || '',
+      showLocation: Boolean(profile.showLocation),
       profilePicture: profile.profilePicture,
       profilePictureFile: null,
 
@@ -409,6 +417,8 @@ export default function Profile({
   }
 
   function closeEditProfile() {
+    locationRequestRef.current += 1; // Ignore a pending lookup after closing.
+    setLocating(false);
     releaseDraftPreviews();
     setCropEditor(null);
     setIsEditing(false);
@@ -421,6 +431,68 @@ export default function Profile({
       ...current,
       [name]: value,
     }));
+  }
+
+
+  function detectGeneralLocation() {
+    setLocationError('');
+    setLocationMessage('');
+
+    if (!navigator.geolocation) {
+      setLocationError('This browser does not support location detection. You can type a location instead.');
+      return;
+    }
+
+    const requestId = ++locationRequestRef.current;
+    setLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const params = new URLSearchParams({
+            latitude: String(coords.latitude),
+            longitude: String(coords.longitude),
+            localityLanguage: 'en',
+          });
+
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?${params}`,
+          );
+          if (!response.ok) throw new Error('Location lookup was unsuccessful.');
+
+          const result = await response.json();
+          const parts = [
+            result.city || result.locality,
+            result.principalSubdivision,
+            result.countryName,
+          ].filter(Boolean);
+          const suggestion = [...new Set(parts)].join(', ');
+
+          if (!suggestion) throw new Error('No general location was returned.');
+          if (locationRequestRef.current !== requestId) return;
+
+          setEditForm((current) => ({ ...current, location: suggestion }));
+          setLocationMessage('Suggestion added. You can edit it before saving.');
+        } catch (error) {
+          if (locationRequestRef.current === requestId) {
+            setLocationError(error.message || 'Could not determine your location.');
+          }
+        } finally {
+          if (locationRequestRef.current === requestId) setLocating(false);
+        }
+      },
+      (error) => {
+        if (locationRequestRef.current !== requestId) return;
+        const message = error.code === 1
+          ? 'Location access was denied. You can enter your location manually.'
+          : error.code === 3
+            ? 'Location detection timed out. Try again or enter it manually.'
+            : 'Your location could not be detected. You can enter it manually.';
+        setLocationError(message);
+        setLocating(false);
+      },
+      { enableHighAccuracy: false, maximumAge: 0, timeout: 10000 },
+    );
   }
 
   function chooseImage(event, type) {
@@ -497,6 +569,8 @@ async function handleSaveProfile(event) {
 
     formData.append('username', editForm.username);
     formData.append('bio', editForm.bio);
+    formData.append('location', editForm.location.trim());
+    formData.append('show_location', String(editForm.showLocation && !!editForm.location.trim()));
 
     // Include cropped profile picture, if changed.
     if (editForm.profilePictureFile) {
@@ -544,6 +618,8 @@ async function handleSaveProfile(event) {
     // Clean up temporary image previews.
     releaseDraftPreviews();
 
+    locationRequestRef.current += 1;
+    setLocating(false);
     setIsEditing(false);
     setSaveNotice('Profile saved successfully!');
 
@@ -598,7 +674,17 @@ async function handleSaveProfile(event) {
             <span className="artist-badge">Verified Artist</span>
           )}
 
+          {profile.location && (
+            <p className="profile-location-display">
+              <span aria-hidden="true">📍</span> {profile.location}
+              {!profile.showLocation && (
+                <span className="profile-location-private"> (Private — only you)</span>
+              )}
+            </p>
+          )}
+
           <p className="profile-bio">{profile.bio}</p>
+
 
           {isOwnProfile ? (
             <div className="profile-actions">
@@ -746,6 +832,68 @@ async function handleSaveProfile(event) {
                 maxLength={300}
                 rows="4"
               />
+
+              <div className="profile-location-setting">
+                <h3>General location</h3>
+                <label htmlFor="edit-location">Where are you based?</label>
+                <input
+                  id="edit-location"
+                  name="location"
+                  type="text"
+                  value={editForm.location}
+                  placeholder="City, region, or country"
+                  maxLength={120}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setLocationError('');
+                    setLocationMessage('');
+                    setEditForm((current) => ({
+                      ...current,
+                      location: value,
+                      showLocation: value.trim() ? current.showLocation : false,
+                    }));
+                  }}
+                />
+                <p className="profile-location-help">
+                  Use a general location, not a street address. You're in control of what you share.
+                </p>
+                <Button
+                  type="button"
+                  className="button--secondary"
+                  onClick={detectGeneralLocation}
+                  disabled={locating || saving}
+                >
+                  {locating ? 'Finding location…' : '📍 Use my current location'}
+                </Button>
+                <p className="profile-location-help">
+                  Optional. This asks your browser for location permission and sends your
+                  coordinates to BigDataCloud for a one-time suggestion. No coordinates
+                  are saved to Musicon.
+                </p>
+                {locationError && <p className="profile-location-error" role="alert">{locationError}</p>}
+                {locationMessage && <p className="profile-location-success" role="status">{locationMessage}</p>}
+                <label className="profile-location-checkbox" htmlFor="edit-show-location">
+                  <input
+                    id="edit-show-location"
+                    type="checkbox"
+                    checked={editForm.showLocation}
+                    disabled={!editForm.location.trim()}
+                    onChange={(event) => setEditForm((current) => ({
+                      ...current,
+                      showLocation: event.target.checked,
+                    }))}
+                  />
+                  Show this location on my public profile
+                </label>
+                <div className="profile-location-preview" aria-live="polite">
+                  <strong>Public preview</strong>
+                  <p>
+                    {editForm.showLocation && editForm.location.trim()
+                      ? `📍 ${editForm.location.trim()}`
+                      : 'Location hidden from other users.'}
+                  </p>
+                </div>
+              </div>
 
               <div className="profile-image-setting">
                 <div>
