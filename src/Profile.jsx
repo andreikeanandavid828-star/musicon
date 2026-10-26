@@ -855,7 +855,7 @@ async function handleSaveProfile(event) {
                   }}
                 />
                 <p className="profile-location-help">
-                  Use a general location, not a street address. You're in control of what you share.
+                  Use a general location. This will be visible to other users if you choose to show it.
                 </p>
                 <Button
                   type="button"
@@ -865,11 +865,6 @@ async function handleSaveProfile(event) {
                 >
                   {locating ? 'Finding location…' : '📍 Use my current location'}
                 </Button>
-                <p className="profile-location-help">
-                  Optional. This asks your browser for location permission and sends your
-                  coordinates to BigDataCloud for a one-time suggestion. No coordinates
-                  are saved to Musicon.
-                </p>
                 {locationError && <p className="profile-location-error" role="alert">{locationError}</p>}
                 {locationMessage && <p className="profile-location-success" role="status">{locationMessage}</p>}
                 <label className="profile-location-checkbox" htmlFor="edit-show-location">
