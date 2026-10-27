@@ -137,12 +137,13 @@ def forgot_password():
 def reset_password():
     data = request.get_json(silent=True) or {}
 
-    token_hash = data.get('token_hash')
+    access_token = data.get('access_token')
+    refresh_token = data.get('refresh_token')
     password = data.get('password')
 
-    if not token_hash or not password:
+    if not access_token or not refresh_token or not password:
         return jsonify({
-            "error": "Missing recovery token or password"
+            "error": "Missing recovery credentials or password"
         }), 400
 
     if len(password) < 8:
@@ -151,21 +152,21 @@ def reset_password():
         }), 400
 
     try:
+        # Isolated client for this request
         client = create_supabase_client()
 
-        # Verify the recovery token with Supabase
-        auth_response = client.auth.verify_otp({
-            "token_hash": token_hash,
-            "type": "recovery"
-        })
+        # Establish and validate the recovery session
+        session_response = client.auth.set_session(
+            access_token,
+            refresh_token
+        )
 
-        if not auth_response.user or not auth_response.session:
+        if not session_response.user or not session_response.session:
             return jsonify({
-                "error": "Invalid or expired recovery link"
-            }), 400
+                "error": "Invalid or expired recovery session"
+            }), 401
 
-        # The verified session belongs to the user
-        # who requested the password reset.
+        # Update the authenticated user's password
         result = client.auth.update_user({
             "password": password
         })
@@ -175,7 +176,6 @@ def reset_password():
                 "error": "Could not update password"
             }), 400
 
-        # Clear the temporary recovery session
         client.auth.sign_out()
 
         return jsonify({
@@ -186,5 +186,5 @@ def reset_password():
         print("PASSWORD UPDATE ERROR:", type(e).__name__)
 
         return jsonify({
-            "error": "Unable to reset password. The link may be expired or already used."
+            "error": "Invalid or expired recovery session. Please request a new link."
         }), 400
