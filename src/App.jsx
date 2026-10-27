@@ -197,6 +197,7 @@ function AppShell() {
           element={
             <Home
               songs={availableSongs}
+              albums={albums}
               selectedSong={selectedSong}
               onSelectSong={handleSongSelection}
             />
