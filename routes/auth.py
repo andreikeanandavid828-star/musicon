@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from utility import supabase
+from utility import supabase, create_supabase_client
 
 auth = Blueprint("auth", __name__)
 
@@ -99,3 +99,92 @@ def logout():
     except Exception as e:
         print("LOGOUT ERROR:", e)
         return jsonify({"error": "Failed to logout"}), 500
+
+
+# Forgot Password Route
+@auth.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json(silent=True) or {}
+    email = str(data.get('email') or '').strip()
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    try:
+        client = create_supabase_client()
+
+        client.auth.reset_password_for_email(
+            email,
+            {
+                "redirect_to": "http://localhost:5173/reset-password"
+            }
+        )
+
+        return jsonify({
+            "message": "If an account exists with this email, a password reset link has been sent."
+        }), 200
+
+    except Exception as e:
+        print("PASSWORD RESET ERROR:", type(e).__name__)
+
+        return jsonify({
+            "error": "Unable to send reset email. Please try again."
+        }), 500
+
+
+# Reset Password Route
+@auth.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json(silent=True) or {}
+
+    token_hash = data.get('token_hash')
+    password = data.get('password')
+
+    if not token_hash or not password:
+        return jsonify({
+            "error": "Missing recovery token or password"
+        }), 400
+
+    if len(password) < 8:
+        return jsonify({
+            "error": "Password must be at least 8 characters"
+        }), 400
+
+    try:
+        client = create_supabase_client()
+
+        # Verify the recovery token with Supabase
+        auth_response = client.auth.verify_otp({
+            "token_hash": token_hash,
+            "type": "recovery"
+        })
+
+        if not auth_response.user or not auth_response.session:
+            return jsonify({
+                "error": "Invalid or expired recovery link"
+            }), 400
+
+        # The verified session belongs to the user
+        # who requested the password reset.
+        result = client.auth.update_user({
+            "password": password
+        })
+
+        if not result.user:
+            return jsonify({
+                "error": "Could not update password"
+            }), 400
+
+        # Clear the temporary recovery session
+        client.auth.sign_out()
+
+        return jsonify({
+            "message": "Password updated successfully!"
+        }), 200
+
+    except Exception as e:
+        print("PASSWORD UPDATE ERROR:", type(e).__name__)
+
+        return jsonify({
+            "error": "Unable to reset password. The link may be expired or already used."
+        }), 400
