@@ -3,18 +3,36 @@ import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
 import SongArtwork from './SongArtwork.jsx';
 
-export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong }) {
+export default function FooterMusicPlayer({
+  selectedSong,
+  onPreviousSong,
+  onNextSong,
+  onSongEnded,
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [playbackError, setPlaybackError] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !selectedSong) return undefined;
+    if (!audio) return undefined;
 
     setPlaybackError('');
+    setCurrentTime(0);
+    setDuration(0);
+
+    if (!selectedSong?.src) {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      setIsPlaying(false);
+      return undefined;
+    }
+
     audio.currentTime = 0;
     audio.play().catch((error) => {
       setIsPlaying(false);
@@ -31,7 +49,7 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
 
   const handlePlayPause = async () => {
     const audio = audioRef.current;
-    if (!audio || !selectedSong) return;
+    if (!audio || !selectedSong?.src) return;
 
     setPlaybackError('');
     try {
@@ -47,6 +65,14 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
     }
   };
 
+  const handleSeek = (event) => {
+    const nextTime = Number(event.target.value);
+    const audio = audioRef.current;
+    if (!audio || !Number.isFinite(nextTime)) return;
+
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
 
   return (
     <div className="footer-player-shell">
@@ -67,6 +93,18 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
         aria-hidden={isCollapsed}
         inert={isCollapsed}
       >
+        <input
+          className="footer-progress"
+          type="range"
+          min="0"
+          max={duration || 0}
+          step="0.1"
+          value={currentTime}
+          disabled={!selectedSong || !duration}
+          aria-label="Song progress"
+          style={{ '--progress-fill': `${duration ? (currentTime / duration) * 100 : 0}%` }}
+          onChange={handleSeek}
+        />
         <div className="footer-track">
           <SongArtwork song={selectedSong} className="footer-artwork" />
           <div className="footer-track__text">
@@ -96,7 +134,7 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
             className="footer-action"
             aria-label={isPlaying ? 'Pause' : 'Play'}
             title={isPlaying ? 'Pause' : 'Play'}
-            disabled={!selectedSong}
+            disabled={!selectedSong?.src}
             onClick={() => handlePlayPause()}
           >
             <span className={isPlaying ? 'pause-icon' : 'play-icon'} aria-hidden="true" />
@@ -128,10 +166,15 @@ export default function FooterMusicPlayer({ selectedSong, onPreviousSong, onNext
 
         <audio
           ref={audioRef}
-          src={selectedSong?.src}
+          src={selectedSong?.src || undefined}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
+          onLoadedMetadata={(event) => {
+            const audioDuration = event.currentTarget.duration;
+            setDuration(Number.isFinite(audioDuration) ? audioDuration : 0);
+          }}
+          onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
           preload="metadata"
         />
         {playbackError && (

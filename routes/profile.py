@@ -87,6 +87,8 @@ def serialize_profile(user_data, profile_data):
     return {
         "username": user_data["username"],
         "bio": profile_data.get("bio") or "",
+        "location": profile_data.get("location") or "",
+        "showLocation": bool(profile_data.get("show_location", False)),
         "profilePicture": (
             bucket.get_public_url(avatar_path)
             if avatar_path else None
@@ -185,6 +187,9 @@ def update_my_profile():
 
     username = data.get("username")
     bio = data.get("bio")
+    location = data.get("location")
+    raw_show_location = data.get("show_location")
+    show_location = None
 
     avatar_file = request.files.get("profile_picture")
     banner_file = request.files.get("banner_picture")
@@ -214,10 +219,37 @@ def update_my_profile():
             return jsonify({
                 "error": "Bio cannot exceed 300 characters"
             }), 400
+        
+        # Validate the optional general location.
+        if location is not None:
+            if not isinstance(location, str):
+                return jsonify({
+                    "error": "Location must be a string"
+                }), 400
+
+            location = location.strip()
+
+            if len(location) > 120 or any(ord(c) < 32 for c in location):
+                return jsonify({
+                    "error": "Location must be one line and at most 120 characters"
+                }), 400
+
+        # Accept a boolean from JSON or a string from FormData.
+        if raw_show_location is not None:
+            if isinstance(raw_show_location, bool):
+                show_location = raw_show_location
+            elif raw_show_location in ("true", "false"):
+                show_location = raw_show_location == "true"
+            else:
+                return jsonify({
+                    "error": "Invalid location visibility value"
+                }), 400
 
     if (
         username is None
         and bio is None
+        and location is None
+        and show_location is None
         and not avatar_file
         and not banner_file
     ):
@@ -239,6 +271,15 @@ def update_my_profile():
         if bio is not None:
             profile_updates["bio"] = bio
 
+        if location is not None:
+            profile_updates["location"] = location or None
+
+        effective_location = (location if location is not None else (profile_data.get("location") or ""))
+
+        if not effective_location.strip(): show_location = False
+
+        if show_location is not None: profile_updates["show_location"] = show_location
+        
         if avatar_file:
             profile_updates["profile_picture_path"] = (
                 upload_profile_image(
