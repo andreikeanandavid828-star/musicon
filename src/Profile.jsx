@@ -339,6 +339,11 @@ export default function Profile({
   const [locationMessage, setLocationMessage] = useState('');
   const locationRequestRef = useRef(0);
 
+  // Forum posts state for the Posts tab
+  const [userPosts, setUserPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [postsError, setPostsError] = useState('');
+
   const [editForm, setEditForm] = useState({
     username: '',
     bio: '',
@@ -378,6 +383,36 @@ export default function Profile({
     void loadProfile();
     return () => { active = false; };
   }, []);
+
+  // Fetch user forum posts when the active tab is switched to 'Posts'
+  useEffect(() => {
+    if (activeTab === 'Posts') {
+      let active = true;
+      async function fetchUserPosts() {
+        setPostsLoading(true);
+        setPostsError('');
+        try {
+          const response = await fetch('http://localhost:5000/api/posts/me', {
+            credentials: 'include',
+          });
+          const data = await response.json();
+          if (!active) return;
+
+          if (response.ok) {
+            setUserPosts(data.posts || []);
+          } else {
+            setPostsError(data.error || 'Failed to load your posts.');
+          }
+        } catch (err) {
+          if (active) setPostsError('Could not connect to server.');
+        } finally {
+          if (active) setPostsLoading(false);
+        }
+      }
+      void fetchUserPosts();
+      return () => { active = false; };
+    }
+  }, [activeTab]);
 
   const isOwnProfile = true;
 
@@ -779,9 +814,30 @@ async function handleSaveProfile(event) {
         )}
 
         {activeTab === 'Posts' && (
+          //changes the post tab to indicate 
           <div className="profile-section">
-            <h2>Posts</h2>
-            <p>Forum posts made by this user will appear here.</p>
+            <h2>My Forum Posts</h2>
+            {postsLoading && <p>Loading your posts...</p>}
+            {postsError && <p role="alert" className="error-msg">{postsError}</p>}
+
+            {!postsLoading && !postsError && userPosts.length === 0 ? (
+              <p>You haven't posted anything in the forum yet.</p>
+            ) : (
+              userPosts.map((post) => (
+                <article className="profile-post-card" key={post.id}>
+                  <h3>{post.title}</h3>
+                  <p>{post.body}</p>
+                  {post.albums && (
+                    <span className="profile-post-album">
+                      Album: {post.albums.title || 'Attached Album'}
+                    </span>
+                  )}
+                  <span className="post-date">
+                    Posted on: {new Date(post.created_at).toLocaleDateString()}
+                  </span>
+                </article>
+              ))
+            )}
           </div>
         )}
 

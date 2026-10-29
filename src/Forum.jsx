@@ -195,6 +195,38 @@ export default function Forum() {
         }
     }
 
+    async function deleteComment(commentId, postId) {
+        if (!window.confirm("Are you sure you want to delete this comment?")) return;
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/posts/comments/${commentId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                alert(result.error || 'Failed to delete comment');
+                return;
+            }
+
+            // Refresh the comments list for this specific post
+            const detailResponse = await fetch(`http://localhost:5000/api/posts/${postId}`, {
+                credentials: 'include',
+            });
+            const detailData = await detailResponse.json();
+            if (detailResponse.ok) {
+                setCommentsMap((prev) => ({
+                    ...prev,
+                    [postId]: detailData.comments || [],
+                }));
+            }
+        } catch (err) {
+            alert('Could not connect to server.');
+        }
+    }
+
     const sortedPosts = [...posts].sort((firstPost, secondPost) => {
         const dateA = new Date(firstPost.created_at).getTime();
         const dateB = new Date(secondPost.created_at).getTime();
@@ -279,6 +311,13 @@ export default function Forum() {
                                             <p className="forum-comment">
                                                 <strong>{commentAuthor}:</strong> {comment.body}
                                             </p>
+                                            <button 
+                                                className="forum-comment-delete" 
+                                                type="button" 
+                                                onClick={() => deleteComment(comment.id, post.id)}
+                                            >
+                                                Delete
+                                            </button>
                                         </div>
                                     );
                                 })}
