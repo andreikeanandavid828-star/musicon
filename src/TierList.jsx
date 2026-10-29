@@ -4,6 +4,14 @@ import { songs as availableSongs } from './songs.jsx';
 import SongArtwork from './SongArtwork.jsx';
 
 const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
+const DEFAULT_TIER_NAMES = {
+    S: 'S',
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D',
+};
+const TIER_KEYS = Object.keys(DEFAULT_TIER_NAMES);
 
 const emptyTierList = () => ({
     S: [],
@@ -21,8 +29,12 @@ export default function TierList() {
     const [listTitle, setListTitle] = useState(DEFAULT_TIER_LIST_TITLE);
     const [titleDraft, setTitleDraft] = useState(DEFAULT_TIER_LIST_TITLE);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [tierNames, setTierNames] = useState(DEFAULT_TIER_NAMES);
+    const [tierDraft, setTierDraft] = useState('');
+    const [editingTier, setEditingTier] = useState(null);
     const [shareNotice, setShareNotice] = useState('');
     const songPickerRef = useRef(null);
+    const canceledTierEditRef = useRef(null);
 
     useEffect(() => {
         const dialog = songPickerRef.current;
@@ -40,6 +52,19 @@ export default function TierList() {
         const title = titleDraft.trim();
         if (title) setListTitle(title);
         setIsEditingTitle(false);
+    }
+
+    function finishTierEdit(tierKey) {
+        if (canceledTierEditRef.current === tierKey) {
+            canceledTierEditRef.current = null;
+            return;
+        }
+
+        const name = tierDraft.trim();
+        if (name) {
+            setTierNames((currentNames) => ({ ...currentNames, [tierKey]: name }));
+        }
+        setEditingTier(null);
     }
 
     function handleShare() {
@@ -103,6 +128,7 @@ export default function TierList() {
                     <div className="tierlist-actions">
                         <Button className="button--primary" onClick={() => {
                             setTiers(emptyTierList());
+                            setTierNames(DEFAULT_TIER_NAMES);
                             setHasCreatedList(true);
                         }}>
                             New Tier List
@@ -162,16 +188,48 @@ export default function TierList() {
                         </p>
                     )}
                     <div className="tierlist-rows">
-                        {['S', 'A', 'B', 'C', 'D'].map((tierName) => (
+                        {TIER_KEYS.map((tierKey) => (
                             <div
-                                className={`tierlist-row tierlist-row--${tierName.toLowerCase()}`}
-                                key={tierName}
+                                className={`tierlist-row tierlist-row--${tierKey.toLowerCase()}`}
+                                key={tierKey}
                                 onDragOver={(event) => event.preventDefault()}
-                                onDrop={(event) => moveSong(event, tierName)}
+                                onDrop={(event) => moveSong(event, tierKey)}
                             >
-                                <h3>{tierName}</h3>
-                                <div className="tierlist-songs" aria-label={`${tierName} tier`}>
-                                    {tiers[tierName].map((song) => (
+                                <h3>
+                                    {editingTier === tierKey ? (
+                                        <input
+                                            className="form-input tierlist-tier-input"
+                                            aria-label={`${tierKey} tier name`}
+                                            autoFocus
+                                            value={tierDraft}
+                                            onChange={(event) => setTierDraft(event.target.value)}
+                                            onBlur={() => finishTierEdit(tierKey)}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') event.currentTarget.blur();
+                                                if (event.key === 'Escape') {
+                                                    canceledTierEditRef.current = tierKey;
+                                                    setTierDraft(tierNames[tierKey]);
+                                                    setEditingTier(null);
+                                                }
+                                            }}
+                                        />
+                                    ) : (
+                                        <button
+                                            className="tierlist-tier-button"
+                                            type="button"
+                                            aria-label={`Edit ${tierNames[tierKey]} tier name`}
+                                            onClick={() => {
+                                                canceledTierEditRef.current = null;
+                                                setTierDraft(tierNames[tierKey]);
+                                                setEditingTier(tierKey);
+                                            }}
+                                        >
+                                            {tierNames[tierKey]}
+                                        </button>
+                                    )}
+                                </h3>
+                                <div className="tierlist-songs" aria-label={`${tierNames[tierKey]} tier`}>
+                                    {tiers[tierKey].map((song) => (
                                         <div
                                             className="tierlist-song tierlist-song--artwork"
                                             title={song.title}

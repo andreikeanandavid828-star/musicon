@@ -391,63 +391,132 @@
   font-weight: 500;
 }
 
+.home-page {
+  text-align: left;
+}
+
 .home-page h1 {
-  margin: 32px 0;
+  margin: 0 0 36px;
   font-size: 56px;
   letter-spacing: -0.03em;
+  text-align: center;
 }
 
 .home-page p {
   margin: 0;
 }
 
-.home-page h2 {
-  margin: 0 0 16px;
+.home-section {
+  margin-bottom: 40px;
+}
+
+.home-section__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.home-section h2 {
+  margin: 0;
   color: var(--heading);
   font-size: 24px;
   font-weight: 500;
 }
 
-.song-list {
-  display: grid;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0;
-  gap: 10px;
-  list-style: none;
+.home-section__link {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
 }
 
-.song-list__item {
+.home-section__link:hover {
+  color: var(--heading);
+  text-decoration: underline;
+}
+
+.home-card-row {
+  display: flex;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0;
+  gap: 20px;
+  list-style: none;
+  scrollbar-color: var(--border) transparent;
+}
+
+.home-card {
+  flex: 0 0 168px;
+  min-width: 0;
+}
+
+.home-card__button,
+.home-card__link {
   display: flex;
   width: 100%;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 14px;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
   color: var(--text);
   text-align: left;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-card__button {
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.song-list__item:hover,
-.song-list__item[aria-pressed='true'] {
-  transform: translateY(-1px);
+.home-card__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.home-card__button:hover:not(:disabled),
+.home-card__button[aria-pressed='true'],
+.home-card__link:hover {
+  transform: translateY(-2px);
   border-color: var(--accent);
+  background: var(--surface);
 }
 
-.song-list__item:focus-visible {
+.home-card__button:focus-visible,
+.home-card__link:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-.song-list__action {
-  margin-left: auto;
+.home-card__artwork {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.home-card__title {
+  overflow: hidden;
+  color: var(--heading);
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-card__subtitle {
+  overflow: hidden;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-empty {
+  color: var(--muted);
 }
 
 .song-artwork {
@@ -1197,7 +1266,7 @@
 .tierlist-row {
   display: grid;
   min-height: 84px;
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: 180px minmax(0, 1fr);
   align-items: stretch;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1211,6 +1280,38 @@
   justify-content: center;
   margin: 0;
   font-size: 18px;
+}
+
+.tierlist-tier-button {
+  width: 100%;
+  height: 100%;
+  padding: 8px 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.tierlist-tier-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tierlist-tier-button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -3px;
+}
+
+.tierlist-tier-input {
+  width: calc(100% - 8px);
+  min-width: 0;
+  margin: 4px;
+  padding: 4px;
+  font: inherit;
+  text-align: center;
 }
 
 .tierlist-row--s h3 {
@@ -1652,8 +1753,16 @@
   }
 
   .home-page h1 {
-    margin: 20px 0;
+    margin-bottom: 24px;
     font-size: 36px;
+  }
+
+  .home-card-row {
+    gap: 8px;
+  }
+
+  .home-card {
+    flex-basis: 128px;
   }
 
   .login-page h1 {
