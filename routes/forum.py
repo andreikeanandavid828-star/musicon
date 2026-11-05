@@ -1,4 +1,3 @@
-
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user
 
@@ -13,7 +12,7 @@ def get_posts():
     try:
         response = supabase.table('posts').select(
             '*, users!posts_user_id_fkey(username), albums(*)'
-        ).order('created_at', desc=True).execute()
+        ).order('created_at', desc=True).limit(50).execute()
         return jsonify(response.data), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -128,21 +127,26 @@ def get_post_detail(post_id):
         return '', 200
 
     try:
-        # Fetch the main post and the author's username
+        # 1. Fetch the post
         post_res = supabase.table('posts').select(
             '*, users!posts_user_id_fkey(username), albums(*)'
-        ).eq('id', post_id).single().execute()
+        ).eq('id', post_id).execute()
 
-        # Fetch all comments for this post, including the commenter's username
+        if not post_res.data:
+            return jsonify({'error': 'Post not found'}), 404
+
+        # 2. Fetch comments with explicit foreign key join for users
         comments_res = supabase.table('comments').select(
-            '*, users(username)'
-        ).eq('post_id', post_id).order('created_at', asc=True).execute()
+            '*, users!comments_user_id_fkey(username)'
+        ).eq('post_id', post_id).order('created_at', desc=False).execute()
 
         return jsonify({
-            'post': post_res.data,
-            'comments': comments_res.data
+            'post': post_res.data[0],
+            'comments': comments_res.data or []
         }), 200
+
     except Exception as e:
+        print("GET POST DETAIL ERROR:", e)
         return jsonify({'error': str(e)}), 500
 
 
@@ -189,13 +193,21 @@ def delete_comment(comment_id):
         return jsonify({'error': 'Unauthorized'}), 401
     
     try: 
-        # Ensure the user owns the comment before deleting
-        existing = supabase.table('comments').select('user_id').eq('id', comment_id).single().execute()
-        if not existing.data or existing.data['user_id'] != user.id:
-            return jsonify({'error': 'Forbidden: You can only delete your own comments'}), 403
-        
-        supabase.table('comments').delete().eq('id', comment_id).execute()
-        return jsonify({'message': 'Comment deleted successfully'}), 200
+       # 1. Fetch the comment to check who owns it
+       comment_res = supabase.table('comments').select('*').eq('id', comment_id).execute()
+       if not comment_res.data:
+           return jsonify({'error': 'Comment no found'}), 404
+       
+       comment = comment_res.data[0]
+
+       # 2. Check if the logged-in user owns the comment
+       if comment['user_id'] != user.id:
+              return jsonify({'error': 'Forbidden: You can only delete your own comments'}), 403
+       
+       # 3. Safe to delete
+       supabase.table('comments').delete().eq('id', comment_id).execute()
+       return jsonify({'message': 'Comment deleted'}), 200    
+
     except Exception as e:
         print("DELETE COMMENT ERROR:", e)
         return jsonify({'error': str(e)}), 500

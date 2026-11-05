@@ -11,6 +11,7 @@ import SignUp from './SignUp.jsx';
 import Tierlist from './TierList.jsx';
 import TierlistButton from './TierListButton.jsx';
 import Forum from './Forum.jsx';
+import PostDetail from './PostDetail.jsx'; // 1. Import your new PostDetail component
 import ForumButton from './ForumButton.jsx';
 import SignupButton from './SignupButton.jsx';
 import Profile from './Profile.jsx';
@@ -23,8 +24,6 @@ import Button from './Button.jsx';
 import { DEFAULT_PALETTE, readPalette, readDefaultMode, savePalette, saveDefaultMode } from './Appearance.js';
 
 function AppShell() {
-  // Color family and preferred brightness are independent settings.
-  // only logged in users can get customized color families and brightness preferences. Guests always see Original Musicon / Light.
   const [paletteId, setPaletteId] = useState(readPalette);
   const [defaultMode, setDefaultMode] = useState(readDefaultMode);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -39,16 +38,13 @@ function AppShell() {
     setDefaultMode(mode);
     setIsDarkMode(mode === 'dark');
   }
+
   const [selectedSong, setSelectedSong] = useState(null);
   const [activeAlbumId, setActiveAlbumId] = useState(null);
-  // Treat the backend's HttpOnly cookie as the source of truth.
   const [authStatus, setAuthStatus] = useState('checking');
   const [authError, setAuthError] = useState('');
   const navigate = useNavigate();
 
-  // GET /profile/me authenticates via utility.get_authenticated_user().
-  // Its 404 responses occur after authentication, when a DB row is missing.
-  // In the long term, a dedicated GET /api/auth/me endpoint would be cleaner.
   const verifySession = useCallback(async () => {
     setAuthStatus('checking');
     setAuthError('');
@@ -57,11 +53,9 @@ function AppShell() {
         credentials: 'include',
       });
       if (response.status === 401) {
-        // Don't erase the saved preference: guests simply see Original Musicon.
         setIsDarkMode(true);
         setAuthStatus('guest');
       } else if (response.ok || response.status === 404) {
-        // Restore the saved brightness once the existing session is confirmed.
         setIsDarkMode(readDefaultMode() === 'dark');
         setAuthStatus('authenticated');
       } else {
@@ -78,7 +72,6 @@ function AppShell() {
 
   function handleLoggedIn() {
     setAuthError('');
-    // Restore previous browser preferences; login itself doesn't change them.
     setPaletteId(readPalette());
     setDefaultMode(readDefaultMode());
     setIsDarkMode(readDefaultMode() === 'dark');
@@ -93,7 +86,6 @@ function AppShell() {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Logout failed');
-      // Show the guest site in Original Musicon / Light without deleting preferences.
       setIsDarkMode(true);
       setAuthStatus('guest');
       navigate('/');
@@ -105,9 +97,11 @@ function AppShell() {
   const [userSongs, setUserSongs] = useState([]);
   const [albums, setAlbums] = useState([]);
   const availableSongs = [...songs, ...userSongs];
+  
   const handleCreateAlbum = (album) => {
     setAlbums((currentAlbums) => [...currentAlbums, album]);
   };
+  
   const handleAddSongs = (albumId, songIds) => {
     setAlbums((currentAlbums) =>
       currentAlbums.map((album) =>
@@ -117,16 +111,20 @@ function AppShell() {
       ),
     );
   };
+
   const { pathname } = useLocation();
   const isAuthPage = pathname === '/login' || pathname === '/signup';
+
   const handleSongSelection = (song) => {
     setActiveAlbumId(null);
     setSelectedSong({ ...song });
   };
+
   const handleAlbumSongSelection = (song, albumId) => {
     setActiveAlbumId(albumId);
     setSelectedSong({ ...song });
   };
+
   const handleTrackNavigation = (direction) => {
     const activeAlbum = albums.find((album) => album.id === activeAlbumId);
     const trackList = activeAlbum
@@ -147,8 +145,6 @@ function AppShell() {
 
   useEffect(() => {
     const root = document.documentElement;
-    // Guest pages always use the original color family. Only authenticated
-    // users see their saved palette; checking/error states use original light.
     root.dataset.palette = authStatus === 'authenticated' ? paletteId : DEFAULT_PALETTE;
     root.dataset.theme = (authStatus === 'checking' || authStatus === 'error')
       ? 'dark'
@@ -207,6 +203,10 @@ function AppShell() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
+        
+        {/* Dynamic Route for individual post pages */}
+        <Route path="/forum/posts/:postId" element={<PostDetail />} />
+
         <Route
           path="/albums"
           element={
