@@ -1,3 +1,4 @@
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user
 
@@ -172,12 +173,12 @@ def add_comment(post_id):
         }).execute()
 
         created_comment = response.data[0] if response.data else {}
-        return jsonify({'message': 'Comment added', 'comment': response.data[0]}), 201
+        return jsonify({'message': 'Comment added', 'comment': created_comment}), 201
     except Exception as e:
         print("ADD COMMENT ERROR:", e)
         return jsonify({'error': str(e)}), 500
     
-# 5. Delete a comment (Optional addition for full CRUD)
+# 5. Delete a comment
 @posts_bp.route('/comments/<comment_id>', methods=['DELETE', 'OPTIONS'], strict_slashes=False)
 def delete_comment(comment_id):
     if request.method == 'OPTIONS':
@@ -188,7 +189,7 @@ def delete_comment(comment_id):
         return jsonify({'error': 'Unauthorized'}), 401
     
     try: 
-        # Ensire the user owns the comment before deleting
+        # Ensure the user owns the comment before deleting
         existing = supabase.table('comments').select('user_id').eq('id', comment_id).single().execute()
         if not existing.data or existing.data['user_id'] != user.id:
             return jsonify({'error': 'Forbidden: You can only delete your own comments'}), 403
@@ -199,6 +200,7 @@ def delete_comment(comment_id):
         print("DELETE COMMENT ERROR:", e)
         return jsonify({'error': str(e)}), 500
     
+# 6. Get posts for the authenticated user's profile
 @posts_bp.route('/me', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_my_posts():
     if request.method == 'OPTIONS':
@@ -206,7 +208,7 @@ def get_my_posts():
     
     user = get_authenticated_user()
     if not user:
-        return jsonify({'error': 'Unathorized'}), 401
+        return jsonify({'error': 'Unauthorized'}), 401
     
     try:
         response = supabase.table('posts').select(
@@ -215,4 +217,4 @@ def get_my_posts():
 
         return jsonify({'posts': response.data}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500 
+        return jsonify({'error': str(e)}), 500
