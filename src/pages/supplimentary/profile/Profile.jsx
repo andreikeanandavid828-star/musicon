@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Button from './Button.jsx';
+import Button from '../../../Button.jsx';
 import PersonalizeModal from './PersonalizeModal.jsx';
 function CropEditor({ source, type, onApply, onCancel }) {
   const viewportRef = useRef(null);
@@ -250,11 +250,11 @@ function CropEditor({ source, type, onApply, onCancel }) {
             style={
               geometry
                 ? {
-                    width: `${geometry.renderedWidth}px`,
-                    height: `${geometry.renderedHeight}px`,
-                    transform:
-                      `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px)`,
-                  }
+                  width: `${geometry.renderedWidth}px`,
+                  height: `${geometry.renderedHeight}px`,
+                  transform:
+                    `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px)`,
+                }
                 : undefined
             }
           />
@@ -310,7 +310,7 @@ export default function Profile({
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
   const [isPersonalizing, setIsPersonalizing] = useState(false);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -591,81 +591,81 @@ export default function Profile({
     setCropEditor(null);
   }
 
-  
-async function handleSaveProfile(event) {
-  event.preventDefault();
-  setSaveError('');
-  setSaveNotice('');
-  setSaving(true);
 
-  try {
-    // Create form data containing profile details and images.
-    const formData = new FormData();
+  async function handleSaveProfile(event) {
+    event.preventDefault();
+    setSaveError('');
+    setSaveNotice('');
+    setSaving(true);
 
-    formData.append('username', editForm.username);
-    formData.append('bio', editForm.bio);
-    formData.append('location', editForm.location.trim());
-    formData.append('show_location', String(editForm.showLocation && !!editForm.location.trim()));
+    try {
+      // Create form data containing profile details and images.
+      const formData = new FormData();
 
-    // Include cropped profile picture, if changed.
-    if (editForm.profilePictureFile) {
-      formData.append(
-        'profile_picture',
-        editForm.profilePictureFile
-      );
-    }
+      formData.append('username', editForm.username);
+      formData.append('bio', editForm.bio);
+      formData.append('location', editForm.location.trim());
+      formData.append('show_location', String(editForm.showLocation && !!editForm.location.trim()));
 
-    // Include cropped banner picture, if changed.
-    if (editForm.bannerPictureFile) {
-      formData.append(
-        'banner_picture',
-        editForm.bannerPictureFile
-      );
-    }
-
-    // Send profile changes to Flask.
-    const response = await fetch(
-      'http://localhost:5000/profile/me',
-      {
-        method: 'PATCH',
-        credentials: 'include',
-        body: formData,
+      // Include cropped profile picture, if changed.
+      if (editForm.profilePictureFile) {
+        formData.append(
+          'profile_picture',
+          editForm.profilePictureFile
+        );
       }
-    );
 
-    const result = await response.json().catch(() => ({}));
+      // Include cropped banner picture, if changed.
+      if (editForm.bannerPictureFile) {
+        formData.append(
+          'banner_picture',
+          editForm.bannerPictureFile
+        );
+      }
 
-    if (!response.ok) {
-      throw new Error(
-        result.error || 'Could not save profile.'
+      // Send profile changes to Flask.
+      const response = await fetch(
+        'http://localhost:5000/profile/me',
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          body: formData,
+        }
       );
-    }
 
-    if (!result.profile) {
-      throw new Error(
-        'The server did not return an updated profile.'
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || 'Could not save profile.'
+        );
+      }
+
+      if (!result.profile) {
+        throw new Error(
+          'The server did not return an updated profile.'
+        );
+      }
+
+      // Update profile using the saved database values.
+      setProfile(result.profile);
+
+      // Clean up temporary image previews.
+      releaseDraftPreviews();
+
+      locationRequestRef.current += 1;
+      setLocating(false);
+      setIsEditing(false);
+      setSaveNotice('Profile saved successfully!');
+
+    } catch (error) {
+      setSaveError(
+        error.message || 'Could not save profile.'
       );
+    } finally {
+      setSaving(false);
     }
-
-    // Update profile using the saved database values.
-    setProfile(result.profile);
-
-    // Clean up temporary image previews.
-    releaseDraftPreviews();
-
-    locationRequestRef.current += 1;
-    setLocating(false);
-    setIsEditing(false);
-    setSaveNotice('Profile saved successfully!');
-
-  } catch (error) {
-    setSaveError(
-      error.message || 'Could not save profile.'
-    );
-  } finally {
-    setSaving(false);
   }
-}
 
 
   if (loading) {

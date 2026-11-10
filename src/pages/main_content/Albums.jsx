@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import Button from './Button.jsx';
-import SongArtwork from './SongArtwork.jsx';
+import Button from '../../Button.jsx';
+import SongArtwork from '../../gather_music/SongArtwork.jsx';
 
 export default function Albums({
     albums,

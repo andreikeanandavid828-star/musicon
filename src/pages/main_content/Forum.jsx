@@ -1,5 +1,5 @@
 import { useId, useState, useEffect } from 'react';
-import Button from './Button.jsx';
+import Button from '../../Button.jsx';
 
 function LikeButton({ itemLabel, isLiked, likeCount, onToggle, disabled }) {
     const inputId = useId();
@@ -178,7 +178,7 @@ export default function Forum() {
             }
 
             form.reset();
-            
+
             // Refresh comments for this post
             const detailResponse = await fetch(`http://localhost:5000/api/posts/${postId}`, {
                 credentials: 'include',
@@ -311,9 +311,9 @@ export default function Forum() {
                                             <p className="forum-comment">
                                                 <strong>{commentAuthor}:</strong> {comment.body}
                                             </p>
-                                            <button 
-                                                className="forum-comment-delete" 
-                                                type="button" 
+                                            <button
+                                                className="forum-comment-delete"
+                                                type="button"
                                                 onClick={() => deleteComment(comment.id, post.id)}
                                             >
                                                 Delete

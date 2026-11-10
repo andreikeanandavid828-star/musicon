@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import Button from './Button.jsx';
-import { songs as availableSongs } from './songs.jsx';
-import SongArtwork from './SongArtwork.jsx';
+import Button from '../../Button.jsx';
+import { songs as availableSongs } from '../../gather_music/songs.jsx';
+import SongArtwork from '../../gather_music/SongArtwork.jsx';
 
 const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
 const DEFAULT_TIER_NAMES = {

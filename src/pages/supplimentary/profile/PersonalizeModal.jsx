@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import Button from './Button.jsx';
+import Button from '../../../Button.jsx';
 import {
   PALETTES, DEFAULT_PALETTE, DEFAULT_MODE,
 } from './Appearance.js';
-import './PersonalizeModal.css';
+import '../../../css/PersonalizeModal.css';
 
 export default function PersonalizeModal({
   onClose,
