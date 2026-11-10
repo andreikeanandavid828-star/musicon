@@ -45,8 +45,11 @@ export default function Forum() {
         try {
             const response = await fetch('http://localhost:5000/api/posts/', { credentials: 'include' });
             const data = await response.json();
-            if (response.ok) setPosts(data);
-            else setError('Failed to load posts.');
+            if (response.ok) {
+                setPosts(data);
+            } else {
+                setError('Failed to load posts.');
+            }
         } catch (err) {
             setError('Could not connect to server.');
         }
@@ -150,14 +153,41 @@ export default function Forum() {
                     <p className="forum-empty">No discussions yet. Your post will be the first.</p>
                 ) : sortedPosts.map((post) => {
                     const authorName = post.users?.username || 'Anonymous';
+                    const rawPath = post.users?.profile_picture_path;
+                    const avatarPath = (rawPath && !rawPath.startsWith('file:///')) ? rawPath : null;
+                    
+                    const avatarUrl = avatarPath 
+                        ? `https://lpvgrxwgruhlxbboivth.supabase.co/storage/v1/object/public/profile-images/${avatarPath}` 
+                        : null;
+
                     return (
                         <article className="forum-post" key={post.id}>
-                            <div className="forum-post-heading">
-                                <div className="forum-post-main">
+                            <div className="forum-post-heading" style={{ minWidth: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                
+                                <div className="forum-avatar-container" style={{ flexShrink: 0 }}>
+                                    {avatarUrl ? (
+                                        <img 
+                                            src={avatarUrl} 
+                                            alt={`${authorName}'s avatar`} 
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
+                                    ) : (
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--border)', display: 'grid', placeItems: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                            {authorName.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="forum-post-main" style={{ minWidth: 0, flex: 1 }}>
                                     <Link to={`/forum/posts/${post.id}`} className="forum-post-title-link">
-                                        <h3 className="forum-post-title">{post.title}</h3>
+                                        <h3 className="forum-post-title" style={{ overflowWrap: 'break-word', whiteSpace: 'normal' }}>
+                                            {post.title}
+                                        </h3>
                                     </Link>
-                                    <p className="forum-post-content">{post.body}</p>
+                                    <p className="forum-post-content" style={{ overflowWrap: 'break-word', whiteSpace: 'normal' }}>
+                                        {post.body}
+                                    </p>
                                     <span className="forum-post-meta">Posted by {authorName}</span>
                                 </div>
                                 <LikeButton
