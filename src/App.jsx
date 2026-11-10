@@ -18,6 +18,8 @@ import ProfileButton from './ProfileButton.jsx';
 import Albums from './Albums.jsx';
 import AlbumButton from './AlbumButton.jsx';
 import Upload from './Upload.jsx';
+import Search from './Search.jsx';
+import SearchBar from './SearchBar.jsx';
 import { songs } from './songs.jsx';
 import Button from './Button.jsx';
 import { DEFAULT_PALETTE, readPalette, readDefaultMode, savePalette, saveDefaultMode } from './Appearance.js';
@@ -160,6 +162,7 @@ function AppShell() {
       <header className="app-header">
         {!isAuthPage && (
           <>
+            <SearchBar />
             {authStatus === 'guest' && (
               <><LoginButton /><SignupButton /></>
             )}
@@ -205,6 +208,7 @@ function AppShell() {
         />
         <Route path="/login" element={<Login onLoggedIn={handleLoggedIn} />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
         <Route
