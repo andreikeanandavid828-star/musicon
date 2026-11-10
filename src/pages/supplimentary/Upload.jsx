@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from './Button.jsx';
+import Button from '../../Button.jsx';
 
 export default function Upload({ onPostSong }) {
 	const [error, setError] = useState('');
