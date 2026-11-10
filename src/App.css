@@ -319,6 +319,7 @@
 
 .search-bar {
   position: absolute;
+  z-index: 20;
   left: 50%;
   display: flex;
   min-width: 0;
@@ -364,6 +365,40 @@
 
 .search-bar__submit:hover {
   border-color: var(--muted);
+}
+
+.search-page__query {
+  margin: -12px 0 0;
+  color: var(--muted);
+}
+
+.search-page__song {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-page__song:last-child {
+  border-bottom: 0;
+}
+
+.search-page .search-page__artwork {
+  width: 56px;
+  height: 56px;
+}
+
+.search-page__error {
+  color: var(--accent);
+}
+
+.search-page__song .album-songs__title,
+.search-page__song .album-songs__artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-header::after {
@@ -457,34 +492,6 @@
 
 .search-page {
   text-align: left;
-}
-
-.search-page__tabs {
-  display: flex;
-  overflow-x: auto;
-  gap: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-.search-page__tab {
-  padding: 10px 14px;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  text-transform: capitalize;
-  cursor: pointer;
-}
-
-.search-page__tab[aria-selected='true'] {
-  border-bottom-color: var(--accent);
-  color: var(--heading);
-  font-weight: 700;
-}
-
-.search-page__tab:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
 }
 
 .search-page__results h1 {
