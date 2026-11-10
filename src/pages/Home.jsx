@@ -1,5 +1,5 @@
-import { songs as catalogSongs } from './songs.jsx';
-import SongArtwork from './SongArtwork.jsx';
+import { songs as catalogSongs } from '../gather_music/songs.jsx';
+import SongArtwork from '../gather_music/SongArtwork.jsx';
 import { Link } from 'react-router-dom';
 
 export default function Home({

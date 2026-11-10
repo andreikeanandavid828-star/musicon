@@ -1,7 +1,7 @@
 
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from './Button.jsx';
+import Button from '../../Button.jsx';
 
 export default function Login({ onLoggedIn }) {
   const [submitting, setSubmitting] = useState(false);
