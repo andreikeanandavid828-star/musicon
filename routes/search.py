@@ -1,3 +1,32 @@
+"""
+Module: Song Search Routes
+Design name: Search API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Provides a paginated case-insensitive song-title search endpoint backed
+    by Supabase.
+
+Important functions:
+    search_songs() -> (JSON response, HTTP status):
+        Input: query parameters `q` (text, maximum 100 characters) and
+        `page` (positive integer, default 1).
+        Output: JSON songs, total count, page, total_pages, and has_next;
+        empty result metadata for a blank query; or JSON validation/database
+        errors with the corresponding status.
+
+Important data structures:
+    PAGE_SIZE is 20. Each song result is a dictionary with selected song
+    fields and related album fields. The response is a dictionary containing
+    the result list and pagination metadata.
+
+Algorithms and design choices:
+    SQL LIKE wildcard characters in user input are escaped before surrounding
+    the query with `%` for substring matching. Page number is converted to
+    zero-based inclusive Supabase range indexes. Exact count and stable
+    title/id ordering support predictable page metadata and pagination.
+"""
 
 from flask import Blueprint, request, jsonify
 from utility import supabase

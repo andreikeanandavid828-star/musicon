@@ -1,3 +1,30 @@
+/**
+ * Module: Signup Page
+ * Design name: Account registration form
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah
+ *
+ * Purpose:
+ *   Collects account details, validates password confirmation, submits
+ *   registration to the backend, and displays success or error status.
+ *
+ * Important functions:
+ *   SignUp() -> React element: takes no props; renders registration form.
+ *   handleSubmit(event) -> Promise<void>: reads email, password,
+ *     confirmation, username, first/last name from FormData; validates
+ *     matching passwords; submits JSON; resets the form and sets success
+ *     state or reports an error.
+ *
+ * Important data structures:
+ *   FormData stores form fields; request JSON is a dictionary of account
+ *   values. React state tracks submitting, error, and created status.
+ *
+ * Algorithms and design choices:
+ *   Passwords are compared before any network request. Response JSON parsing
+ *   has a fallback for non-JSON responses; a finally block restores the
+ *   submitting state.
+ */
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../Button.jsx';

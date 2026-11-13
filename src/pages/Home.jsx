@@ -1,3 +1,30 @@
+/**
+ * Module: Home Page
+ * Design name: Song and playlist catalog view
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah, Ian Flack, Anthony Langer
+ *
+ * Purpose:
+ *   Shows available songs and albums/playlists, with playback selection and
+ *   navigation to album details.
+ *
+ * Important functions:
+ *   Home({ songs, albums, selectedSong, onSelectSong }) -> React element:
+ *     accepts song and album arrays, selected song or null, and a song
+ *     selection callback; renders catalog cards and empty states.
+ *   The inline cover-song lookup maps an album's song IDs to catalog records
+ *     and selects the first available record; it returns a song or undefined.
+ *
+ * Important data structures:
+ *   Song records use id/title/src/artist fields; album records use id/name/
+ *   songIds. Arrays are rendered as keyed lists.
+ *
+ * Algorithms and design choices:
+ *   Album cover art uses the first album song found in the catalog. Missing
+ *   songs are filtered by selecting the first truthy match, avoiding broken
+ *   artwork references.
+ */
+
 import { songs as catalogSongs } from '../gather_music/songs.jsx';
 import SongArtwork from '../gather_music/SongArtwork.jsx';
 import { Link } from 'react-router-dom';

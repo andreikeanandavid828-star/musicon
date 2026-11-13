@@ -1,3 +1,32 @@
+"""
+Module: Spotify Search Routes
+Design name: Spotify API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Validates incoming track-search requests and adapts Spotify service
+    results and upstream errors into the application's JSON API.
+
+Important functions:
+    search_tracks() -> (JSON response, HTTP status):
+        Input: query parameter `q`, trimmed and limited to 1-100 characters.
+        Output: JSON song list with status 200; validation error 400; upstream
+        Spotify failures as 502, including 429 rate limits and Retry-After;
+        or a generic service error 500.
+
+Important data structures:
+    Spotify track results are returned as a list of song dictionaries.
+    Error responses are JSON dictionaries; rate-limit responses may include
+    a Retry-After header.
+
+Algorithms and design choices:
+    The route validates length before making an upstream call, then delegates
+    token management and result normalization to utility.spotify_client.
+    RequestException is handled separately to distinguish upstream outages
+    and rate limiting from unexpected local errors.
+"""
+
 from flask import Blueprint, request, jsonify
 from requests.exceptions import RequestException
 

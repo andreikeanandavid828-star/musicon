@@ -1,3 +1,33 @@
+/**
+ * Module: Login Page
+ * Design name: Login form and password-reset dialog
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah
+ *
+ * Purpose:
+ *   Authenticates users through the backend, reports form/API errors, and
+ *   provides a password-reset dialog placeholder.
+ *
+ * Important functions:
+ *   Login({ onLoggedIn }) -> React element: accepts an optional callback
+ *     invoked after a successful login; returns login form and reset dialog.
+ *   openResetPopup() / closeResetPopup() -> void: open or close the native
+ *     reset dialog and initialize its local fields.
+ *   handleResetSubmit(event) -> void: prevents form submission and displays
+ *     a not-connected notice; the backend reset flow is not wired here.
+ *   handleSubmit(event) -> Promise<void>: reads email/password from FormData,
+ *     calls the login endpoint, updates submitting/error state, invokes
+ *     onLoggedIn, resets the form, and navigates to the profile on success.
+ *
+ * Important data structures:
+ *   FormData carries credentials; React state holds submitting, error, reset
+ *   email, and reset message. A ref points to the native dialog.
+ *
+ * Algorithms and design choices:
+ *   The server response is parsed defensively and the first available
+ *   server-side message is shown, with a generic fallback. A finally block
+ *   always clears submitting state.
+ */
 
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

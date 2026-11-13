@@ -1,3 +1,43 @@
+/**
+ * Module: Forum Page
+ * Design name: Discussion feed with likes and comments
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah, Ian Flack, Anthony Langer
+ *
+ * Purpose:
+ *   Loads and displays discussions, creates posts/comments, sorts the feed,
+ *   expands post details, and displays/toggles likes.
+ *
+ * Important functions:
+ *   LikeButton({ itemLabel, isLiked, likeCount, onToggle, disabled })
+ *     -> React element: renders a controlled like checkbox and count.
+ *   Forum() -> React element: takes no props; owns feed and interaction state.
+ *   fetchPosts() -> Promise<void>: retrieves the post feed and sets error state.
+ *   fetchLikes() -> Promise<void>: retrieves vote counts and current user's
+ *     liked post IDs.
+ *   toggleLike(postId) -> Promise<void>: posts or deletes the current user's
+ *     vote, then refreshes authoritative counts.
+ *   addPost(event) -> Promise<void>: reads title/content FormData, submits a
+ *     post, clears the form and refreshes the feed.
+ *   handleToggleExpand(postId) -> Promise<void>: toggles one expanded post and
+ *     fetches its comments when opening it.
+ *   addComment(event, postId) -> Promise<void>: submits comment body then
+ *     refreshes that post's comments.
+ *   deleteComment(commentId, postId) -> Promise<void>: confirms deletion,
+ *     removes the comment, and refreshes the post's comments.
+ *
+ * Important data structures:
+ *   Posts/comments are arrays of records. `commentsMap` maps post IDs to
+ *   comment arrays; `likeCounts` maps post IDs to counts; liked and pending
+ *   post IDs are arrays. Sorting uses copied post records.
+ *
+ * Algorithms and design choices:
+ *   Feed sorting copies before sorting to avoid mutating React state. Dates
+ *   are converted to epoch milliseconds and ordered newest-first by default.
+ *   Like counts are reloaded from the server after each mutation to reflect
+ *   concurrent users; pending IDs prevent duplicate in-flight toggles.
+ */
+
 import { useId, useState, useEffect } from 'react';
 import Button from '../../Button.jsx';
 

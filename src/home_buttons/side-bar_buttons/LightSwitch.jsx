@@ -1,3 +1,26 @@
+/**
+ * Module: Light Switch
+ * Design name: Sidebar appearance-mode control
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah, Ian Flack
+ *
+ * Purpose:
+ *   Renders the animated checkbox control that toggles the application's
+ *   light/dark appearance.
+ *
+ * Important functions:
+ *   LightSwitch({ toggleTheme, isDarkMode }) -> React element:
+ *     accepts a change callback and current boolean theme value; returns a
+ *     controlled checkbox with decorative sun, moon, clouds, and stars.
+ *
+ * Important data structures:
+ *   Boolean `isDarkMode`; mapped integer arrays generate decorative SVG clouds.
+ *
+ * Algorithms and design choices:
+ *   The native checkbox is controlled by its parent; no local theme state
+ *   or appearance algorithm is duplicated here.
+ */
+
 export default function LightSwitch({ toggleTheme, isDarkMode }) {
   return (
     <label className="switch">

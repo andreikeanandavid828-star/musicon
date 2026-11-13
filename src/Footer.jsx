@@ -1,3 +1,33 @@
+/**
+ * Module: Footer Music Player
+ * Design name: Persistent audio playback controls
+ * Code date: 2026-11-12.
+ * Programmer: Ian Flack, Anthony Langer
+ *
+ * Purpose:
+ *   Displays the selected track and provides playback, seek, volume,
+ *   previous/next, artwork, error status, and collapse controls.
+ *
+ * Important functions:
+ *   FooterMusicPlayer({ selectedSong, onPreviousSong, onNextSong,
+ *   onSongEnded }) -> React element: receives the current song object or
+ *   null and callbacks for track navigation/end; returns player UI.
+ *   handlePlayPause() -> Promise<void>: toggles the HTMLAudioElement and
+ *   records playback errors.
+ *   handleSeek(event) -> void: reads a numeric time from a range input,
+ *   updates audio currentTime and React progress state.
+ *
+ * Important data structures:
+ *   State stores playback status, volume, current time, duration, error, and
+ *   collapsed state. `audioRef` references the HTMLAudioElement.
+ *
+ * Algorithms and design choices:
+ *   Playback state follows native audio play/pause/time/metadata events.
+ *   Progress is represented as currentTime/duration; volume and seek use
+ *   native range inputs. Audio pauses when the selected track changes or the
+ *   component is cleaned up.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from './Button.jsx';

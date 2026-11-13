@@ -1,3 +1,33 @@
+/**
+ * Module: Profile Button
+ * Design name: Account menu and profile navigation
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah
+ *
+ * Purpose:
+ *   Renders the authenticated account menu, fetches profile display data, and
+ *   exposes profile, upload, personalization, and logout actions.
+ *
+ * Important functions:
+ *   ProfileButton({ onLogout }) -> React element: accepts a logout callback
+ *     and returns the account trigger/menu.
+ *   refreshProfile() -> Promise<void>: fetches the current user's profile
+ *     and updates local profile state when available.
+ *   toggleMenu() -> void: refreshes profile data when opening and toggles menu.
+ *   openPersonalize() -> void: closes the menu and navigates to /profile with
+ *     a state flag requesting the personalization dialog.
+ *   Pointer/key handlers close the menu outside or on Escape; Escape restores
+ *     focus to the trigger. Logout invokes onLogout after closing.
+ *
+ * Important data structures:
+ *   Profile state is an object containing username/profilePicture; menu,
+ *   image-failure, and open states are booleans. Refs track menu and trigger.
+ *
+ * Algorithms and design choices:
+ *   Global pointer and keyboard listeners exist only while the menu is open,
+ *   and are removed in effect cleanup. A failed avatar image falls back to
+ *   the username's initial.
+ */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

@@ -1,3 +1,34 @@
+/**
+ * Module: Albums Page
+ * Design name: Album catalog and detail editor
+ * Code date: 2026-11-12.
+ * Programmer: Ian Flack
+ *
+ * Purpose:
+ *   Lists albums and shows a selected album's songs, with dialogs to create
+ *   albums and add catalog songs.
+ *
+ * Important functions:
+ *   Albums({ albums, songs, onCreateAlbum, onAddSongs, selectedSong,
+ *   onSelectSong }) -> React element: takes album/song arrays, creation and
+ *   addition callbacks, current song, and selection callback; renders list
+ *   or detail view according to the /albums/:albumId route.
+ *   handleCreateAlbum(event) -> void: reads the album name from FormData,
+ *   creates a local album record, invokes onCreateAlbum, and navigates to it.
+ *   handleAddSongs(event) -> void: reads selected song IDs, invokes
+ *   onAddSongs for the active album, and closes the picker.
+ *
+ * Important data structures:
+ *   Album objects contain id/name/songIds; song objects contain id/title and
+ *   optional artist/src. FormData holds submitted album names and song IDs.
+ *
+ * Algorithms and design choices:
+ *   Album songs are resolved by mapping song IDs into the catalog and
+ *   filtering missing records. Songs already in the album are excluded from
+ *   the picker using the selected ID list. Native dialog elements are
+ *   synchronized with component state through refs and an effect.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '../../Button.jsx';

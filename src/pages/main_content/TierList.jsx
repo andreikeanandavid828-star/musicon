@@ -1,3 +1,39 @@
+/**
+ * Module: Tier List Page
+ * Design name: Interactive song-ranking board
+ * Code date: 2026-11-12.
+ * Programmer: Anthony Langer
+ *
+ * Purpose:
+ *   Creates a local tier-list board, allows custom title/tier labels, adds
+ *   songs from the catalog, and supports dragging songs between ranking rows.
+ *
+ * Important functions:
+ *   emptyTierList() -> tier map: returns empty arrays for S/A/B/C/D and neutral.
+ *   TierList() -> React element: takes no props; manages editor, picker, title,
+ *     tier labels, and share notice state.
+ *   finishTitleEdit() -> void: trims and saves a non-empty title draft.
+ *   finishTierEdit(tierKey) -> void: trims and saves a non-empty label unless
+ *     the edit was canceled.
+ *   handleShare() -> void: requires a custom title, otherwise displays a
+ *     notice; currently reports that sharing is not yet available.
+ *   addSong(song) -> void: accepts a catalog song object and places a unique
+ *     copy into neutral; ignores songs already present.
+ *   moveSong(event, destination) -> void: accepts a drag/drop event and tier
+ *     key; removes the dragged record from its current tier and appends it to
+ *     the destination.
+ *
+ * Important data structures:
+ *   Tier state is an object keyed by S/A/B/C/D/neutral, each mapping to song
+ *   record arrays. Song records keep a unique board ID and catalog ID.
+ *   Tier names are a key-to-label object; addedSongIds is a Set.
+ *
+ * Algorithms and design choices:
+ *   A Set derived from tier contents provides efficient duplicate detection.
+ *   Drag/drop rebuilds each tier by filtering the dragged ID, then appends the
+ *   found song to its destination. This preserves immutable state updates.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import Button from '../../Button.jsx';
 import { songs as availableSongs } from '../../gather_music/songs.jsx';

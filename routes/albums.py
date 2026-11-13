@@ -1,3 +1,59 @@
+"""
+Module: Album Routes
+Design name: Albums API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Defines Flask API endpoints for listing and retrieving albums, creating
+    albums, and adding songs to an album. Database reads and writes use the
+    shared Supabase client; write endpoints require an authenticated user.
+
+Important functions:
+    get_albums() -> (Flask response, status):
+        Input: Flask request; no URL parameters or JSON body.
+        Output: JSON list of album records ordered by created_at descending
+        with status 200; an empty OPTIONS response with status 200; or a JSON
+        error with status 500.
+
+    get_album_detail(album_id) -> (Flask response, status):
+        Input: album_id from the URL.
+        Output: JSON album record enriched with its songs and related posts
+        (including post authors' usernames) with status 200; a not-found JSON
+        response with status 404 when no album data is returned; an empty
+        OPTIONS response with status 200; or a JSON error with status 500.
+
+    create_album() -> (Flask response, status):
+        Input: JSON object with title, artist or artist_name, and optional
+        cover_image_url and release_year; authenticated user from the session.
+        Output: JSON confirmation and created album with status 201; a JSON
+        unauthorized, validation, or server error with status 401, 400, or 500;
+        or an empty OPTIONS response with status 200.
+
+    add_song_to_album(album_id) -> (Flask response, status):
+        Input: album_id from the URL; JSON object with title, audio_url, and
+        optional track_number; authenticated user from the session.
+        Output: JSON confirmation and created song with status 201; a JSON
+        unauthorized, validation, or server error with status 401, 400, or 500;
+        or an empty OPTIONS response with status 200.
+
+Important data structures:
+    - Supabase table results expose records as response.data, a list of
+      dictionaries; album details add songs and posts as list-valued fields.
+    - Request payloads and JSON API responses are dictionaries.
+    - Flask handlers return response-body/status-code tuples.
+
+Algorithms and design choices:
+    - Album listing delegates sorting to the database (created_at descending)
+      to avoid loading all records merely to sort them in application memory.
+    - Album detail performs one album lookup, then queries its songs and posts
+      by album_id and attaches those result lists to the album dictionary.
+    - Create operations validate required input and authentication before
+      inserting a row. Direct Supabase queries keep these CRUD operations
+      simple and avoid duplicating database filtering or sorting logic in
+      Python.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user
 

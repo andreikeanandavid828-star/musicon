@@ -1,3 +1,28 @@
+/**
+ * Module: Search Bar
+ * Design name: Header search form and navigation
+ * Code date: 2026-11-12.
+ * Programmer: Anthony Langer
+ *
+ * Purpose:
+ *   Provides a controlled text search field in the shared header and opens
+ *   the Search page with the query in the URL when submitted.
+ *
+ * Important functions:
+ *   SearchBar() -> React element: takes no props; synchronizes its field with
+ *     the current `q` query parameter.
+ *   handleSubmit(event) -> void: prevents native form submission, trims the
+ *     query, and navigates to /search?q=... when the query is non-empty.
+ *
+ * Important data structures:
+ *   `query` is a string state value. URLSearchParams reads the current
+ *   location's query parameters.
+ *
+ * Algorithms and design choices:
+ *   Whitespace is trimmed before submit and encodeURIComponent safely
+ *   encodes the query for a URL. An empty query does not navigate.
+ */
+
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 

@@ -1,3 +1,30 @@
+/**
+ * Module: Song Upload Page
+ * Design name: Local catalog song entry dialog
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah, Ian Flack
+ *
+ * Purpose:
+ *   Opens a dialog to add a song title and artist to the in-memory Home
+ *   catalog. This screen does not upload an audio file to the backend.
+ *
+ * Important functions:
+ *   Upload({ onPostSong }) -> React element: accepts callback used to add a
+ *     song record to application state; renders the dialog form.
+ *   handlePostSong(event) -> void: reads song/artist fields from FormData,
+ *     validates both, invokes onPostSong with a generated ID and metadata,
+ *     then navigates Home; invalid values set an error.
+ *
+ * Important data structures:
+ *   FormData contains song and artist strings. Created song objects contain
+ *   id, title, and artist. A ref points to the native dialog.
+ *
+ * Algorithms and design choices:
+ *   A timestamp plus random value generates a local unique identifier; the
+ *   record is passed to the owner via callback rather than maintained in
+ *   duplicate page-local catalog state.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../Button.jsx';

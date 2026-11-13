@@ -1,3 +1,41 @@
+/**
+ * Module: Application Shell
+ * Design name: Musicon React application and route composition
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah, Ian Flack, Anthony Langer
+ *
+ * Purpose:
+ *   Owns top-level routing, session state, theme preferences, shared header
+ *   and sidebar, playlist/song state, and the persistent music player.
+ *
+ * Important functions:
+ *   AppShell() -> React element: takes no props; renders the routed app shell.
+ *   changePalette(id) -> void: saves and applies a palette identifier.
+ *   changeDefaultMode(mode) -> void: persists light/dark preference and applies it.
+ *   verifySession() -> Promise<void>: checks the server session and updates
+ *     authentication/error state.
+ *   handleLoggedIn() -> void: restores saved appearance settings on login.
+ *   handleLogout() -> Promise<void>: clears the server session and returns
+ *     to Home; records a user-visible error on failure.
+ *   handleCreateAlbum(album) / handleAddSongs(albumId, songIds) -> void:
+ *     update in-memory album and song-ID collections.
+ *   handleSongSelection(song) / handleAlbumSongSelection(song, albumId):
+ *     select playback track, optionally recording its album context.
+ *   handleTrackNavigation(direction) -> void: selects the adjacent track.
+ *   App() -> React element: no props; wraps AppShell in BrowserRouter.
+ *
+ * Important data structures:
+ *   React state holds palette/mode, auth status, current song, active album,
+ *   user songs, and albums. Routes are declared using React Router Route
+ *   elements; song/album records are object arrays.
+ *
+ * Algorithms and design choices:
+ *   Track navigation selects tracks from the active album when applicable
+ *   and wraps the index modulo the list length, enabling continuous next/
+ *   previous playback. Theme data attributes are derived from auth and
+ *   appearance state. BrowserRouter centralizes page navigation.
+ */
+
 import { useCallback, useEffect, useState } from 'react';
 import HomeButton from './home_buttons/side-bar_buttons/HomeButton.jsx';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';

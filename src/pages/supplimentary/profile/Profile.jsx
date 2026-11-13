@@ -1,3 +1,63 @@
+/**
+ * Module: User Profile Page
+ * Design name: Profile display, editing, and personalization
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah
+ *
+ * Purpose:
+ *   Loads and displays the current user's profile and posts, supports profile
+ *   editing with image cropping and optional location detection, and opens
+ *   theme personalization.
+ *
+ * Important functions:
+ *   CropEditor({ source, type, onApply, onCancel }) -> React element:
+ *     accepts source image URL, avatar/banner type, apply callback, and
+ *     cancel callback; provides draggable/zoomable crop UI.
+ *   getGeometry(nextZoom) -> geometry or null: computes scaled image
+ *     dimensions and maximum pan boundaries for the viewport.
+ *   clampOffset(nextOffset, nextZoom) -> {x,y}: constrains crop pan values.
+ *   handleImageLoad(event), handlePointerDown/Move/stopDragging(event), and
+ *     handleZoomChange(event) -> void: initialize dimensions and update the
+ *     clamped crop position from image/pointer/zoom input.
+ *   applyCrop() -> Promise<void>: draws the visible source region to a
+ *     canvas (600x600 avatar or 1500x500 banner), creates a PNG Blob/object
+ *     URL, and passes both to onApply.
+ *   Profile({ paletteId, defaultMode, currentMode, onPaletteChange,
+ *     onDefaultModeChange }) -> React element: accepts appearance state and
+ *     callbacks; loads profile data, then renders tabs and edit/settings UI.
+ *   loadProfile() -> Promise<void>: fetches current profile and sets profile,
+ *     loading, authorization, or error state.
+ *   fetchUserPosts() -> Promise<void>: loads authenticated user's posts for
+ *     the Posts tab.
+ *   openEditProfile() / closeEditProfile() -> void: initialize or discard
+ *     the editing draft and release temporary previews.
+ *   releaseDraftPreviews() -> void: revokes local object URLs for draft images.
+ *   handleInputChange(event) -> void: stores the changed edit-form field.
+ *   detectGeneralLocation() -> void: requests browser coordinates, reverse
+ *     geocodes them, and fills a general location suggestion or error state.
+ *   chooseImage(event, type) -> void: accepts a selected file and opens the
+ *     crop editor for avatar or banner.
+ *   applyCroppedImage({ previewUrl, blob }) -> void: updates the selected
+ *     image preview and File held in the edit form.
+ *   cancelCrop() -> void: closes crop UI and releases its temporary source.
+ *   handleSaveProfile(event) -> Promise<void>: posts profile fields and
+ *     optional image files as multipart data; updates profile or error state.
+ *
+ * Important data structures:
+ *   `profile` is the server-returned profile object. `editForm` stores text,
+ *   location visibility, preview URLs, and optional File objects.
+ *   `cropEditor` stores image source and type; crop geometry uses image and
+ *   viewport dimensions, zoom, and x/y offset. User posts are an array.
+ *
+ * Algorithms and design choices:
+ *   Crop scaling uses the larger viewport-to-image ratio so the viewport is
+ *   fully covered; pointer offsets are clamped to prevent empty crop edges.
+ *   Canvas draws the selected source rectangle into fixed avatar/banner
+ *   output dimensions. Location request IDs ignore stale geolocation results
+ *   after closing or starting a newer request. Object URLs are explicitly
+ *   revoked to release browser resources.
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../../Button.jsx';

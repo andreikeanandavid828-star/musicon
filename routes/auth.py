@@ -1,3 +1,42 @@
+"""
+Module: Authentication Routes
+Design name: Auth API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Provides registration, login, logout, forgot-password, and password-reset
+    endpoints backed by Supabase Auth.
+
+Important functions:
+    register() -> (JSON response, HTTP status): accepts an OPTIONS request or
+        JSON email, password, confirmPassword, username, firstName, and
+        lastName; creates an Auth user with profile metadata and returns its
+        ID or an error.
+    login() -> (JSON response, HTTP status): accepts JSON email and password;
+        returns a success response and sets an HttpOnly session cookie when
+        credentials authenticate, otherwise returns an error.
+    logout() -> (JSON response, HTTP status): clears the session cookie and
+        reports success or failure.
+    forgot_password() -> (JSON response, HTTP status): accepts an email,
+        requests a reset link via an isolated Supabase client, and returns a
+        privacy-preserving confirmation or error.
+    reset_password() -> (JSON response, HTTP status): accepts access_token,
+        refresh_token, and password; validates required data and an eight-
+        character minimum, establishes a recovery session, updates the
+        password, and signs that session out.
+
+Important data structures:
+    Request JSON and response bodies are dictionaries. Supabase Auth
+    responses contain user/session objects. The access token is stored in an
+    HttpOnly cookie on login.
+
+Algorithms and design choices:
+    Recovery uses the supplied access/refresh token pair to establish a
+    temporary Supabase session before changing the password. Password-reset
+    confirmation avoids disclosing whether an email belongs to an account.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, create_supabase_client
 

@@ -1,3 +1,48 @@
+"""
+Module: Profile Routes
+Design name: Profile API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Retrieves and updates the authenticated user's public profile fields and
+    profile images, using Supabase database and object storage services.
+
+Important functions:
+    get_first_record(table, columns, filter_column, value) -> row or None:
+        Input: Supabase table/column names and a filter value. Output: one
+        matching record dictionary, or None.
+    get_profile_records(user_id) -> (user row, profile row):
+        Input: authenticated user ID. Output: matching users and profiles rows.
+    upload_profile_image(image_file, user_id, image_type) -> storage path:
+        Input: uploaded file, user ID, and avatar/banner type. Reads at most
+        5 MiB plus one byte, validates PNG signature and authentication, then
+        stores the image and returns its unique object path; invalid input
+        raises ValueError.
+    serialize_profile(user_data, profile_data) -> dictionary:
+        Input: database user and profile rows. Output: frontend profile shape,
+        including public image URLs, privacy setting, role flags, and counts.
+    get_my_profile() -> (JSON response, status):
+        Input: current authenticated session. Output: serialized profile with
+        dynamic post count, or authentication/not-found/server error.
+    update_my_profile() -> (JSON response, status):
+        Input: authenticated session and JSON or multipart form fields for
+        username, bio, location, show_location, profile_picture, and
+        banner_picture. Output: updated profile JSON or validation,
+        authorization, not-found, or server error.
+
+Important data structures:
+    Profile/user/database rows and API payloads are dictionaries. Image
+    uploads are binary bytes stored under per-user UUID-based object paths.
+    Serialized profile includes nested scalar values and role/count fields.
+
+Algorithms and design choices:
+    Image size is bounded during reading and its PNG magic bytes are checked
+    before upload, avoiding unbounded file reads and extension-only checks.
+    UUID filenames avoid path collisions. Profile records are serialized
+    separately from database schema to preserve a frontend-facing contract.
+    Location visibility is forced off when the effective location is blank.
+"""
 
 import os
 from uuid import uuid4

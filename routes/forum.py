@@ -1,3 +1,43 @@
+"""
+Module: Forum Routes
+Design name: Posts API blueprint
+Code date: 2026-11-12.
+Programmer:
+
+Purpose:
+    Exposes forum post, like, comment, and authenticated-user post endpoints
+    using Supabase tables.
+
+Important functions:
+    get_posts() -> (JSON response, status): takes no data input and returns
+        posts with user and album relations sorted newest-first.
+    create_post() -> (JSON response, status): accepts authenticated user plus
+        JSON title, body, and optional album_id; inserts a post or returns
+        validation/auth/database errors.
+    get_likes_status() -> (JSON response, status): optionally uses the current
+        user; returns a post-ID-to-count dictionary and that user's liked IDs.
+    like_post(post_id) / unlike_post(post_id) -> (JSON response, status):
+        require authentication and add/remove the user's vote for a URL post ID.
+    get_post_detail(post_id) -> (JSON response, status): returns one post and
+        its comments, with related usernames, for the URL post ID.
+    add_comment(post_id) -> (JSON response, status): accepts authenticated
+        user and JSON body/optional parent_id; inserts a comment or reply.
+    delete_comment(comment_id) -> (JSON response, status): requires the owner
+        of the URL comment ID and deletes that comment.
+    get_my_posts() -> (JSON response, status): requires authentication and
+        returns the current user's posts with album data.
+
+Important data structures:
+    Supabase result rows are dictionaries in lists. Like status uses a
+    dictionary keyed by post ID and a list of IDs liked by the current user.
+    Comments may refer to a parent comment ID for replies.
+
+Algorithms and design choices:
+    Like rows are fetched in ordered pages of 1,000 so PostgREST's default
+    result cap does not silently truncate counts. A composite user/post key
+    with upsert makes repeated like requests idempotent. Feed ordering and
+    filtering are delegated to Supabase.
+"""
 
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user

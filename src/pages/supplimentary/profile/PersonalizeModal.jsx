@@ -1,3 +1,32 @@
+/**
+ * Module: Personalization Modal
+ * Design name: Theme palette and default brightness dialog
+ * Code date: 2026-11-12.
+ * Programmer: Mariam Shah
+ *
+ * Purpose:
+ *   Lets users choose a color palette and preferred light/dark mode, reset
+ *   those preferences, or close the dialog.
+ *
+ * Important functions:
+ *   PersonalizeModal({ onClose, paletteId, defaultMode, currentMode,
+ *   onPaletteChange, onDefaultModeChange }) -> React element: accepts current
+ *   appearance values and update/close callbacks; returns a native modal.
+ *   reset() -> void: invokes both change callbacks with default appearance
+ *   values.
+ *   The effect opens the dialog, moves focus to close, and restores prior
+ *   focus/cleans up when the component unmounts.
+ *
+ * Important data structures:
+ *   Palette items contain id, name, description, and color arrays. Modes are
+ *   the strings `light` and `dark`.
+ *
+ * Algorithms and design choices:
+ *   Appearance changes are delegated immediately to the parent so persisted
+ *   state remains centralized. Focus is returned to the previously active
+ *   element on cleanup; native dialog behavior supplies modal semantics.
+ */
+
 import { useEffect, useRef } from 'react';
 import Button from '../../../Button.jsx';
 import {
