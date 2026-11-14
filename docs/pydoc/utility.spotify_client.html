@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module utility.spotify_client</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="utility.html"><font color="#ffffff">utility</font></a>.spotify_client</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/andreidavid/Documents/GitHub/musicon/utility/spotify_client.py">/Users/andreidavid/Documents/GitHub/musicon/utility/spotify_client.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;Name:&nbsp;Spotify&nbsp;Client&nbsp;Utility<br>
+Date:&nbsp;November&nbsp;2026<br>
+Programmer:&nbsp;Andrei&nbsp;David<br>
+&nbsp;<br>
+Description:<br>
+Handles&nbsp;Spotify&nbsp;API&nbsp;authentication&nbsp;and&nbsp;searches<br>
+for&nbsp;tracks&nbsp;using&nbsp;the&nbsp;Spotify&nbsp;Web&nbsp;API.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="requests.html">requests</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-get_spotify_token"><strong>get_spotify_token</strong></a>()</dt><dd><tt>Retrieves&nbsp;a&nbsp;Spotify&nbsp;API&nbsp;access&nbsp;token.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;None.&nbsp;Uses&nbsp;SPOTIFY_CLIENT_ID&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;SPOTIFY_CLIENT_SECRET&nbsp;environment&nbsp;variables.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;str:&nbsp;A&nbsp;valid&nbsp;Spotify&nbsp;access&nbsp;token.</tt></dd></dl>
+ <dl><dt><a name="-search_spotify_tracks"><strong>search_spotify_tracks</strong></a>(query)</dt><dd><tt>Searches&nbsp;for&nbsp;tracks&nbsp;using&nbsp;the&nbsp;Spotify&nbsp;Web&nbsp;API.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;query&nbsp;(str):&nbsp;Song&nbsp;title&nbsp;or&nbsp;search&nbsp;keyword.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list:&nbsp;Matching&nbsp;tracks&nbsp;with&nbsp;titles,&nbsp;artists,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;album&nbsp;details,&nbsp;cover&nbsp;images,&nbsp;and&nbsp;durations.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>SPOTIFY_API_URL</strong> = 'https://api.spotify.com/v1'<br>
+<strong>SPOTIFY_TOKEN_URL</strong> = 'https://accounts.spotify.com/api/token'</td></tr></table>
+</body></html>

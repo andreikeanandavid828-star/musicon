@@ -1,12 +1,33 @@
 
+"""
+Module Name: Posts
+Date: October - November 2026
+Programmer: Martin Reyes
+
+Description:
+Handles forum posts, comments, replies, and likes
+using Flask and Supabase.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user
 
 posts_bp = Blueprint('posts', __name__)
 
+
 # 1. Fetch all forum posts (Feed)
 @posts_bp.route('/', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_posts():
+    """
+    Retrieves all forum posts for the feed.
+
+    Inputs:
+        None.
+
+    Output:
+        JSON response containing all posts
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -22,6 +43,18 @@ def get_posts():
 # 2. Create a new post
 @posts_bp.route('/', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def create_post():
+    """
+    Creates a new forum post for an authenticated user.
+
+    Inputs:
+        title (str): Title of the post.
+        body (str): Content of the post.
+        album_id (str): Optional album ID.
+
+    Output:
+        JSON response containing the created post
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -48,11 +81,22 @@ def create_post():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 # Like status: use post_votes as the single source of truth.
 # The backend's Supabase client must have permission to read vote rows.
 # For large forums, replace this with server-side aggregate queries/pagination.
 @posts_bp.route('/likes/status', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_likes_status():
+    """
+    Retrieves like counts and the user's liked posts.
+
+    Inputs:
+        Authentication token (optional).
+
+    Output:
+        JSON response containing like counts
+        and liked post IDs.
+    """
     if request.method == 'OPTIONS':
         return '', 200
     try:
@@ -87,6 +131,17 @@ def get_likes_status():
 
 @posts_bp.route('/<post_id>/like', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def like_post(post_id):
+    """
+    Adds a like to a forum post.
+
+    Inputs:
+        post_id (str): ID of the post to like.
+        Authentication token from the request.
+
+    Output:
+        JSON response confirming the like
+        or showing an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
     user = get_authenticated_user()
@@ -106,6 +161,17 @@ def like_post(post_id):
 
 @posts_bp.route('/<post_id>/like', methods=['DELETE', 'OPTIONS'], strict_slashes=False)
 def unlike_post(post_id):
+    """
+    Removes a user's like from a forum post.
+
+    Inputs:
+        post_id (str): ID of the post to unlike.
+        Authentication token from the request.
+
+    Output:
+        JSON response confirming the removal
+        or showing an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
     user = get_authenticated_user()
@@ -124,6 +190,16 @@ def unlike_post(post_id):
 # 3. Get single post details and its comments
 @posts_bp.route('/<post_id>', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_post_detail(post_id):
+    """
+    Retrieves a forum post and its comments.
+
+    Inputs:
+        post_id (str): ID of the post to retrieve.
+
+    Output:
+        JSON response containing post details
+        and comments or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -149,6 +225,18 @@ def get_post_detail(post_id):
 # 4. Add a comment or reply to a comment
 @posts_bp.route('/<post_id>/comments', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def add_comment(post_id):
+    """
+    Adds a comment or reply to a forum post.
+
+    Inputs:
+        post_id (str): ID of the post.
+        body (str): Content of the comment.
+        parent_id (str): Optional parent comment ID.
+
+    Output:
+        JSON response containing the new comment
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -177,39 +265,62 @@ def add_comment(post_id):
     except Exception as e:
         print("ADD COMMENT ERROR:", e)
         return jsonify({'error': str(e)}), 500
-    
+
+
 # 5. Delete a comment
 @posts_bp.route('/comments/<comment_id>', methods=['DELETE', 'OPTIONS'], strict_slashes=False)
 def delete_comment(comment_id):
+    """
+    Deletes a comment owned by the authenticated user.
+
+    Inputs:
+        comment_id (str): ID of the comment to delete.
+        Authentication token from the request.
+
+    Output:
+        JSON response confirming deletion
+        or showing an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
-    
+
     user = get_authenticated_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
-    
-    try: 
+
+    try:
         # Ensure the user owns the comment before deleting
         existing = supabase.table('comments').select('user_id').eq('id', comment_id).single().execute()
         if not existing.data or existing.data['user_id'] != user.id:
             return jsonify({'error': 'Forbidden: You can only delete your own comments'}), 403
-        
+
         supabase.table('comments').delete().eq('id', comment_id).execute()
         return jsonify({'message': 'Comment deleted successfully'}), 200
     except Exception as e:
         print("DELETE COMMENT ERROR:", e)
         return jsonify({'error': str(e)}), 500
-    
+
+
 # 6. Get posts for the authenticated user's profile
 @posts_bp.route('/me', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_my_posts():
+    """
+    Retrieves all posts created by the authenticated user.
+
+    Inputs:
+        Authentication token from the request.
+
+    Output:
+        JSON response containing the user's posts
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
-    
+
     user = get_authenticated_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     try:
         response = supabase.table('posts').select(
             '*, albums(*)'
