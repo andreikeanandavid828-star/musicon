@@ -1,4 +1,14 @@
 
+"""
+Module Name: Profile
+Date: October - November 2026
+Programmer: Andrei David
+
+Description:
+Handles user profile information, profile updates,
+and profile image uploads using Flask and Supabase.
+"""
+
 import os
 from uuid import uuid4
 
@@ -14,6 +24,18 @@ USER_COLUMNS = "id, username, is_admin, is_artist"
 
 
 def get_first_record(table, columns, filter_column, value):
+    """
+    Retrieves a single record from a Supabase table.
+
+    Inputs:
+        table (str): Name of the database table.
+        columns (str): Columns to retrieve.
+        filter_column (str): Column used to filter records.
+        value: Value to search for.
+
+    Output:
+        dict or None: Record data if found.
+    """
     response = (
         supabase.table(table)
         .select(columns)
@@ -25,6 +47,15 @@ def get_first_record(table, columns, filter_column, value):
 
 
 def get_profile_records(user_id):
+    """
+    Retrieves a user's account and profile information.
+
+    Inputs:
+        user_id (str): ID of the user.
+
+    Output:
+        tuple: User data and profile data.
+    """
     user_data = get_first_record(
         "users", USER_COLUMNS, "id", user_id
     )
@@ -37,6 +68,17 @@ def get_profile_records(user_id):
 
 
 def upload_profile_image(image_file, user_id, image_type):
+    """
+    Uploads a PNG profile image to Supabase Storage.
+
+    Inputs:
+        image_file (FileStorage): Image to upload.
+        user_id (str): ID of the user.
+        image_type (str): Type of image (avatar or banner).
+
+    Output:
+        str: Storage path of the uploaded image.
+    """
     image_bytes = image_file.read(MAX_IMAGE_SIZE + 1)
 
     if len(image_bytes) > MAX_IMAGE_SIZE:
@@ -79,6 +121,16 @@ def upload_profile_image(image_file, user_id, image_type):
 
 
 def serialize_profile(user_data, profile_data):
+    """
+    Converts user and profile data into a dictionary.
+
+    Inputs:
+        user_data (dict): User account information.
+        profile_data (dict): User profile information.
+
+    Output:
+        dict: Formatted profile information.
+    """
     bucket = supabase.storage.from_(PROFILE_IMAGE_BUCKET)
 
     avatar_path = profile_data.get("profile_picture_path")
@@ -110,6 +162,15 @@ def serialize_profile(user_data, profile_data):
 
 @profile.route("/me", methods=["GET"])
 def get_my_profile():
+    """
+    Retrieves the authenticated user's profile information.
+
+    Inputs:
+        Authentication token from the request.
+
+    Output:
+        JSON response containing profile data and post count.
+    """
     user = get_authenticated_user()
 
     if not user:
@@ -141,7 +202,7 @@ def get_my_profile():
 
         if not profile_response or not profile_response.data:
             return jsonify({"error": "Profile not found"}), 404
-        
+
         # Count the user's posts dynamically from the posts table
         post_count_res = (
             supabase
@@ -152,13 +213,13 @@ def get_my_profile():
         )
         total_posts = post_count_res.count if post_count_res.count is not None else 0
 
-        # Serialize profile and inject the real post count 
+        # Serialize profile and inject the real post count
         profile_data = serialize_profile(
             user_response.data,
             profile_response.data
         )
         profile_data["posts"] = total_posts
-        
+
         return jsonify({"profile": profile_data}), 200
 
     except Exception:
@@ -167,9 +228,23 @@ def get_my_profile():
             "error": "Failed to retrieve profile"
         }), 500
 
-@profile.route("/me", methods=["PATCH"])
 
+@profile.route("/me", methods=["PATCH"])
 def update_my_profile():
+    """
+    Updates the authenticated user's profile information.
+
+    Inputs:
+        username (str): New username.
+        bio (str): New profile biography.
+        location (str): User's location.
+        show_location (bool): Location visibility setting.
+        profile_picture (file): New avatar image.
+        banner_picture (file): New banner image.
+
+    Output:
+        JSON response with updated profile or error message.
+    """
     user = get_authenticated_user()
 
     if not user:
@@ -219,7 +294,7 @@ def update_my_profile():
             return jsonify({
                 "error": "Bio cannot exceed 300 characters"
             }), 400
-        
+
         # Validate the optional general location.
         if location is not None:
             if not isinstance(location, str):
@@ -279,7 +354,7 @@ def update_my_profile():
         if not effective_location.strip(): show_location = False
 
         if show_location is not None: profile_updates["show_location"] = show_location
-        
+
         if avatar_file:
             profile_updates["profile_picture_path"] = (
                 upload_profile_image(

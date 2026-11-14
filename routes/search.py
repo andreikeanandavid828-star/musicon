@@ -1,4 +1,14 @@
 
+"""
+Module Name: Search
+Date: November 2026
+Programmer: Andrei David
+
+Description:
+Handles searching for songs and artists using
+Flask and Supabase with paginated results.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase
 
@@ -6,8 +16,20 @@ search_bp = Blueprint("search", __name__)
 
 PAGE_SIZE = 20
 
+
 @search_bp.route("/songs", methods=["GET"])
 def search_songs():
+    """
+    Searches for songs by title using Supabase.
+
+    Inputs:
+        q (str): Song title or search keyword.
+        page (int): Page number for search results.
+
+    Output:
+        JSON response containing matching songs,
+        total results, page information, and errors.
+    """
     try:
         query = request.args.get("q", "").strip()
         page = request.args.get("page", default=1, type=int)
@@ -44,7 +66,6 @@ def search_songs():
         start = (page - 1) * PAGE_SIZE
         end = start + PAGE_SIZE - 1
 
-
         result = (
             supabase.table("songs")
             .select(
@@ -59,7 +80,6 @@ def search_songs():
             .range(start, end)
             .execute()
         )
-
 
         songs = result.data or []
         total = result.count or 0
@@ -84,6 +104,17 @@ def search_songs():
 
 @search_bp.route("/artists", methods=["GET"])
 def search_artists():
+    """
+    Searches for artists by name using Supabase.
+
+    Inputs:
+        q (str): Artist name or search keyword.
+        page (int): Page number for search results.
+
+    Output:
+        JSON response containing matching artists,
+        total results, page information, and errors.
+    """
     try:
         query = request.args.get("q", "").strip()
         page = request.args.get("page", default=1, type=int)
