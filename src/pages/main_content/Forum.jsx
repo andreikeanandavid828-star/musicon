@@ -1,6 +1,27 @@
 import { useId, useState, useEffect } from 'react';
 import Button from '../../Button.jsx';
 
+/**
+ * @fileoverview Loads and displays forum posts, comments, and like state.
+ * @module Forum
+ * @author Anthony, Mariam, Andrei
+ * @date 2026-10-26
+ *
+ * The comments and like-count maps are keyed by post ID, allowing updates to
+ * one post without rebuilding unrelated post data.
+ */
+
+/**
+ * Renders the like control and count for one post or comment.
+ *
+ * @param {Object} props - Like state and change handler.
+ * @param {string} props.itemLabel - Accessible label identifying the item.
+ * @param {boolean} props.isLiked - Whether the current user likes the item.
+ * @param {number} props.likeCount - Current number of likes.
+ * @param {Function} props.onToggle - Handles changes to the liked state.
+ * @param {boolean} props.disabled - Whether the control is unavailable.
+ * @returns {React.JSX.Element} The like checkbox and count.
+ */
 function LikeButton({ itemLabel, isLiked, likeCount, onToggle, disabled }) {
     const inputId = useId();
 
@@ -26,6 +47,12 @@ function LikeButton({ itemLabel, isLiked, likeCount, onToggle, disabled }) {
     );
 }
 
+/**
+ * Fetches forum content and the current user's like state, then supports
+ * sorting posts, expanding comments, and updating likes.
+ *
+ * @returns {React.JSX.Element} The forum feed and its controls.
+ */
 export default function Forum() {
     const [posts, setPosts] = useState([]);
     const [sortOrder, setSortOrder] = useState('newest');

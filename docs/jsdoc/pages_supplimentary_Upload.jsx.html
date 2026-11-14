@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/supplimentary/Upload.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/supplimentary/Upload.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../Button.jsx';
+
+/**
+ * @fileoverview Collects song metadata and passes the new song to the app.
+ * @module Upload
+ * @author Ian
+ * @date 2026-10-20
+ */
+
+/**
+ * Validates song title and artist fields, then submits the metadata through
+ * the callback supplied by the app.
+ *
+ * @param {Object} props - Song submission callback.
+ * @param {Function} props.onPostSong - Adds the submitted song to the catalog.
+ * @returns {React.JSX.Element} The song upload dialog.
+ */
+export default function Upload({ onPostSong }) {
+	const [error, setError] = useState('');
+	const dialogRef = useRef(null);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const dialog = dialogRef.current;
+		if (dialog &amp;&amp; !dialog.open) dialog.showModal();
+	}, []);
+
+	function handlePostSong(event) {
+		event.preventDefault();
+		const formData = new FormData(event.currentTarget);
+		const songName = formData.get('song').trim();
+		const artistName = formData.get('artist').trim();
+
+		if (!songName || !artistName) {
+			setError('Enter both a song name and an artist name.');
+			return;
+		}
+
+		onPostSong({
+			id: `${Date.now()}-${Math.random()}`,
+			title: songName,
+			artist: artistName,
+		});
+		navigate('/');
+	}
+
+	return (
+		&lt;main className="upload-page">
+			&lt;dialog
+				ref={dialogRef}
+				className="tierlist-song-picker album-dialog"
+				aria-labelledby="song-dialog-title"
+				onClose={() => navigate('/')}
+			>
+				&lt;div className="tierlist-song-picker__header">
+					&lt;div>
+						&lt;h2 id="song-dialog-title">Upload a song&lt;/h2>
+						&lt;p>Add a song and artist to the Home catalog.&lt;/p>
+					&lt;/div>
+					&lt;Button type="button" onClick={() => dialogRef.current?.close()}>
+						Close
+					&lt;/Button>
+				&lt;/div>
+				&lt;form className="album-form" onSubmit={handlePostSong}>
+					&lt;label htmlFor="song-name">Song name&lt;/label>
+					&lt;input
+						className="form-input"
+						id="song-name"
+						name="song"
+						maxLength="120"
+						required
+						onChange={() => setError('')}
+					/>
+					&lt;label htmlFor="song-artist">Artist name&lt;/label>
+					&lt;input
+						className="form-input"
+						id="song-artist"
+						name="artist"
+						maxLength="120"
+						required
+						onChange={() => setError('')}
+					/>
+					{error &amp;&amp; &lt;p className="album-form__error" role="alert">{error}&lt;/p>}
+					&lt;Button className="button--primary" type="submit">Add song&lt;/Button>
+				&lt;/form>
+			&lt;/dialog>
+		&lt;/main>
+	);
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AlbumButton.html">AlbumButton</a></li><li><a href="module-Albums.html">Albums</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Button.html">Button</a></li><li><a href="module-Footer.html">Footer</a></li><li><a href="module-Forum.html">Forum</a></li><li><a href="module-ForumButton.html">ForumButton</a></li><li><a href="module-Home.html">Home</a></li><li><a href="module-HomeButton.html">HomeButton</a></li><li><a href="module-LightSwitch.html">LightSwitch</a></li><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginButton.html">LoginButton</a></li><li><a href="module-PersonalizeModal.html">PersonalizeModal</a></li><li><a href="module-Profile.html">Profile</a></li><li><a href="module-ProfileButton.html">ProfileButton</a></li><li><a href="module-Search.html">Search</a></li><li><a href="module-SearchBar.html">SearchBar</a></li><li><a href="module-SignUp.html">SignUp</a></li><li><a href="module-SignupButton.html">SignupButton</a></li><li><a href="module-SongArtwork.html">SongArtwork</a></li><li><a href="module-TierList.html">TierList</a></li><li><a href="module-TierListButton.html">TierListButton</a></li><li><a href="module-Upload.html">Upload</a></li><li><a href="module-UploadButton.html">UploadButton</a></li><li><a href="module-main.html">main</a></li><li><a href="module-songs.html">songs</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 13 2026 19:44:14 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

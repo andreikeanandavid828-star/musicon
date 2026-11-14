@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Module: Profile</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: Profile</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">Displays and edits the signed-in user's profile, including
+profile images, posts, location, and appearance settings.</div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Mariam</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_supplimentary_profile_Profile.jsx.html">pages/supplimentary/profile/Profile.jsx</a>, <a href="pages_supplimentary_profile_Profile.jsx.html#line6">line 6</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="module:Profile"><span class="type-signature"></span>(require("Profile"))<span class="signature">(props)</span><span class="type-signature"> &rarr; {React.JSX.Element}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Loads profile data and provides profile editing, posts, location, image
+cropping, and personalization controls.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>props</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Appearance state and update callbacks.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>paletteId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Current palette ID.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>defaultMode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">'light'</span>
+|
+
+<span class="param-type">'dark'</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Saved default brightness mode.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentMode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">'light'</span>
+|
+
+<span class="param-type">'dark'</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Brightness mode currently applied.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onPaletteChange</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Applies a palette choice.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onDefaultModeChange</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Applies a default brightness choice.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_supplimentary_profile_Profile.jsx.html">pages/supplimentary/profile/Profile.jsx</a>, <a href="pages_supplimentary_profile_Profile.jsx.html#line338">line 338</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The user's profile page.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">React.JSX.Element</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~CropEditor"><span class="type-signature">(inner) </span>CropEditor<span class="signature">(props)</span><span class="type-signature"> &rarr; {React.JSX.Element}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Lets the user position and crop a profile or banner image before applying
+the result.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>props</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Source image, crop type, and completion callbacks.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Image source being edited.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">'avatar'</span>
+|
+
+<span class="param-type">'banner'</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Crop shape to apply.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onApply</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Receives the completed image data.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onCancel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Closes the crop editor without applying.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_supplimentary_profile_Profile.jsx.html">pages/supplimentary/profile/Profile.jsx</a>, <a href="pages_supplimentary_profile_Profile.jsx.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The interactive image crop editor.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">React.JSX.Element</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AlbumButton.html">AlbumButton</a></li><li><a href="module-Albums.html">Albums</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Button.html">Button</a></li><li><a href="module-Footer.html">Footer</a></li><li><a href="module-Forum.html">Forum</a></li><li><a href="module-ForumButton.html">ForumButton</a></li><li><a href="module-Home.html">Home</a></li><li><a href="module-HomeButton.html">HomeButton</a></li><li><a href="module-LightSwitch.html">LightSwitch</a></li><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginButton.html">LoginButton</a></li><li><a href="module-PersonalizeModal.html">PersonalizeModal</a></li><li><a href="module-Profile.html">Profile</a></li><li><a href="module-ProfileButton.html">ProfileButton</a></li><li><a href="module-Search.html">Search</a></li><li><a href="module-SearchBar.html">SearchBar</a></li><li><a href="module-SignUp.html">SignUp</a></li><li><a href="module-SignupButton.html">SignupButton</a></li><li><a href="module-SongArtwork.html">SongArtwork</a></li><li><a href="module-TierList.html">TierList</a></li><li><a href="module-TierListButton.html">TierListButton</a></li><li><a href="module-Upload.html">Upload</a></li><li><a href="module-UploadButton.html">UploadButton</a></li><li><a href="module-main.html">main</a></li><li><a href="module-songs.html">songs</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 13 2026 19:44:14 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -3,6 +3,24 @@ import { Link } from 'react-router-dom';
 import Button from './Button.jsx';
 import SongArtwork from './gather_music/SongArtwork.jsx';
 
+/**
+ * @fileoverview Implements the persistent audio player and playback controls.
+ * @module Footer
+ * @author Mariam, Ian, Anthony
+ * @date 2026-10-22
+ */
+
+/**
+ * Displays the selected song and controls browser audio playback, seeking,
+ * volume, and track navigation.
+ *
+ * @param {Object} props - Current playback selection and navigation callbacks.
+ * @param {Object|null} props.selectedSong - Song to play, or null when none is selected.
+ * @param {Function} props.onPreviousSong - Selects the previous song.
+ * @param {Function} props.onNextSong - Selects the next song.
+ * @param {Function} props.onSongEnded - Reserved for end-of-track handling.
+ * @returns {React.JSX.Element} The collapsible music player.
+ */
 export default function FooterMusicPlayer({
   selectedSong,
   onPreviousSong,

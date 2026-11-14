@@ -2,6 +2,29 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../../Button.jsx';
 import PersonalizeModal from './PersonalizeModal.jsx';
+
+/**
+ * @fileoverview Displays and edits the signed-in user's profile, including
+ * profile images, posts, location, and appearance settings.
+ * @module Profile
+ * @author Mariam
+ * @date 2026-10-26
+ *
+ * The crop editor represents image geometry with image/viewport dimensions,
+ * zoom, and x/y offset state so a user can position an image before saving.
+ */
+
+/**
+ * Lets the user position and crop a profile or banner image before applying
+ * the result.
+ *
+ * @param {Object} props - Source image, crop type, and completion callbacks.
+ * @param {string} props.source - Image source being edited.
+ * @param {'avatar' | 'banner'} props.type - Crop shape to apply.
+ * @param {Function} props.onApply - Receives the completed image data.
+ * @param {Function} props.onCancel - Closes the crop editor without applying.
+ * @returns {React.JSX.Element} The interactive image crop editor.
+ */
 function CropEditor({ source, type, onApply, onCancel }) {
   const viewportRef = useRef(null);
   const imageRef = useRef(null);
@@ -300,6 +323,18 @@ function CropEditor({ source, type, onApply, onCancel }) {
   );
 }
 
+/**
+ * Loads profile data and provides profile editing, posts, location, image
+ * cropping, and personalization controls.
+ *
+ * @param {Object} props - Appearance state and update callbacks.
+ * @param {string} props.paletteId - Current palette ID.
+ * @param {'light' | 'dark'} props.defaultMode - Saved default brightness mode.
+ * @param {'light' | 'dark'} props.currentMode - Brightness mode currently applied.
+ * @param {Function} props.onPaletteChange - Applies a palette choice.
+ * @param {Function} props.onDefaultModeChange - Applies a default brightness choice.
+ * @returns {React.JSX.Element} The user's profile page.
+ */
 export default function Profile({
   paletteId,
   defaultMode,

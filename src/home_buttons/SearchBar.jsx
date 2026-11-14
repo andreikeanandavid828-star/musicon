@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+/**
+ * @fileoverview Provides the site-wide song search form.
+ * @module SearchBar
+ * @author Ian, Anthony
+ * @date 2026-11-09
+ */
+
+/**
+ * Keeps the search field synchronized with the URL query and navigates to the
+ * search results page when a non-empty query is submitted.
+ *
+ * @returns {React.JSX.Element} The labeled site search form.
+ */
 export default function SearchBar() {
   const [query, setQuery] = useState('');
   const location = useLocation();

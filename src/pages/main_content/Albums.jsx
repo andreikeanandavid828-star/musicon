@@ -3,6 +3,27 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Button from '../../Button.jsx';
 import SongArtwork from '../../gather_music/SongArtwork.jsx';
 
+/**
+ * @fileoverview Displays album lists and details, and manages album creation
+ * and adding songs.
+ * @module Albums
+ * @author Ian
+ * @date 2026-10-22
+ */
+
+/**
+ * Renders the album index or a routed album detail page. Album membership is
+ * represented by ordered song IDs and resolved against the supplied catalog.
+ *
+ * @param {Object} props - Album/song data and state update callbacks.
+ * @param {Array<Object>} props.albums - Available album records.
+ * @param {Array<Object>} props.songs - Song catalog used to resolve album tracks.
+ * @param {Function} props.onCreateAlbum - Adds a newly created album.
+ * @param {Function} props.onAddSongs - Adds song IDs to an album.
+ * @param {Object|null} props.selectedSong - Currently selected song.
+ * @param {Function} props.onSelectSong - Selects an album song for playback.
+ * @returns {React.JSX.Element} The album index or album detail view.
+ */
 export default function Albums({
     albums,
     songs,

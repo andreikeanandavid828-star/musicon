@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/main_content/Albums.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/main_content/Albums.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import Button from '../../Button.jsx';
+import SongArtwork from '../../gather_music/SongArtwork.jsx';
+
+/**
+ * @fileoverview Displays album lists and details, and manages album creation
+ * and adding songs.
+ * @module Albums
+ * @author Ian
+ * @date 2026-10-22
+ */
+
+/**
+ * Renders the album index or a routed album detail page. Album membership is
+ * represented by ordered song IDs and resolved against the supplied catalog.
+ *
+ * @param {Object} props - Album/song data and state update callbacks.
+ * @param {Array&lt;Object>} props.albums - Available album records.
+ * @param {Array&lt;Object>} props.songs - Song catalog used to resolve album tracks.
+ * @param {Function} props.onCreateAlbum - Adds a newly created album.
+ * @param {Function} props.onAddSongs - Adds song IDs to an album.
+ * @param {Object|null} props.selectedSong - Currently selected song.
+ * @param {Function} props.onSelectSong - Selects an album song for playback.
+ * @returns {React.JSX.Element} The album index or album detail view.
+ */
+export default function Albums({
+    albums,
+    songs,
+    onCreateAlbum,
+    onAddSongs,
+    selectedSong,
+    onSelectSong,
+}) {
+    const { albumId } = useParams();
+    const navigate = useNavigate();
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isAddSongDialogOpen, setIsAddSongDialogOpen] = useState(false);
+    const createDialogRef = useRef(null);
+    const addSongDialogRef = useRef(null);
+    const selectedAlbum = albums.find((album) => album.id === albumId);
+    const selectedSongIds = selectedAlbum?.songIds || [];
+    const albumSongs = selectedSongIds
+        .map((songId) => songs.find((song) => song.id === songId))
+        .filter(Boolean);
+    const albumCoverSong = albumSongs[0];
+    const songsNotInAlbum = songs.filter((song) => !selectedSongIds.includes(song.id));
+
+    useEffect(() => {
+        const createDialog = createDialogRef.current;
+        const addSongDialog = addSongDialogRef.current;
+
+        if (createDialog &amp;&amp; isCreateDialogOpen &amp;&amp; !createDialog.open) createDialog.showModal();
+        if (createDialog &amp;&amp; !isCreateDialogOpen &amp;&amp; createDialog.open) createDialog.close();
+        if (addSongDialog &amp;&amp; isAddSongDialogOpen &amp;&amp; !addSongDialog.open) addSongDialog.showModal();
+        if (addSongDialog &amp;&amp; !isAddSongDialogOpen &amp;&amp; addSongDialog.open) addSongDialog.close();
+    }, [isCreateDialogOpen, isAddSongDialogOpen]);
+
+    function handleCreateAlbum(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const name = formData.get('album').trim();
+
+        if (!name) return;
+
+        const newAlbum = {
+            id: `${Date.now()}-${Math.random()}`,
+            name,
+            songIds: [],
+        };
+        onCreateAlbum(newAlbum);
+        setIsCreateDialogOpen(false);
+        navigate(`/albums/${newAlbum.id}`);
+    }
+
+    function handleAddSongs(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const songIds = formData.getAll('songs');
+
+        if (!albumId || songIds.length === 0) return;
+
+        onAddSongs(albumId, songIds);
+        setIsAddSongDialogOpen(false);
+    }
+
+    if (albumId) {
+        return (
+            &lt;main className="albums-page">
+                &lt;Link className="albums-back-link" to="/albums">Back to albums&lt;/Link>
+                {!selectedAlbum ? (
+                    &lt;p className="albums-empty">Album not found.&lt;/p>
+                ) : (
+                    &lt;>
+                        &lt;div className="album-detail-heading">
+                            &lt;SongArtwork song={albumCoverSong} className="album-cover album-cover--detail" />
+                            &lt;h1>{selectedAlbum.name}&lt;/h1>
+                        &lt;/div>
+                        &lt;div className="album-detail-actions">
+                            &lt;Button className="button--primary" onClick={() => setIsAddSongDialogOpen(true)}>
+                                Add song
+                            &lt;/Button>
+                        &lt;/div>
+                        {albumSongs.length === 0 ? (
+                            &lt;p className="albums-empty">
+                                Nothing in this album yet. Add a song here, or &lt;Link to="/upload">go to Upload&lt;/Link> to add one to the Home catalog.
+                            &lt;/p>
+                        ) : (
+                            &lt;ul className="album-songs" aria-label={`Songs in ${selectedAlbum.name}`}>
+                                {albumSongs.map((song) => (
+                                    &lt;li key={song.id}>
+                                        &lt;button
+                                            className="album-songs__item"
+                                            type="button"
+                                            aria-pressed={selectedSong?.id === song.id}
+                                            onClick={() => onSelectSong(song, albumId)}
+                                        >
+                                            &lt;SongArtwork song={song} className="song-artwork--home" />
+                                            &lt;span className="album-songs__title">{song.title}&lt;/span>
+                                            &lt;span className="album-songs__artist">{song.artist || 'Unknown artist'}&lt;/span>
+                                        &lt;/button>
+                                    &lt;/li>
+                                ))}
+                            &lt;/ul>
+                        )}
+                        &lt;dialog
+                            ref={addSongDialogRef}
+                            className="tierlist-song-picker album-dialog"
+                            aria-labelledby="add-album-songs-title"
+                            onClose={() => setIsAddSongDialogOpen(false)}
+                        >
+                            &lt;div className="tierlist-song-picker__header">
+                                &lt;div>
+                                    &lt;h2 id="add-album-songs-title">Add songs to {selectedAlbum.name}&lt;/h2>
+                                    &lt;p>Choose songs from the Home catalog.&lt;/p>
+                                &lt;/div>
+                                &lt;Button type="button" onClick={() => setIsAddSongDialogOpen(false)}>Close&lt;/Button>
+                            &lt;/div>
+                            &lt;form className="album-form" onSubmit={handleAddSongs}>
+                                &lt;div className="album-form__actions">
+                                    &lt;Button className="button--primary" type="submit">Add selected songs&lt;/Button>
+                                &lt;/div>
+                                {songsNotInAlbum.length === 0 ? (
+                                    &lt;p className="albums-empty">
+                                        No songs available to add. &lt;Link to="/upload">Upload a song&lt;/Link> first.
+                                    &lt;/p>
+                                ) : (
+                                    &lt;fieldset className="album-song-picker">
+                                        &lt;legend>Available songs&lt;/legend>
+                                        &lt;div className="album-song-options">
+                                            {songsNotInAlbum.map((song) => (
+                                                &lt;label key={song.id}>
+                                                    &lt;input type="checkbox" name="songs" value={song.id} />
+                                                    &lt;span>{song.title}{song.artist ? ` - ${song.artist}` : ''}&lt;/span>
+                                                &lt;/label>
+                                            ))}
+                                        &lt;/div>
+                                    &lt;/fieldset>
+                                )}
+                            &lt;/form>
+                        &lt;/dialog>
+                    &lt;/>
+                )}
+            &lt;/main>
+        );
+    }
+
+    return (
+        &lt;main className="albums-page">
+            &lt;div className="albums-heading">
+                &lt;h1>Albums&lt;/h1>
+                &lt;Button className="button--primary" onClick={() => setIsCreateDialogOpen(true)}>
+                    Create album
+                &lt;/Button>
+            &lt;/div>
+            {albums.length === 0 ? (
+                &lt;p className="albums-empty">No albums yet. Create an album and choose songs from the catalog.&lt;/p>
+            ) : (
+                &lt;ul className="albums-list" aria-label="Posted albums">
+                    {albums.map((album) => {
+                        const firstSong = (album.songIds || [])
+                            .map((songId) => songs.find((song) => song.id === songId))
+                            .find(Boolean);
+
+                        return (
+                            &lt;li key={album.id}>
+                                &lt;Link className="albums-list__item" to={`/albums/${album.id}`}>
+                                    &lt;SongArtwork song={firstSong} className="album-cover" />
+                                    &lt;div className="albums-list__details">
+                                        &lt;h2>{album.name}&lt;/h2>
+                                        &lt;span>{(album.songIds || []).length} songs&lt;/span>
+                                    &lt;/div>
+                                &lt;/Link>
+                            &lt;/li>
+                        );
+                    })}
+                &lt;/ul>
+            )}
+            &lt;dialog
+                ref={createDialogRef}
+                className="tierlist-song-picker album-dialog"
+                aria-labelledby="create-album-title"
+                onClose={() => setIsCreateDialogOpen(false)}
+            >
+                &lt;div className="tierlist-song-picker__header">
+                    &lt;div>
+                        &lt;h2 id="create-album-title">Create an album&lt;/h2>
+                        &lt;p>Choose songs from the Home catalog, including songs you uploaded.&lt;/p>
+                    &lt;/div>
+                    &lt;Button type="button" onClick={() => setIsCreateDialogOpen(false)}>Close&lt;/Button>
+                &lt;/div>
+                &lt;form className="album-form" onSubmit={handleCreateAlbum}>
+                    &lt;div className="album-form__actions">
+                        &lt;Button className="button--primary" type="submit">Create album&lt;/Button>
+                    &lt;/div>
+                    &lt;label htmlFor="create-album-name">Album name&lt;/label>
+                    &lt;input className="form-input" id="create-album-name" name="album" maxLength="120" required />
+                &lt;/form>
+            &lt;/dialog>
+        &lt;/main>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AlbumButton.html">AlbumButton</a></li><li><a href="module-Albums.html">Albums</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Button.html">Button</a></li><li><a href="module-Footer.html">Footer</a></li><li><a href="module-Forum.html">Forum</a></li><li><a href="module-ForumButton.html">ForumButton</a></li><li><a href="module-Home.html">Home</a></li><li><a href="module-HomeButton.html">HomeButton</a></li><li><a href="module-LightSwitch.html">LightSwitch</a></li><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginButton.html">LoginButton</a></li><li><a href="module-PersonalizeModal.html">PersonalizeModal</a></li><li><a href="module-Profile.html">Profile</a></li><li><a href="module-ProfileButton.html">ProfileButton</a></li><li><a href="module-Search.html">Search</a></li><li><a href="module-SearchBar.html">SearchBar</a></li><li><a href="module-SignUp.html">SignUp</a></li><li><a href="module-SignupButton.html">SignupButton</a></li><li><a href="module-SongArtwork.html">SongArtwork</a></li><li><a href="module-TierList.html">TierList</a></li><li><a href="module-TierListButton.html">TierListButton</a></li><li><a href="module-Upload.html">Upload</a></li><li><a href="module-UploadButton.html">UploadButton</a></li><li><a href="module-main.html">main</a></li><li><a href="module-songs.html">songs</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 13 2026 19:44:14 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

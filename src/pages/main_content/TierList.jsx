@@ -3,6 +3,16 @@ import Button from '../../Button.jsx';
 import { songs as availableSongs } from '../../gather_music/songs.jsx';
 import SongArtwork from '../../gather_music/SongArtwork.jsx';
 
+/**
+ * @fileoverview Implements the interactive song tier-list editor.
+ * @module TierList
+ * @author Anthony
+ * @date 2026-10-27
+ *
+ * The tier data structure maps each tier key to an ordered array of song
+ * records. A neutral tier stores songs that have not been ranked.
+ */
+
 const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
 const DEFAULT_TIER_NAMES = {
     S: 'S',
@@ -22,6 +32,12 @@ const emptyTierList = () => ({
     neutral: [],
 });
 
+/**
+ * Lets users create and edit a tier list, including its title, tier labels,
+ * and song assignments.
+ *
+ * @returns {React.JSX.Element} The tier-list editor and song picker.
+ */
 export default function TierList() {
     const [hasCreatedList, setHasCreatedList] = useState(false);
     const [tiers, setTiers] = useState(emptyTierList);

@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
+/**
+ * @fileoverview Fetches and displays song results for the query in the URL.
+ * @module Search
+ * @author Anthony, Ian
+ * @date 2026-11-09
+ */
+
+/**
+ * Reads the `q` query parameter and requests matching songs. An AbortController
+ * cancels an outdated request when the query changes or the page unmounts.
+ *
+ * @returns {React.JSX.Element} Search results and loading/error states.
+ */
 export default function Search() {
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

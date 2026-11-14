@@ -2,6 +2,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+/**
+ * @fileoverview Displays the signed-in user's profile menu and logout action.
+ * @module ProfileButton
+ * @author Mariam
+ * @date 2026-10-20
+ */
+
+/**
+ * Loads the current profile and displays a menu with profile navigation and
+ * the supplied logout action.
+ *
+ * @param {Object} props - Profile menu callbacks.
+ * @param {Function} props.onLogout - Performs the application's logout flow.
+ * @returns {React.JSX.Element} The profile menu trigger and dropdown.
+ */
 export default function ProfileButton({ onLogout }) {
   const [profile, setProfile] = useState(null);
   const [open, setOpen] = useState(false);

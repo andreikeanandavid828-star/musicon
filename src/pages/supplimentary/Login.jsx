@@ -3,6 +3,20 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../Button.jsx';
 
+/**
+ * @fileoverview Implements account login and the password-reset dialog.
+ * @module Login
+ * @author Mariam, Andrei, Martin
+ * @date 2026-10-22
+ */
+
+/**
+ * Submits login credentials to the backend and notifies the app after success.
+ *
+ * @param {Object} props - Login completion callback.
+ * @param {Function} props.onLoggedIn - Called after a successful login.
+ * @returns {React.JSX.Element} The login form and password-reset dialog.
+ */
 export default function Login({ onLoggedIn }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');

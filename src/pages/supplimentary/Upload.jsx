@@ -2,6 +2,21 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../Button.jsx';
 
+/**
+ * @fileoverview Collects song metadata and passes the new song to the app.
+ * @module Upload
+ * @author Ian
+ * @date 2026-10-20
+ */
+
+/**
+ * Validates song title and artist fields, then submits the metadata through
+ * the callback supplied by the app.
+ *
+ * @param {Object} props - Song submission callback.
+ * @param {Function} props.onPostSong - Adds the submitted song to the catalog.
+ * @returns {React.JSX.Element} The song upload dialog.
+ */
 export default function Upload({ onPostSong }) {
 	const [error, setError] = useState('');
 	const dialogRef = useRef(null);
