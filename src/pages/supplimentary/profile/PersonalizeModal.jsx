@@ -5,6 +5,25 @@ import {
 } from './Appearance.js';
 import '../../../css/PersonalizeModal.css';
 
+/**
+ * @fileoverview Provides the appearance customization dialog.
+ * @module PersonalizeModal
+ * @author Mariam
+ * @date 2026-10-20
+ */
+
+/**
+ * Lets the user choose a color palette and brightness mode, or restore defaults.
+ *
+ * @param {Object} props - Dialog state, change callbacks, and close callback.
+ * @param {Function} props.onClose - Closes the dialog.
+ * @param {string} props.paletteId - Currently selected palette ID.
+ * @param {'light' | 'dark'} props.defaultMode - Saved default brightness mode.
+ * @param {'light' | 'dark'} props.currentMode - Brightness mode currently applied.
+ * @param {Function} props.onPaletteChange - Applies and saves a palette choice.
+ * @param {Function} props.onDefaultModeChange - Applies and saves a default mode.
+ * @returns {React.JSX.Element} The appearance customization dialog.
+ */
 export default function PersonalizeModal({
   onClose,
   paletteId,

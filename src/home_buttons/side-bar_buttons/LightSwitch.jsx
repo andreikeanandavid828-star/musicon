@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Provides the sidebar control for switching appearance mode.
+ * @module LightSwitch
+ * @author Ian, Mariam
+ * @date 2026-10-20
+ */
+
+/**
+ * Renders a controlled checkbox that represents the current dark-mode state.
+ *
+ * @param {Object} props - Current mode and its change callback.
+ * @param {Function} props.toggleTheme - Called when the checkbox changes.
+ * @param {boolean} props.isDarkMode - Whether dark mode is currently active.
+ * @returns {React.JSX.Element} The labeled appearance-mode switch.
+ */
 export default function LightSwitch({ toggleTheme, isDarkMode }) {
   return (
     <label className="switch">

@@ -2,6 +2,18 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../Button.jsx';
 
+/**
+ * @fileoverview Implements account registration and displays its result.
+ * @module SignUp
+ * @author Mariam, Andrei, Martin
+ * @date 2026-10-08
+ */
+
+/**
+ * Validates registration form values and submits a new account request.
+ *
+ * @returns {React.JSX.Element} The registration form and feedback.
+ */
 export default function SignUp() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');

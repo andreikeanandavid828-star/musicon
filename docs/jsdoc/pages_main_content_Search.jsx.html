@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/main_content/Search.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/main_content/Search.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+/**
+ * @fileoverview Fetches and displays song results for the query in the URL.
+ * @module Search
+ * @author Anthony, Ian
+ * @date 2026-11-09
+ */
+
+/**
+ * Reads the `q` query parameter and requests matching songs. An AbortController
+ * cancels an outdated request when the query changes or the page unmounts.
+ *
+ * @returns {React.JSX.Element} Search results and loading/error states.
+ */
+export default function Search() {
+  const [songs, setSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
+  const location = useLocation();
+  const query = new URLSearchParams(location.search).get('q')?.trim() || '';
+
+  useEffect(() => {
+    if (!query) {
+      setSongs([]);
+      setSearchError('');
+      setIsLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setSongs([]);
+    setIsLoading(true);
+    setSearchError('');
+
+    async function fetchSongs() {
+      try {
+        const params = new URLSearchParams({ q: query, page: '1' });
+        const response = await fetch(
+          `http://localhost:5000/api/search/songs?${params.toString()}`,
+          { signal: controller.signal },
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Unable to search songs.');
+        }
+
+        setSongs(Array.isArray(data.songs) ? data.songs.slice(0, 20) : []);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setSongs([]);
+          setSearchError(error.message || 'Unable to search songs.');
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void fetchSongs();
+    return () => controller.abort();
+  }, [query]);
+
+  return (
+    &lt;main className="search-page">
+      &lt;section className="search-page__results" aria-labelledby="search-results-heading">
+        &lt;h1 id="search-results-heading">Search results&lt;/h1>
+        {query &amp;&amp; &lt;p className="search-page__query">Songs matching “{query}”&lt;/p>}
+        {!query &amp;&amp; &lt;p className="home-empty">Enter a song title in the search bar to get started.&lt;/p>}
+        {isLoading &amp;&amp; &lt;p className="home-empty" role="status">Searching songs…&lt;/p>}
+        {searchError &amp;&amp; &lt;p className="search-page__error" role="alert">{searchError}&lt;/p>}
+        {!isLoading &amp;&amp; !searchError &amp;&amp; query &amp;&amp; songs.length === 0 &amp;&amp; (
+          &lt;p className="home-empty">No songs found.&lt;/p>
+        )}
+        {!isLoading &amp;&amp; !searchError &amp;&amp; songs.length > 0 &amp;&amp; (
+          &lt;ul className="album-songs search-page__song-list" aria-label="Song search results">
+            {songs.map((song) => (
+              &lt;li className="search-page__song" key={song.id}>
+                &lt;div className="song-artwork album-cover search-page__artwork">
+                  {song.albums?.cover_image_url &amp;&amp; (
+                    &lt;img src={song.albums.cover_image_url} alt="" />
+                  )}
+                &lt;/div>
+                &lt;span className="album-songs__title">{song.title}&lt;/span>
+                &lt;span className="album-songs__artist">
+                  {song.artist_name || 'Unknown artist'}
+                &lt;/span>
+              &lt;/li>
+            ))}
+          &lt;/ul>
+        )}
+      &lt;/section>
+    &lt;/main>
+  );
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AlbumButton.html">AlbumButton</a></li><li><a href="module-Albums.html">Albums</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Button.html">Button</a></li><li><a href="module-Footer.html">Footer</a></li><li><a href="module-Forum.html">Forum</a></li><li><a href="module-ForumButton.html">ForumButton</a></li><li><a href="module-Home.html">Home</a></li><li><a href="module-HomeButton.html">HomeButton</a></li><li><a href="module-LightSwitch.html">LightSwitch</a></li><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginButton.html">LoginButton</a></li><li><a href="module-PersonalizeModal.html">PersonalizeModal</a></li><li><a href="module-Profile.html">Profile</a></li><li><a href="module-ProfileButton.html">ProfileButton</a></li><li><a href="module-Search.html">Search</a></li><li><a href="module-SearchBar.html">SearchBar</a></li><li><a href="module-SignUp.html">SignUp</a></li><li><a href="module-SignupButton.html">SignupButton</a></li><li><a href="module-SongArtwork.html">SongArtwork</a></li><li><a href="module-TierList.html">TierList</a></li><li><a href="module-TierListButton.html">TierListButton</a></li><li><a href="module-Upload.html">Upload</a></li><li><a href="module-UploadButton.html">UploadButton</a></li><li><a href="module-main.html">main</a></li><li><a href="module-songs.html">songs</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 13 2026 19:44:14 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

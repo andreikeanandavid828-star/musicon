@@ -2,6 +2,23 @@ import { songs as catalogSongs } from '../gather_music/songs.jsx';
 import SongArtwork from '../gather_music/SongArtwork.jsx';
 import { Link } from 'react-router-dom';
 
+/**
+ * @fileoverview Renders the song catalog and album summaries on the home page.
+ * @module Home
+ * @author Anthony, Ian, Mariam
+ * @date 2026-10-27
+ */
+
+/**
+ * Displays available songs and albums and delegates song selection to the app.
+ *
+ * @param {Object} props - Catalog data and song-selection state.
+ * @param {Array<Object>} [props.songs] - Songs to display; defaults to the sample catalog.
+ * @param {Array<Object>} [props.albums] - Albums to display.
+ * @param {Object|null} props.selectedSong - Currently selected song.
+ * @param {Function} props.onSelectSong - Selects a song for playback.
+ * @returns {React.JSX.Element} The home page.
+ */
 export default function Home({
   songs = catalogSongs,
   albums = [],

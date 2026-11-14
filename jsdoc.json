@@ -1,0 +1,10 @@
+{
+  "source": {
+    "include": ["src"],
+    "includePattern": ".+\\.jsx$"
+  },
+  "opts": {
+    "destination": "docs/jsdoc",
+    "recurse": true
+  }
+}

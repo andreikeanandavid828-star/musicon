@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/main_content/TierList.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/main_content/TierList.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useEffect, useRef, useState } from 'react';
+import Button from '../../Button.jsx';
+import { songs as availableSongs } from '../../gather_music/songs.jsx';
+import SongArtwork from '../../gather_music/SongArtwork.jsx';
+
+/**
+ * @fileoverview Implements the interactive song tier-list editor.
+ * @module TierList
+ * @author Anthony
+ * @date 2026-10-27
+ *
+ * The tier data structure maps each tier key to an ordered array of song
+ * records. A neutral tier stores songs that have not been ranked.
+ */
+
+const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
+const DEFAULT_TIER_NAMES = {
+    S: 'S',
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D',
+};
+const TIER_KEYS = Object.keys(DEFAULT_TIER_NAMES);
+
+const emptyTierList = () => ({
+    S: [],
+    A: [],
+    B: [],
+    C: [],
+    D: [],
+    neutral: [],
+});
+
+/**
+ * Lets users create and edit a tier list, including its title, tier labels,
+ * and song assignments.
+ *
+ * @returns {React.JSX.Element} The tier-list editor and song picker.
+ */
+export default function TierList() {
+    const [hasCreatedList, setHasCreatedList] = useState(false);
+    const [tiers, setTiers] = useState(emptyTierList);
+    const [isSongPickerOpen, setIsSongPickerOpen] = useState(false);
+    const [listTitle, setListTitle] = useState(DEFAULT_TIER_LIST_TITLE);
+    const [titleDraft, setTitleDraft] = useState(DEFAULT_TIER_LIST_TITLE);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [tierNames, setTierNames] = useState(DEFAULT_TIER_NAMES);
+    const [tierDraft, setTierDraft] = useState('');
+    const [editingTier, setEditingTier] = useState(null);
+    const [shareNotice, setShareNotice] = useState('');
+    const songPickerRef = useRef(null);
+    const canceledTierEditRef = useRef(null);
+
+    useEffect(() => {
+        const dialog = songPickerRef.current;
+        if (!dialog) return;
+
+        if (isSongPickerOpen &amp;&amp; !dialog.open) dialog.showModal();
+        if (!isSongPickerOpen &amp;&amp; dialog.open) dialog.close();
+    }, [isSongPickerOpen]);
+
+    const addedSongIds = new Set(
+        Object.values(tiers).flat().map((song) => song.catalogId),
+    );
+
+    function finishTitleEdit() {
+        const title = titleDraft.trim();
+        if (title) setListTitle(title);
+        setIsEditingTitle(false);
+    }
+
+    function finishTierEdit(tierKey) {
+        if (canceledTierEditRef.current === tierKey) {
+            canceledTierEditRef.current = null;
+            return;
+        }
+
+        const name = tierDraft.trim();
+        if (name) {
+            setTierNames((currentNames) => ({ ...currentNames, [tierKey]: name }));
+        }
+        setEditingTier(null);
+    }
+
+    function handleShare() {
+        if (listTitle === DEFAULT_TIER_LIST_TITLE) {
+            setShareNotice('Name your tier list before sharing.');
+            setTitleDraft(listTitle);
+            setIsEditingTitle(true);
+            return;
+        }
+
+        setShareNotice('Sharing will be available soon.');
+    }
+
+    function addSong(song) {
+        if (addedSongIds.has(song.id)) return;
+
+        setTiers((currentTiers) => ({
+            ...currentTiers,
+            neutral: [
+                ...currentTiers.neutral,
+                {
+                    id: `${song.id}-${Date.now()}-${Math.random()}`,
+                    catalogId: song.id,
+                    title: song.title,
+                    src: song.src,
+                },
+            ],
+        }));
+        setIsSongPickerOpen(false);
+    }
+
+    function moveSong(event, destination) {
+        event.preventDefault();
+        const songId = event.dataTransfer.getData('text/plain');
+        if (!songId) return;
+
+        setTiers((currentTiers) => {
+            let movedSong;
+            const nextTiers = Object.fromEntries(
+                Object.entries(currentTiers).map(([tierName, songs]) => [
+                    tierName,
+                    songs.filter((song) => {
+                        if (song.id !== songId) return true;
+                        movedSong = song;
+                        return false;
+                    }),
+                ]),
+            );
+
+            if (movedSong) nextTiers[destination] = [...nextTiers[destination], movedSong];
+            return nextTiers;
+        });
+    }
+
+    return (
+        &lt;main className="tierlist-page">
+            &lt;h1>Tier List&lt;/h1>
+            {!hasCreatedList ? (
+                &lt;section className="tierlist-start" aria-label="Tier list options">
+                    &lt;p>Choose from the available songs and rank your favorites.&lt;/p>
+                    &lt;div className="tierlist-actions">
+                        &lt;Button className="button--primary" onClick={() => {
+                            setTiers(emptyTierList());
+                            setTierNames(DEFAULT_TIER_NAMES);
+                            setHasCreatedList(true);
+                        }}>
+                            New Tier List
+                        &lt;/Button>
+                        &lt;Button onClick={() => { }}>Find a Public Tier List&lt;/Button>
+                    &lt;/div>
+                &lt;/section>
+            ) : (
+                &lt;section className="tierlist-board" aria-label="Tier list editor">
+                    &lt;div className="tierlist-titlebar">
+                        &lt;h2>
+                            {isEditingTitle ? (
+                                &lt;input
+                                    className="form-input tierlist-title-input"
+                                    aria-label="Tier list title"
+                                    autoFocus
+                                    value={titleDraft}
+                                    onChange={(event) => {
+                                        setTitleDraft(event.target.value);
+                                        setShareNotice('');
+                                    }}
+                                    onBlur={finishTitleEdit}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter') finishTitleEdit();
+                                        if (event.key === 'Escape') {
+                                            setTitleDraft(listTitle);
+                                            setIsEditingTitle(false);
+                                        }
+                                    }}
+                                />
+                            ) : (
+                                &lt;button
+                                    className="tierlist-title-button"
+                                    type="button"
+                                    onClick={() => {
+                                        setTitleDraft(listTitle);
+                                        setIsEditingTitle(true);
+                                    }}
+                                    aria-label={`Edit tier list title: ${listTitle}`}
+                                >
+                                    {listTitle}
+                                    &lt;svg
+                                        className="tierlist-title-pencil"
+                                        viewBox="0 0 16 16"
+                                        aria-hidden="true"
+                                    >
+                                        &lt;path d="M11.7 1.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-9.2 9.2-3.5.7.7-3.5 9-9.4ZM2.9 11.2l-.3 1.3 1.3-.3 7.7-7.7-1-1-7.7 7.7Z" />
+                                    &lt;/svg>
+                                &lt;/button>
+                            )}
+                        &lt;/h2>
+                        &lt;Button type="button" onClick={handleShare}>Share&lt;/Button>
+                    &lt;/div>
+                    {shareNotice &amp;&amp; (
+                        &lt;p className="tierlist-share-notice" role="status">
+                            {shareNotice}
+                        &lt;/p>
+                    )}
+                    &lt;div className="tierlist-rows">
+                        {TIER_KEYS.map((tierKey) => (
+                            &lt;div
+                                className={`tierlist-row tierlist-row--${tierKey.toLowerCase()}`}
+                                key={tierKey}
+                                onDragOver={(event) => event.preventDefault()}
+                                onDrop={(event) => moveSong(event, tierKey)}
+                            >
+                                &lt;h3>
+                                    {editingTier === tierKey ? (
+                                        &lt;input
+                                            className="form-input tierlist-tier-input"
+                                            aria-label={`${tierKey} tier name`}
+                                            autoFocus
+                                            value={tierDraft}
+                                            onChange={(event) => setTierDraft(event.target.value)}
+                                            onBlur={() => finishTierEdit(tierKey)}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter') event.currentTarget.blur();
+                                                if (event.key === 'Escape') {
+                                                    canceledTierEditRef.current = tierKey;
+                                                    setTierDraft(tierNames[tierKey]);
+                                                    setEditingTier(null);
+                                                }
+                                            }}
+                                        />
+                                    ) : (
+                                        &lt;button
+                                            className="tierlist-tier-button"
+                                            type="button"
+                                            aria-label={`Edit ${tierNames[tierKey]} tier name`}
+                                            onClick={() => {
+                                                canceledTierEditRef.current = null;
+                                                setTierDraft(tierNames[tierKey]);
+                                                setEditingTier(tierKey);
+                                            }}
+                                        >
+                                            {tierNames[tierKey]}
+                                        &lt;/button>
+                                    )}
+                                &lt;/h3>
+                                &lt;div className="tierlist-songs" aria-label={`${tierNames[tierKey]} tier`}>
+                                    {tiers[tierKey].map((song) => (
+                                        &lt;div
+                                            className="tierlist-song tierlist-song--artwork"
+                                            title={song.title}
+                                            aria-label={song.title}
+                                            role="img"
+                                            draggable
+                                            key={song.id}
+                                            onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
+                                        >
+                                            &lt;SongArtwork song={song} className="tierlist-song__artwork" />
+                                        &lt;/div>
+                                    ))}
+                                &lt;/div>
+                            &lt;/div>
+                        ))}
+                    &lt;/div>
+                    &lt;div
+                        className="tierlist-neutral"
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={(event) => moveSong(event, 'neutral')}
+                    >
+                        &lt;div className="tierlist-songs">
+                            {tiers.neutral.map((song) => (
+                                &lt;div
+                                    className="tierlist-song tierlist-song--artwork"
+                                    title={song.title}
+                                    aria-label={song.title}
+                                    role="img"
+                                    draggable
+                                    key={song.id}
+                                    onDragStart={(event) => event.dataTransfer.setData('text/plain', song.id)}
+                                >
+                                    &lt;SongArtwork song={song} className="tierlist-song__artwork" />
+                                &lt;/div>
+                            ))}
+                        &lt;/div>
+                        &lt;Button
+                            className="button--primary"
+                            type="button"
+                            onClick={() => setIsSongPickerOpen(true)}
+                        >
+                            Add new song
+                        &lt;/Button>
+                    &lt;/div>
+                &lt;/section>
+            )}
+            &lt;dialog
+                ref={songPickerRef}
+                className="tierlist-song-picker"
+                aria-labelledby="tierlist-song-picker-title"
+                onClose={() => setIsSongPickerOpen(false)}
+            >
+                &lt;div className="tierlist-song-picker__header">
+                    &lt;div>
+                        &lt;h2 id="tierlist-song-picker-title">Choose a song&lt;/h2>
+                        &lt;p>Select a song to add it to your tier list.&lt;/p>
+                    &lt;/div>
+                    &lt;Button
+                        type="button"
+                        aria-label="Close song picker"
+                        onClick={() => setIsSongPickerOpen(false)}
+                    >
+                        Close
+                    &lt;/Button>
+                &lt;/div>
+                &lt;div className="tierlist-song-picker__list">
+                    {availableSongs.map((song) => {
+                        const isAdded = addedSongIds.has(song.id);
+
+                        return (
+                            &lt;button
+                                className="tierlist-song-picker__option"
+                                type="button"
+                                key={song.id}
+                                disabled={isAdded}
+                                onClick={() => addSong(song)}
+                            >
+                                &lt;span className="tierlist-song-picker__title">
+                                    &lt;SongArtwork song={song} className="song-artwork--picker" />
+                                    &lt;span>{song.title}&lt;/span>
+                                &lt;/span>
+                                &lt;span className="tierlist-song-picker__status">
+                                    {isAdded ? 'Added' : 'Add to tier list'}
+                                &lt;/span>
+                            &lt;/button>
+                        );
+                    })}
+                &lt;/div>
+            &lt;/dialog>
+        &lt;/main>
+    );
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AlbumButton.html">AlbumButton</a></li><li><a href="module-Albums.html">Albums</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Button.html">Button</a></li><li><a href="module-Footer.html">Footer</a></li><li><a href="module-Forum.html">Forum</a></li><li><a href="module-ForumButton.html">ForumButton</a></li><li><a href="module-Home.html">Home</a></li><li><a href="module-HomeButton.html">HomeButton</a></li><li><a href="module-LightSwitch.html">LightSwitch</a></li><li><a href="module-Login.html">Login</a></li><li><a href="module-LoginButton.html">LoginButton</a></li><li><a href="module-PersonalizeModal.html">PersonalizeModal</a></li><li><a href="module-Profile.html">Profile</a></li><li><a href="module-ProfileButton.html">ProfileButton</a></li><li><a href="module-Search.html">Search</a></li><li><a href="module-SearchBar.html">SearchBar</a></li><li><a href="module-SignUp.html">SignUp</a></li><li><a href="module-SignupButton.html">SignupButton</a></li><li><a href="module-SongArtwork.html">SongArtwork</a></li><li><a href="module-TierList.html">TierList</a></li><li><a href="module-TierListButton.html">TierListButton</a></li><li><a href="module-Upload.html">Upload</a></li><li><a href="module-UploadButton.html">UploadButton</a></li><li><a href="module-main.html">main</a></li><li><a href="module-songs.html">songs</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 13 2026 19:44:14 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
