@@ -367,9 +367,57 @@
   border-color: var(--muted);
 }
 
-.search-page__query {
-  margin: -12px 0 0;
-  color: var(--muted);
+.search-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  margin: 0 0 20px;
+}
+
+.search-page__result-types {
+  display: flex;
+  gap: 8px;
+}
+
+.search-page__filter-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  cursor: pointer;
+}
+
+.search-page__filter-button:hover,
+.search-page__filter-button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.search-page__filter-button:focus-visible,
+.search-page__genre-select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.search-page__genre-select {
+  margin-left: auto;
+  min-width: 140px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  cursor: pointer;
+}
+
+.search-page__genre-select:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
 }
 
 .search-page__song {
