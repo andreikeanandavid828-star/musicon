@@ -70,7 +70,7 @@ def search_songs():
             supabase.table("songs")
             .select(
                 "id, title, artist_name, album_id, "
-                "duration_ms, explicit, year, genre, "
+                "duration_ms, explicit, year, genre, popularity,"
                 "albums(id, title, cover_image_url)",
                 count="exact"
             )
