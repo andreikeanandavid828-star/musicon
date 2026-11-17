@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const COMMON_GENRE_ORDER = ['Pop', 'R&B', 'Hip Hop', 'Dance/Electronic', 'Rock'];
 
@@ -193,15 +193,24 @@ export default function Search() {
           <ul className="album-songs search-page__song-list" aria-label="Song search results">
             {filteredSongs.map((song) => (
               <li className="search-page__song" key={song.id}>
-                <div className="song-artwork album-cover search-page__artwork">
-                  {song.albums?.cover_image_url && (
-                    <img src={song.albums.cover_image_url} alt="" />
-                  )}
-                </div>
-                <span className="album-songs__title">{song.title}</span>
-                <span className="album-songs__artist">
-                  {song.artist_name || 'Unknown artist'}
-                </span>
+                <Link
+                  className="search-page__song-link"
+                  to={`/songs/${encodeURIComponent(song.id)}`}
+                  state={{
+                    song,
+                    from: `${location.pathname}${location.search}`,
+                  }}
+                >
+                  <div className="song-artwork album-cover search-page__artwork">
+                    {song.albums?.cover_image_url && (
+                      <img src={song.albums.cover_image_url} alt="" />
+                    )}
+                  </div>
+                  <span className="album-songs__title">{song.title}</span>
+                  <span className="album-songs__artist">
+                    {song.artist_name || 'Unknown artist'}
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
