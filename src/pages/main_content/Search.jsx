@@ -2,6 +2,17 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const COMMON_GENRE_ORDER = ['Pop', 'R&B', 'Hip Hop', 'Dance/Electronic', 'Rock'];
+const genreCoverFiles = import.meta.glob('../../assets/7_genre_song_covers/*.png', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const genreCovers = Object.fromEntries(
+  Object.entries(genreCoverFiles).map(([path, url]) => {
+    const fileName = path.split('/').pop().replace(/\.png$/i, '');
+    return [fileName.toLocaleLowerCase().replace(/[^a-z0-9]/g, ''), url];
+  }),
+);
 
 function getSongGenres(genre) {
   const values = Array.isArray(genre) ? genre : [genre];
@@ -9,6 +20,23 @@ function getSongGenres(genre) {
     .flatMap((value) => typeof value === 'string' ? value.split(/[,;|\n]+/) : [])
     .map((value) => value.trim())
     .filter(Boolean);
+}
+
+function getGenreCover(song, selectedGenre) {
+  const songGenres = getSongGenres(song.genre);
+  const genre = selectedGenre === 'all'
+    ? songGenres[0]
+    : songGenres.find(
+      (songGenre) => songGenre.toLocaleLowerCase() === selectedGenre.toLocaleLowerCase(),
+    );
+  if (!genre) return null;
+
+  let genreKey = genre.toLocaleLowerCase().replace(/[^a-z0-9]/g, '');
+  if (['dance', 'electronic', 'edm'].includes(genreKey)) {
+    genreKey = 'danceelectronic';
+  }
+
+  return genreCovers[genreKey] || null;
 }
 
 function formatGenreLabel(genre) {
@@ -191,19 +219,22 @@ export default function Search() {
         )}
         {!isLoading && !searchError && activeResultType === 'songs' && filteredSongs.length > 0 && (
           <ul className="album-songs search-page__song-list" aria-label="Song search results">
-            {filteredSongs.map((song) => (
-              <li className="search-page__song" key={song.id}>
-                <div className="song-artwork album-cover search-page__artwork">
-                  {song.albums?.cover_image_url && (
-                    <img src={song.albums.cover_image_url} alt="" />
-                  )}
-                </div>
-                <span className="album-songs__title">{song.title}</span>
-                <span className="album-songs__artist">
-                  {song.artist_name || 'Unknown artist'}
-                </span>
-              </li>
-            ))}
+            {filteredSongs.map((song) => {
+              const coverUrl = getGenreCover(song, selectedGenre)
+                || song.albums?.cover_image_url;
+
+              return (
+                <li className="search-page__song" key={song.id}>
+                  <div className="song-artwork album-cover search-page__artwork">
+                    {coverUrl && <img src={coverUrl} alt="" />}
+                  </div>
+                  <span className="album-songs__title">{song.title}</span>
+                  <span className="album-songs__artist">
+                    {song.artist_name || 'Unknown artist'}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
         {!isLoading && !searchError && activeResultType === 'artists' && artists.length > 0 && (

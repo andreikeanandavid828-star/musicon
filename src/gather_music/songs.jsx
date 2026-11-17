@@ -7,16 +7,21 @@
  * @date 2026-10-13
  */
 
-import neonDawnFade from '../assets/TempMusic/Neon Dawn Fade.mp3';
-import neonDawnFadeAlternate from '../assets/TempMusic/Neon Dawn Fade (4).mp3';
-import neonSkyTrain from '../assets/TempMusic/Neon SkyTrain.mp3';
+const musicFiles = import.meta.glob('../assets/TempMusic/*.mp3', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
 
-export const songs = [
-  { id: 'neon-skytrain', title: 'Neon SkyTrain', src: neonSkyTrain },
-  { id: 'neon-dawn-fade', title: 'Neon Dawn Fade', src: neonDawnFade },
-  {
-    id: 'neon-dawn-fade-alternate',
-    title: 'Neon Dawn Fade (4)',
-    src: neonDawnFadeAlternate,
-  },
-];
+export const songs = Object.entries(musicFiles)
+  .map(([path, src]) => {
+    const fileName = path.split('/').pop();
+    const title = fileName.replace(/\.mp3$/i, '');
+
+    return {
+      id: title.toLocaleLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      title,
+      src,
+    };
+  })
+  .sort((a, b) => a.title.localeCompare(b.title));

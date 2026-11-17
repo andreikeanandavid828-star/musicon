@@ -590,6 +590,52 @@
   scrollbar-color: var(--border) transparent;
 }
 
+.home-song-carousel {
+  position: relative;
+}
+
+.home-song-carousel .home-card-row {
+  scroll-behavior: smooth;
+}
+
+.home-song-carousel__arrow {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--heading);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.home-song-carousel__arrow:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.home-song-carousel__arrow:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.home-song-carousel__arrow--left {
+  left: 0;
+}
+
+.home-song-carousel__arrow--right {
+  right: 0;
+}
+
 .home-card {
   flex: 0 0 168px;
   min-width: 0;
