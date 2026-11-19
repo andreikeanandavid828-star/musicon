@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module routes.profile</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="routes.html"><font color="#ffffff">routes</font></a>.profile</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/andreidavid/Documents/GitHub/musicon/routes/profile.py">/Users/andreidavid/Documents/GitHub/musicon/routes/profile.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;Name:&nbsp;Profile<br>
+Date:&nbsp;October&nbsp;-&nbsp;November&nbsp;2026<br>
+Programmer:&nbsp;Andrei&nbsp;David<br>
+&nbsp;<br>
+Description:<br>
+Handles&nbsp;user&nbsp;profile&nbsp;information,&nbsp;profile&nbsp;updates,<br>
+and&nbsp;profile&nbsp;image&nbsp;uploads&nbsp;using&nbsp;Flask&nbsp;and&nbsp;Supabase.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-get_first_record"><strong>get_first_record</strong></a>(table, columns, filter_column, value)</dt><dd><tt>Retrieves&nbsp;a&nbsp;single&nbsp;record&nbsp;from&nbsp;a&nbsp;Supabase&nbsp;table.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table&nbsp;(str):&nbsp;Name&nbsp;of&nbsp;the&nbsp;database&nbsp;table.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;columns&nbsp;(str):&nbsp;Columns&nbsp;to&nbsp;retrieve.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filter_column&nbsp;(str):&nbsp;Column&nbsp;used&nbsp;to&nbsp;filter&nbsp;records.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;value:&nbsp;Value&nbsp;to&nbsp;search&nbsp;for.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict&nbsp;or&nbsp;None:&nbsp;Record&nbsp;data&nbsp;if&nbsp;found.</tt></dd></dl>
+ <dl><dt><a name="-get_my_profile"><strong>get_my_profile</strong></a>()</dt><dd><tt>Retrieves&nbsp;the&nbsp;authenticated&nbsp;user's&nbsp;profile&nbsp;information.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;from&nbsp;the&nbsp;request.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;profile&nbsp;data&nbsp;and&nbsp;post&nbsp;count.</tt></dd></dl>
+ <dl><dt><a name="-get_profile_records"><strong>get_profile_records</strong></a>(user_id)</dt><dd><tt>Retrieves&nbsp;a&nbsp;user's&nbsp;account&nbsp;and&nbsp;profile&nbsp;information.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;user.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tuple:&nbsp;User&nbsp;data&nbsp;and&nbsp;profile&nbsp;data.</tt></dd></dl>
+ <dl><dt><a name="-serialize_profile"><strong>serialize_profile</strong></a>(user_data, profile_data)</dt><dd><tt>Converts&nbsp;user&nbsp;and&nbsp;profile&nbsp;data&nbsp;into&nbsp;a&nbsp;dictionary.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_data&nbsp;(dict):&nbsp;User&nbsp;account&nbsp;information.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;profile_data&nbsp;(dict):&nbsp;User&nbsp;profile&nbsp;information.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;Formatted&nbsp;profile&nbsp;information.</tt></dd></dl>
+ <dl><dt><a name="-update_my_profile"><strong>update_my_profile</strong></a>()</dt><dd><tt>Updates&nbsp;the&nbsp;authenticated&nbsp;user's&nbsp;profile&nbsp;information.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;username&nbsp;(str):&nbsp;New&nbsp;username.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bio&nbsp;(str):&nbsp;New&nbsp;profile&nbsp;biography.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;location&nbsp;(str):&nbsp;User's&nbsp;location.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;show_location&nbsp;(bool):&nbsp;Location&nbsp;visibility&nbsp;setting.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;profile_picture&nbsp;(file):&nbsp;New&nbsp;avatar&nbsp;image.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;banner_picture&nbsp;(file):&nbsp;New&nbsp;banner&nbsp;image.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;with&nbsp;updated&nbsp;profile&nbsp;or&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-upload_profile_image"><strong>upload_profile_image</strong></a>(image_file, user_id, image_type)</dt><dd><tt>Uploads&nbsp;a&nbsp;PNG&nbsp;profile&nbsp;image&nbsp;to&nbsp;Supabase&nbsp;Storage.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;image_file&nbsp;(FileStorage):&nbsp;Image&nbsp;to&nbsp;upload.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;user.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;image_type&nbsp;(str):&nbsp;Type&nbsp;of&nbsp;image&nbsp;(avatar&nbsp;or&nbsp;banner).<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;str:&nbsp;Storage&nbsp;path&nbsp;of&nbsp;the&nbsp;uploaded&nbsp;image.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>MAX_IMAGE_SIZE</strong> = 5242880<br>
+<strong>PROFILE_IMAGE_BUCKET</strong> = 'profile-images'<br>
+<strong>USER_COLUMNS</strong> = 'id, username, is_admin, is_artist'<br>
+<strong>current_app</strong> = &lt;LocalProxy unbound&gt;<br>
+<strong>profile</strong> = &lt;Blueprint 'profile'&gt;<br>
+<strong>request</strong> = &lt;LocalProxy unbound&gt;<br>
+<strong>supabase</strong> = &lt;supabase._sync.client.Client object&gt;</td></tr></table>
+</body></html>

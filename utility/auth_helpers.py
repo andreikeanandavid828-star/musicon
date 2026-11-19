@@ -1,8 +1,29 @@
+
+"""
+Module Name: Authentication Utility
+Date: September - October 2026
+Programmer: Martin Reyes
+
+Description:
+Handles user authentication by retrieving and
+validating Supabase authentication tokens.
+"""
+
 from flask import request
 from .supabase_client import supabase 
 
 def get_authenticated_user():
-    """Extracts token from cookie or Authorization header and returns Supabase user objects."""
+    """
+    Retrieves the authenticated user using a Supabase token.
+
+    Inputs:
+        None. Reads the authentication token from
+        request cookies or the Authorization header.
+
+    Output:
+        User or None: The authenticated Supabase user
+        object, or None if authentication fails.
+    """
     token = request.cookies.get("supabase-auth-token")
 
     if not token and 'Authorization' in request.headers:

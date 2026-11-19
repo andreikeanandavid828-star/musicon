@@ -1,3 +1,14 @@
+
+"""
+Module Name: Spotify Client Utility
+Date: November 2026
+Programmer: Andrei David
+
+Description:
+Handles Spotify API authentication and searches
+for tracks using the Spotify Web API.
+"""
+
 import os
 import time
 import requests
@@ -10,6 +21,16 @@ _token_expires_at = 0
 
 
 def get_spotify_token():
+    """
+    Retrieves a Spotify API access token.
+
+    Inputs:
+        None. Uses SPOTIFY_CLIENT_ID and
+        SPOTIFY_CLIENT_SECRET environment variables.
+
+    Output:
+        str: A valid Spotify access token.
+    """
     global _access_token, _token_expires_at
 
     # Reuse the token if it is still valid
@@ -41,6 +62,16 @@ def get_spotify_token():
 
 
 def search_spotify_tracks(query):
+    """
+    Searches for tracks using the Spotify Web API.
+
+    Inputs:
+        query (str): Song title or search keyword.
+
+    Output:
+        list: Matching tracks with titles, artists,
+        album details, cover images, and durations.
+    """
     token = get_spotify_token()
 
     response = requests.get(

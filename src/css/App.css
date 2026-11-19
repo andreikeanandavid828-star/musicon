@@ -367,22 +367,136 @@
   border-color: var(--muted);
 }
 
-.search-page__query {
-  margin: -12px 0 0;
-  color: var(--muted);
+.search-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  margin: 0 0 20px;
+}
+
+.search-page__result-types {
+  display: flex;
+  gap: 8px;
+}
+
+.search-page__filter-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  cursor: pointer;
+}
+
+.search-page__filter-button:hover,
+.search-page__filter-button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.search-page__filter-button:focus-visible,
+.search-page__genre-select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.search-page__genre-select {
+  margin-left: auto;
+  min-width: 140px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--control-text);
+  cursor: pointer;
+}
+
+.search-page__genre-select:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
 }
 
 .search-page__song {
   display: flex;
   min-width: 0;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
   border-bottom: 1px solid var(--border);
 }
 
 .search-page__song:last-child {
   border-bottom: 0;
+}
+
+.search-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 16px 0;
+}
+
+.search-page__pagination-button {
+  min-width: 32px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.search-page__pagination-button:hover:not(:disabled) {
+  background: var(--nav-hover-bg);
+}
+
+.search-page__pagination-number[aria-current='page'] {
+  color: var(--heading);
+  font-weight: 700;
+}
+
+.search-page__pagination-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.search-page__pagination-button:disabled {
+  cursor: default;
+}
+
+.search-page__pagination-button:disabled:not([aria-current='page']) {
+  opacity: 0.5;
+}
+
+.search-page__pagination-button:first-child,
+.search-page__pagination-button:last-child {
+  min-width: auto;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.search-page__song-link {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.search-page__song-link:hover {
+  background: var(--surface);
+}
+
+.search-page__song-link:focus-visible,
+.individual-song__back:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .search-page .search-page__artwork {
@@ -399,6 +513,132 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.individual-song-page {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+  flex-direction: column;
+  margin: 0;
+  background: var(--page-bg);
+  text-align: left;
+}
+
+.individual-song__back {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  align-self: flex-start;
+  margin: 10px 0 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--control-bg);
+  color: var(--control-text);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.individual-song__back:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.individual-song {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  align-items: center;
+  gap: 32px;
+  padding: 32px;
+}
+
+.individual-song__artwork {
+  flex: 0 0 220px;
+  width: 220px;
+  height: 220px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.individual-song__cover {
+  flex: 0 0 220px;
+  display: block;
+  width: 220px;
+  height: 220px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.individual-song__details {
+  min-width: 0;
+}
+
+.individual-song__eyebrow {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.individual-song__details h1 {
+  margin: 0;
+  color: var(--heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.individual-song__artist {
+  margin: 10px 0 24px;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.individual-song__metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+
+.individual-song__metadata div {
+  min-width: 0;
+}
+
+.individual-song__metadata dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.individual-song__metadata dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .individual-song {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .individual-song__artwork,
+  .individual-song__cover {
+    width: min(220px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+    align-self: center;
+    flex-basis: auto;
+  }
 }
 
 .app-header::after {
@@ -540,6 +780,52 @@
   gap: 20px;
   list-style: none;
   scrollbar-color: var(--border) transparent;
+}
+
+.home-song-carousel {
+  position: relative;
+}
+
+.home-song-carousel .home-card-row {
+  scroll-behavior: smooth;
+}
+
+.home-song-carousel__arrow {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--heading);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.home-song-carousel__arrow:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.home-song-carousel__arrow:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.home-song-carousel__arrow--left {
+  left: 0;
+}
+
+.home-song-carousel__arrow--right {
+  right: 0;
 }
 
 .home-card {

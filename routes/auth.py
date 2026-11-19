@@ -1,11 +1,37 @@
+
+"""
+Module Name: Authentication
+Date: September-October 2026
+Programmer: Andrei David
+
+Description:
+Handles user registration, login, logout,
+and password recovery using Flask and Supabase.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, create_supabase_client
 
 auth = Blueprint("auth", __name__)
 
-#Register Route
+
+# Register Route
 @auth.route('/register', methods=['POST', 'OPTIONS'])
 def register():
+    """
+    Registers a new user using Supabase.
+
+    Inputs:
+        email (str): User's email.
+        password (str): User's password.
+        confirmPassword (str): Confirmed password.
+        username (str): User's username.
+        firstName (str): User's first name.
+        lastName (str): User's last name.
+
+    Output:
+        JSON response with user ID or error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -48,9 +74,21 @@ def register():
             "details": str(e)
         }), 500
 
-#Login Route
+
+# Login Route
 @auth.route('/login', methods=['POST', 'OPTIONS'])
 def login():
+    """
+    Logs in a user using Supabase authentication.
+
+    Inputs:
+        email (str): User's email.
+        password (str): User's password.
+
+    Output:
+        JSON response with login status and user ID.
+        Sets an authentication cookie if successful.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -86,9 +124,18 @@ def login():
         return jsonify({"error": "Failed to login"}), 500
 
 
-#Logout Route
+# Logout Route
 @auth.route('/logout', methods=['POST', 'OPTIONS'])
 def logout():
+    """
+    Logs out the user by clearing the authentication cookie.
+
+    Inputs:
+        None.
+
+    Output:
+        JSON response with logout status or error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -104,6 +151,15 @@ def logout():
 # Forgot Password Route
 @auth.route('/forgot-password', methods=['POST'])
 def forgot_password():
+    """
+    Sends a password reset email to the user.
+
+    Inputs:
+        email (str): User's email address.
+
+    Output:
+        JSON response confirming the request or showing an error.
+    """
     data = request.get_json(silent=True) or {}
     email = str(data.get('email') or '').strip()
 
@@ -135,6 +191,17 @@ def forgot_password():
 # Reset Password Route
 @auth.route('/reset-password', methods=['POST'])
 def reset_password():
+    """
+    Resets a user's password using Supabase.
+
+    Inputs:
+        access_token (str): User's recovery access token.
+        refresh_token (str): User's recovery refresh token.
+        password (str): New password (at least 8 characters).
+
+    Output:
+        JSON response with password update status or error.
+    """
     data = request.get_json(silent=True) or {}
 
     access_token = data.get('access_token')

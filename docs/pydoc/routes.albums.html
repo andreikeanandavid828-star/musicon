@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module routes.albums</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="routes.html"><font color="#ffffff">routes</font></a>.albums</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/andreidavid/Documents/GitHub/musicon/routes/albums.py">/Users/andreidavid/Documents/GitHub/musicon/routes/albums.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;Name:&nbsp;Albums<br>
+Date:&nbsp;October&nbsp;-&nbsp;November&nbsp;2026<br>
+Programmer:&nbsp;Martin&nbsp;Reyes<br>
+&nbsp;<br>
+Description:<br>
+Handles&nbsp;retrieving,&nbsp;creating,&nbsp;and&nbsp;viewing&nbsp;albums,<br>
+as&nbsp;well&nbsp;as&nbsp;adding&nbsp;songs&nbsp;using&nbsp;Flask&nbsp;and&nbsp;Supabase.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_song_to_album"><strong>add_song_to_album</strong></a>(album_id)</dt><dd><tt>Adds&nbsp;a&nbsp;new&nbsp;song&nbsp;to&nbsp;an&nbsp;existing&nbsp;album.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;album_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;album.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(str):&nbsp;Title&nbsp;of&nbsp;the&nbsp;song.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;audio_url&nbsp;(str):&nbsp;URL&nbsp;of&nbsp;the&nbsp;uploaded&nbsp;audio&nbsp;file.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;track_number&nbsp;(int):&nbsp;Optional&nbsp;track&nbsp;number.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;the&nbsp;created&nbsp;song<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-create_album"><strong>create_album</strong></a>()</dt><dd><tt>Creates&nbsp;a&nbsp;new&nbsp;album&nbsp;for&nbsp;an&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(str):&nbsp;Title&nbsp;of&nbsp;the&nbsp;album.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;artist&nbsp;(str):&nbsp;Name&nbsp;of&nbsp;the&nbsp;artist.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;artist_name&nbsp;(str):&nbsp;Alternative&nbsp;artist&nbsp;field.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cover_image_url&nbsp;(str):&nbsp;Optional&nbsp;album&nbsp;cover&nbsp;URL.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;release_year&nbsp;(int):&nbsp;Optional&nbsp;release&nbsp;year.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;the&nbsp;created&nbsp;album<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-get_album_detail"><strong>get_album_detail</strong></a>(album_id)</dt><dd><tt>Retrieves&nbsp;an&nbsp;album&nbsp;with&nbsp;its&nbsp;songs&nbsp;and&nbsp;related&nbsp;posts.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;album_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;album&nbsp;to&nbsp;retrieve.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;album&nbsp;details,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;songs,&nbsp;and&nbsp;posts&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-get_albums"><strong>get_albums</strong></a>()</dt><dd><tt>Retrieves&nbsp;all&nbsp;albums&nbsp;from&nbsp;Supabase.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;None.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;all&nbsp;albums<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>albums_bp</strong> = &lt;Blueprint 'albums'&gt;<br>
+<strong>request</strong> = &lt;LocalProxy unbound&gt;<br>
+<strong>supabase</strong> = &lt;supabase._sync.client.Client object&gt;</td></tr></table>
+</body></html>

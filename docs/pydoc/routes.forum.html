@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module routes.forum</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="routes.html"><font color="#ffffff">routes</font></a>.forum</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/andreidavid/Documents/GitHub/musicon/routes/forum.py">/Users/andreidavid/Documents/GitHub/musicon/routes/forum.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;Name:&nbsp;Posts<br>
+Date:&nbsp;October&nbsp;-&nbsp;November&nbsp;2026<br>
+Programmer:&nbsp;Martin&nbsp;Reyes<br>
+&nbsp;<br>
+Description:<br>
+Handles&nbsp;forum&nbsp;posts,&nbsp;comments,&nbsp;replies,&nbsp;and&nbsp;likes<br>
+using&nbsp;Flask&nbsp;and&nbsp;Supabase.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_comment"><strong>add_comment</strong></a>(post_id)</dt><dd><tt>Adds&nbsp;a&nbsp;comment&nbsp;or&nbsp;reply&nbsp;to&nbsp;a&nbsp;forum&nbsp;post.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;post_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;post.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;body&nbsp;(str):&nbsp;Content&nbsp;of&nbsp;the&nbsp;comment.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;parent_id&nbsp;(str):&nbsp;Optional&nbsp;parent&nbsp;comment&nbsp;ID.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;the&nbsp;new&nbsp;comment<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-create_post"><strong>create_post</strong></a>()</dt><dd><tt>Creates&nbsp;a&nbsp;new&nbsp;forum&nbsp;post&nbsp;for&nbsp;an&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;(str):&nbsp;Title&nbsp;of&nbsp;the&nbsp;post.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;body&nbsp;(str):&nbsp;Content&nbsp;of&nbsp;the&nbsp;post.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;album_id&nbsp;(str):&nbsp;Optional&nbsp;album&nbsp;ID.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;the&nbsp;created&nbsp;post<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-delete_comment"><strong>delete_comment</strong></a>(comment_id)</dt><dd><tt>Deletes&nbsp;a&nbsp;comment&nbsp;owned&nbsp;by&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;comment_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;comment&nbsp;to&nbsp;delete.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;from&nbsp;the&nbsp;request.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;confirming&nbsp;deletion<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;showing&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-get_likes_status"><strong>get_likes_status</strong></a>()</dt><dd><tt>Retrieves&nbsp;like&nbsp;counts&nbsp;and&nbsp;the&nbsp;user's&nbsp;liked&nbsp;posts.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;(optional).<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;like&nbsp;counts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;liked&nbsp;post&nbsp;IDs.</tt></dd></dl>
+ <dl><dt><a name="-get_my_posts"><strong>get_my_posts</strong></a>()</dt><dd><tt>Retrieves&nbsp;all&nbsp;posts&nbsp;created&nbsp;by&nbsp;the&nbsp;authenticated&nbsp;user.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;from&nbsp;the&nbsp;request.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;the&nbsp;user's&nbsp;posts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-get_post_detail"><strong>get_post_detail</strong></a>(post_id)</dt><dd><tt>Retrieves&nbsp;a&nbsp;forum&nbsp;post&nbsp;and&nbsp;its&nbsp;comments.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;post_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;post&nbsp;to&nbsp;retrieve.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;post&nbsp;details<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;comments&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-get_posts"><strong>get_posts</strong></a>()</dt><dd><tt>Retrieves&nbsp;all&nbsp;forum&nbsp;posts&nbsp;for&nbsp;the&nbsp;feed.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;None.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;containing&nbsp;all&nbsp;posts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-like_post"><strong>like_post</strong></a>(post_id)</dt><dd><tt>Adds&nbsp;a&nbsp;like&nbsp;to&nbsp;a&nbsp;forum&nbsp;post.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;post_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;post&nbsp;to&nbsp;like.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;from&nbsp;the&nbsp;request.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;confirming&nbsp;the&nbsp;like<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;showing&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+ <dl><dt><a name="-unlike_post"><strong>unlike_post</strong></a>(post_id)</dt><dd><tt>Removes&nbsp;a&nbsp;user's&nbsp;like&nbsp;from&nbsp;a&nbsp;forum&nbsp;post.<br>
+&nbsp;<br>
+Inputs:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;post_id&nbsp;(str):&nbsp;ID&nbsp;of&nbsp;the&nbsp;post&nbsp;to&nbsp;unlike.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Authentication&nbsp;token&nbsp;from&nbsp;the&nbsp;request.<br>
+&nbsp;<br>
+Output:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;JSON&nbsp;response&nbsp;confirming&nbsp;the&nbsp;removal<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;showing&nbsp;an&nbsp;error&nbsp;message.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>posts_bp</strong> = &lt;Blueprint 'posts'&gt;<br>
+<strong>request</strong> = &lt;LocalProxy unbound&gt;<br>
+<strong>supabase</strong> = &lt;supabase._sync.client.Client object&gt;</td></tr></table>
+</body></html>

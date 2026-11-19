@@ -1,14 +1,36 @@
+
+"""
+Module Name: Albums
+Date: October - November 2026
+Programmer: Martin Reyes
+
+Description:
+Handles retrieving, creating, and viewing albums,
+as well as adding songs using Flask and Supabase.
+"""
+
 from flask import Blueprint, request, jsonify
 from utility import supabase, get_authenticated_user
 
 albums_bp = Blueprint('albums', __name__)  # Fixed: changed albums_bl to albums_bp
 
+
 #Fetch All Albums Route
 @albums_bp.route('/', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_albums():
+    """
+    Retrieves all albums from Supabase.
+
+    Inputs:
+        None.
+
+    Output:
+        JSON response containing all albums
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
-    
+
     try:
         response = supabase.table('albums').select('*').order('created_at', desc=True).execute()  # Fixed: reponse -> response
         return jsonify(response.data), 200
@@ -16,15 +38,26 @@ def get_albums():
         print("GET ALBUMS ERROR:", e)
         return jsonify({'error': str(e)}), 500
 
+
 #Get Single Album Detail Route
 @albums_bp.route('/<album_id>', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_album_detail(album_id):
+    """
+    Retrieves an album with its songs and related posts.
+
+    Inputs:
+        album_id (str): ID of the album to retrieve.
+
+    Output:
+        JSON response containing album details,
+        songs, and posts or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
     try:
         album_res = supabase.table('albums').select('*').eq('id', album_id).single().execute()
-        
+
         if not album_res.data:
             return jsonify({'error': 'Album not found'}), 404
 
@@ -40,9 +73,24 @@ def get_album_detail(album_id):
         print("GET ALBUM DETAIL ERROR:", e)
         return jsonify({'error': str(e)}), 500
 
-#Create a New Album Route 
+
+#Create a New Album Route
 @albums_bp.route('/', methods=['POST', 'OPTIONS'], strict_slashes=False)
 def create_album():
+    """
+    Creates a new album for an authenticated user.
+
+    Inputs:
+        title (str): Title of the album.
+        artist (str): Name of the artist.
+        artist_name (str): Alternative artist field.
+        cover_image_url (str): Optional album cover URL.
+        release_year (int): Optional release year.
+
+    Output:
+        JSON response containing the created album
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -73,28 +121,42 @@ def create_album():
     except Exception as e:
         print("CREATE ALBUM ERROR:", e)
         return jsonify({'error': str(e)}), 500
-    
+
+
 # Add a Sing to an Album Route
 @albums_bp.route('/<album_id>/songs', methods=['POST','OPTIONS'], strict_slashes=False)
 def add_song_to_album(album_id):
+    """
+    Adds a new song to an existing album.
+
+    Inputs:
+        album_id (str): ID of the album.
+        title (str): Title of the song.
+        audio_url (str): URL of the uploaded audio file.
+        track_number (int): Optional track number.
+
+    Output:
+        JSON response containing the created song
+        or an error message.
+    """
     if request.method == 'OPTIONS':
         return '', 200
-    
+
     # 1. Ensure the user is logged in
     user = get_authenticated_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     # 2. Grab the JSON payload sent from the frontend JSX after it uploaded the file
     data = request.get_json() or {}
     title = data.get('title')
     audio_url = data.get('audio_url') # The cloud storage link from supabase
     track_number = data.get('track_number')
 
-    # 3. Validate required fields 
+    # 3. Validate required fields
     if not title or not audio_url:
         return jsonify({'error': 'Song title and audio URL are required fields'}), 400
-    
+
     try:
         # 4. Insert the text record into your PostgreSQL songs table
         response = supabase.table('songs').insert({
@@ -110,7 +172,7 @@ def add_song_to_album(album_id):
             'message': 'Song uploaded successfully',
             'song': created_song
         }), 201
-    
+
     except Exception as e:
         print("ADD SONG ERROR:", e)
         return jsonify({'error': str(e)}), 500
