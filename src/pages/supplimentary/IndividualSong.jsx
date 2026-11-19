@@ -1,5 +1,6 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import SongArtwork from '../../gather_music/SongArtwork.jsx';
+import { getGenreCover } from '../../gather_music/genreCovers.js';
 
 /**
  * Displays database song details for a selected search result.
@@ -15,6 +16,8 @@ export default function IndividualSong({ song: providedSong = null }) {
   const stateSong = location.state?.song;
   const song = providedSong || (stateSong?.id === songId ? stateSong : null);
   const album = Array.isArray(song?.albums) ? song.albums[0] : song?.albums;
+  const searchCoverUrl = stateSong?.id === songId ? location.state?.coverUrl : null;
+  const coverUrl = searchCoverUrl || getGenreCover(song) || album?.cover_image_url;
 
   function handleBack() {
     const previousPage = location.state?.from;
@@ -35,14 +38,14 @@ export default function IndividualSong({ song: providedSong = null }) {
         <p className="home-empty" role="status">Song information is unavailable.</p>
       ) : (
         <article className="individual-song">
-          {album?.cover_image_url && (
+          {coverUrl && (
             <img
               className="individual-song__cover"
-              src={album.cover_image_url}
+              src={coverUrl}
               alt=""
             />
           )}
-          {!album?.cover_image_url && (
+          {!coverUrl && (
             <SongArtwork
               song={song}
               className="individual-song__artwork"

@@ -1,18 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getGenreCover } from '../../gather_music/genreCovers.js';
 
 const COMMON_GENRE_ORDER = ['Pop', 'R&B', 'Hip Hop', 'Dance/Electronic', 'Rock'];
-const genreCoverFiles = import.meta.glob('../../assets/7_genre_song_covers/*.png', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
-const genreCovers = Object.fromEntries(
-  Object.entries(genreCoverFiles).map(([path, url]) => {
-    const fileName = path.split('/').pop().replace(/\.png$/i, '');
-    return [fileName.toLocaleLowerCase().replace(/[^a-z0-9]/g, ''), url];
-  }),
-);
 
 function getSongGenres(genre) {
   const values = Array.isArray(genre) ? genre : [genre];
@@ -20,23 +10,6 @@ function getSongGenres(genre) {
     .flatMap((value) => typeof value === 'string' ? value.split(/[,;|\n]+/) : [])
     .map((value) => value.trim())
     .filter(Boolean);
-}
-
-function getGenreCover(song, selectedGenre) {
-  const songGenres = getSongGenres(song.genre);
-  const genre = selectedGenre === 'all'
-    ? songGenres[0]
-    : songGenres.find(
-      (songGenre) => songGenre.toLocaleLowerCase() === selectedGenre.toLocaleLowerCase(),
-    );
-  if (!genre) return null;
-
-  let genreKey = genre.toLocaleLowerCase().replace(/[^a-z0-9]/g, '');
-  if (['dance', 'electronic', 'edm'].includes(genreKey)) {
-    genreKey = 'danceelectronic';
-  }
-
-  return genreCovers[genreKey] || null;
 }
 
 function formatGenreLabel(genre) {
@@ -68,74 +41,128 @@ export default function Search() {
   const [songError, setSongError] = useState('');
   const [artistError, setArtistError] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const location = useLocation();
-  const query = new URLSearchParams(location.search).get('q')?.trim() || '';
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get('q')?.trim() || '';
+  const requestedPage = Number(searchParams.get('page'));
+  const currentPage = Number.isInteger(requestedPage) && requestedPage > 0
+    ? requestedPage
+    : 1;
 
   useEffect(() => {
     setSelectedGenre('all');
     setActiveResultType('songs');
+  }, [query]);
+
+  useEffect(() => {
     if (!query) {
       setSongs([]);
-      setArtists([]);
       setSongError('');
-      setArtistError('');
       setIsLoadingSongs(false);
-      setIsLoadingArtists(false);
+      setHasNextPage(false);
+      setTotalPages(0);
       return undefined;
     }
 
     const controller = new AbortController();
     setSongs([]);
-    setArtists([]);
     setIsLoadingSongs(true);
-    setIsLoadingArtists(true);
     setSongError('');
-    setArtistError('');
+    setHasNextPage(false);
+    setTotalPages(0);
 
-    async function fetchResults(type, setResults, setError, setLoading, resultKey, fallbackError) {
+    async function fetchSongs() {
       try {
-        const params = new URLSearchParams({ q: query, page: '1' });
+        const params = new URLSearchParams({
+          q: query,
+          page: String(currentPage),
+        });
         const response = await fetch(
-          `http://localhost:5000/api/search/${type}?${params.toString()}`,
+          `http://localhost:5000/api/search/songs?${params.toString()}`,
           { signal: controller.signal },
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || fallbackError);
+          throw new Error(data.error || 'Unable to search songs.');
         }
 
-        setResults(Array.isArray(data[resultKey]) ? data[resultKey].slice(0, 20) : []);
+        setSongs(Array.isArray(data.songs) ? data.songs.slice(0, 20) : []);
+        setTotalPages(Number.isInteger(data.total_pages) ? data.total_pages : 0);
+        setHasNextPage(
+          typeof data.has_next === 'boolean'
+            ? data.has_next
+            : Number(data.total_pages) > currentPage,
+        );
       } catch (error) {
         if (error.name !== 'AbortError') {
-          setResults([]);
-          setError(error.message || fallbackError);
+          setSongs([]);
+          setSongError(error.message || 'Unable to search songs.');
         }
       } finally {
         if (!controller.signal.aborted) {
-          setLoading(false);
+          setIsLoadingSongs(false);
         }
       }
     }
 
-    void fetchResults(
-      'songs',
-      setSongs,
-      setSongError,
-      setIsLoadingSongs,
-      'songs',
-      'Unable to search songs.',
-    );
-    void fetchResults(
-      'artists',
-      setArtists,
-      setArtistError,
-      setIsLoadingArtists,
-      'artists',
-      'Unable to search artists.',
-    );
+    void fetchSongs();
+    return () => controller.abort();
+  }, [query, currentPage]);
+
+  useEffect(() => {
+    if (!query) {
+      setArtists([]);
+      setArtistError('');
+      setIsLoadingArtists(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setArtists([]);
+    setIsLoadingArtists(true);
+    setArtistError('');
+
+    async function fetchArtists() {
+      try {
+        const params = new URLSearchParams({ q: query, page: '1' });
+        const response = await fetch(
+          `http://localhost:5000/api/search/artists?${params.toString()}`,
+          { signal: controller.signal },
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Unable to search artists.');
+        }
+
+        setArtists(Array.isArray(data.artists) ? data.artists.slice(0, 20) : []);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setArtists([]);
+          setArtistError(error.message || 'Unable to search artists.');
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoadingArtists(false);
+        }
+      }
+    }
+
+    void fetchArtists();
     return () => controller.abort();
   }, [query]);
+
+  function navigateToPage(page) {
+    const params = new URLSearchParams(location.search);
+    params.set('q', query);
+    params.set('page', String(page));
+    setActiveResultType('songs');
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  }
 
   const genreByKey = new Map();
   songs.forEach((song) => {
@@ -165,6 +192,44 @@ export default function Search() {
   const isLoading = activeResultType === 'songs' ? isLoadingSongs : isLoadingArtists;
   const searchError = activeResultType === 'songs' ? songError : artistError;
   const resultCount = activeResultType === 'songs' ? filteredSongs.length : artists.length;
+
+  function renderPagination(position) {
+    if (!query || activeResultType !== 'songs') return null;
+
+    return (
+      <nav className={`search-page__pagination search-page__pagination--${position}`} aria-label={`${position} search pagination`}>
+        <button
+          className="search-page__pagination-button"
+          type="button"
+          disabled={currentPage <= 1 || isLoadingSongs}
+          onClick={() => navigateToPage(currentPage - 1)}
+        >
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+          <button
+            className="search-page__pagination-button search-page__pagination-number"
+            type="button"
+            key={page}
+            aria-label={`Page ${page}`}
+            aria-current={page === currentPage ? 'page' : undefined}
+            disabled={isLoadingSongs || page === currentPage}
+            onClick={() => navigateToPage(page)}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          className="search-page__pagination-button"
+          type="button"
+          disabled={!hasNextPage || isLoadingSongs}
+          onClick={() => navigateToPage(currentPage + 1)}
+        >
+          Next
+        </button>
+      </nav>
+    );
+  }
 
   return (
     <main className="search-page">
@@ -205,6 +270,7 @@ export default function Search() {
             )}
           </div>
         )}
+        {renderPagination('top')}
         {!query && <p className="home-empty">Enter a song title in the search bar to get started.</p>}
         {isLoading && (
           <p className="home-empty" role="status">
@@ -225,18 +291,29 @@ export default function Search() {
 
               return (
                 <li className="search-page__song" key={song.id}>
-                  <div className="song-artwork album-cover search-page__artwork">
-                    {coverUrl && <img src={coverUrl} alt="" />}
-                  </div>
-                  <span className="album-songs__title">{song.title}</span>
-                  <span className="album-songs__artist">
-                    {song.artist_name || 'Unknown artist'}
-                  </span>
+                  <Link
+                    className="search-page__song-link"
+                    to={`/songs/${encodeURIComponent(song.id)}`}
+                    state={{
+                      song,
+                      coverUrl,
+                      from: `${location.pathname}${location.search}`,
+                    }}
+                  >
+                    <div className="song-artwork album-cover search-page__artwork">
+                      {coverUrl && <img src={coverUrl} alt="" />}
+                    </div>
+                    <span className="album-songs__title">{song.title}</span>
+                    <span className="album-songs__artist">
+                      {song.artist_name || 'Unknown artist'}
+                    </span>
+                  </Link>
                 </li>
               );
             })}
           </ul>
         )}
+        {renderPagination('bottom')}
         {!isLoading && !searchError && activeResultType === 'artists' && artists.length > 0 && (
           <ul className="album-songs search-page__song-list" aria-label="Artist search results">
             {artists.map((artist) => (

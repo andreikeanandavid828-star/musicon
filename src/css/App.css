@@ -430,6 +430,54 @@
   border-bottom: 0;
 }
 
+.search-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 16px 0;
+}
+
+.search-page__pagination-button {
+  min-width: 32px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.search-page__pagination-button:hover:not(:disabled) {
+  background: var(--nav-hover-bg);
+}
+
+.search-page__pagination-number[aria-current='page'] {
+  color: var(--heading);
+  font-weight: 700;
+}
+
+.search-page__pagination-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.search-page__pagination-button:disabled {
+  cursor: default;
+}
+
+.search-page__pagination-button:disabled:not([aria-current='page']) {
+  opacity: 0.5;
+}
+
+.search-page__pagination-button:first-child,
+.search-page__pagination-button:last-child {
+  min-width: auto;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
 .search-page__song-link {
   display: flex;
   width: 100%;
