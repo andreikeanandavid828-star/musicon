@@ -21,6 +21,7 @@ import AlbumButton from './home_buttons/side-bar_buttons/AlbumButton.jsx';
 import Upload from './pages/supplimentary/Upload.jsx';
 import Search from './pages/main_content/Search.jsx';
 import IndividualSong from './pages/supplimentary/IndividualSong.jsx';
+import IndividualArtist from './pages/supplimentary/IndividualArtist.jsx';
 import SearchBar from './home_buttons/SearchBar.jsx';
 import { songs } from './gather_music/songs.jsx';
 import Button from './Button.jsx';
@@ -305,6 +306,8 @@ function AppShell() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/search" element={<Search />} />
         <Route path="/songs/:songId" element={<IndividualSong />} />
+        <Route path="/artists/:artistId" element={<IndividualArtist />} />
+        <Route path="/artists/by-name/:artistName" element={<IndividualArtist />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/forum/posts/:postId" element={<PostDetail />} /> {/* <--- Add this line */}

@@ -183,3 +183,47 @@ def search_artists():
         return jsonify({
             "error": "Failed to search artists"
         }), 500
+
+
+@search_bp.route("/artist", methods=["GET"])
+def get_artist():
+    """Returns an artist and their songs by artist ID or exact name."""
+    try:
+        artist_id = request.args.get("id", "").strip()
+        artist_name = request.args.get("name", "").strip()
+
+        if bool(artist_id) == bool(artist_name):
+            return jsonify({
+                "error": "Provide either an artist ID or artist name"
+            }), 400
+
+        artist_query = supabase.table("artists").select("id, name, image_url")
+        artist_query = artist_query.eq("id", artist_id) if artist_id else artist_query.eq(
+            "name", artist_name,
+        )
+        artist_result = artist_query.maybe_single().execute()
+        artist = artist_result.data
+
+        if not artist:
+            return jsonify({"error": "Artist not found"}), 404
+
+        songs_result = (
+            supabase.table("songs")
+            .select(
+                "id, title, artist_name, album_id, "
+                "duration_ms, explicit, year, genre, popularity, "
+                "albums(id, title, cover_image_url)",
+            )
+            .eq("artist_name", artist["name"])
+            .order("title")
+            .order("id")
+            .execute()
+        )
+
+        return jsonify({
+            "artist": artist,
+            "songs": songs_result.data or [],
+        }), 200
+    except Exception as error:
+        print("ARTIST DETAIL ERROR:", error)
+        return jsonify({"error": "Failed to retrieve artist"}), 500

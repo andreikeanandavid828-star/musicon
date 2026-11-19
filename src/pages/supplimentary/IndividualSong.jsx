@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import SongArtwork from '../../gather_music/SongArtwork.jsx';
 import { getGenreCover } from '../../gather_music/genreCovers.js';
 
@@ -20,8 +20,7 @@ export default function IndividualSong({ song: providedSong = null }) {
   const coverUrl = searchCoverUrl || getGenreCover(song) || album?.cover_image_url;
 
   function handleBack() {
-    const previousPage = location.state?.from;
-    navigate(previousPage || '/search');
+    navigate(location.state?.from ? -1 : '/search');
   }
 
   return (
@@ -55,7 +54,17 @@ export default function IndividualSong({ song: providedSong = null }) {
             <p className="individual-song__eyebrow">Song</p>
             <h1>{song.title || 'Untitled song'}</h1>
             <p className="individual-song__artist">
-              {song.artist_name || 'Unknown artist'}
+              {song.artist_name ? (
+                <Link
+                  className="individual-song__artist-link"
+                  to={`/artists/by-name/${encodeURIComponent(song.artist_name)}`}
+                  state={{
+                    from: `${location.pathname}${location.search}`,
+                  }}
+                >
+                  {song.artist_name}
+                </Link>
+              ) : 'Unknown artist'}
             </p>
             <dl className="individual-song__metadata">
               {album?.title && (
