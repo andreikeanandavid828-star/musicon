@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getGenreCover } from '../../gather_music/genreCovers.js';
+import { getArtistProfileCover } from '../../gather_music/artistProfileCovers.js';
 
 const COMMON_GENRE_ORDER = ['Pop', 'R&B', 'Hip Hop', 'Dance/Electronic', 'Rock'];
+const PAGINATION_WINDOW_SIZE = 10;
+
+function getPaginationWindow(currentPage, totalPages) {
+  const firstPage = Math.floor((currentPage - 1) / PAGINATION_WINDOW_SIZE)
+    * PAGINATION_WINDOW_SIZE + 1;
+
+  return {
+    firstPage,
+    lastPage: Math.min(firstPage + PAGINATION_WINDOW_SIZE - 1, totalPages),
+  };
+}
 
 function getSongGenres(genre) {
   const values = Array.isArray(genre) ? genre : [genre];
@@ -43,6 +55,8 @@ export default function Search() {
   const [selectedGenre, setSelectedGenre] = useState('all');
   const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [hasNextArtistPage, setHasNextArtistPage] = useState(false);
+  const [totalArtistPages, setTotalArtistPages] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
@@ -50,6 +64,10 @@ export default function Search() {
   const requestedPage = Number(searchParams.get('page'));
   const currentPage = Number.isInteger(requestedPage) && requestedPage > 0
     ? requestedPage
+    : 1;
+  const requestedArtistPage = Number(searchParams.get('artist_page'));
+  const currentArtistPage = Number.isInteger(requestedArtistPage) && requestedArtistPage > 0
+    ? requestedArtistPage
     : 1;
 
   useEffect(() => {
@@ -118,6 +136,8 @@ export default function Search() {
       setArtists([]);
       setArtistError('');
       setIsLoadingArtists(false);
+      setHasNextArtistPage(false);
+      setTotalArtistPages(0);
       return undefined;
     }
 
@@ -128,7 +148,10 @@ export default function Search() {
 
     async function fetchArtists() {
       try {
-        const params = new URLSearchParams({ q: query, page: '1' });
+        const params = new URLSearchParams({
+          q: query,
+          page: String(currentArtistPage),
+        });
         const response = await fetch(
           `http://localhost:5000/api/search/artists?${params.toString()}`,
           { signal: controller.signal },
@@ -140,9 +163,17 @@ export default function Search() {
         }
 
         setArtists(Array.isArray(data.artists) ? data.artists.slice(0, 20) : []);
+        setTotalArtistPages(Number.isInteger(data.total_pages) ? data.total_pages : 0);
+        setHasNextArtistPage(
+          typeof data.has_next === 'boolean'
+            ? data.has_next
+            : Number(data.total_pages) > currentArtistPage,
+        );
       } catch (error) {
         if (error.name !== 'AbortError') {
           setArtists([]);
+          setTotalArtistPages(0);
+          setHasNextArtistPage(false);
           setArtistError(error.message || 'Unable to search artists.');
         }
       } finally {
@@ -154,13 +185,21 @@ export default function Search() {
 
     void fetchArtists();
     return () => controller.abort();
-  }, [query]);
+  }, [query, currentArtistPage]);
 
   function navigateToPage(page) {
     const params = new URLSearchParams(location.search);
     params.set('q', query);
     params.set('page', String(page));
     setActiveResultType('songs');
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  }
+
+  function navigateToArtistPage(page) {
+    const params = new URLSearchParams(location.search);
+    params.set('q', query);
+    params.set('artist_page', String(page));
+    setActiveResultType('artists');
     navigate({ pathname: location.pathname, search: `?${params.toString()}` });
   }
 
@@ -194,36 +233,84 @@ export default function Search() {
   const resultCount = activeResultType === 'songs' ? filteredSongs.length : artists.length;
 
   function renderPagination(position) {
-    if (!query || activeResultType !== 'songs') return null;
+    if (!query) return null;
+    const isArtistPagination = activeResultType === 'artists';
+    const page = isArtistPagination ? currentArtistPage : currentPage;
+    const pageCount = isArtistPagination ? totalArtistPages : totalPages;
+    const canGoNext = isArtistPagination ? hasNextArtistPage : hasNextPage;
+    const isLoadingPages = isArtistPagination ? isLoadingArtists : isLoadingSongs;
+    const navigateToSelectedPage = isArtistPagination
+      ? navigateToArtistPage
+      : navigateToPage;
+    const { firstPage, lastPage } = getPaginationWindow(page, pageCount);
 
     return (
-      <nav className={`search-page__pagination search-page__pagination--${position}`} aria-label={`${position} search pagination`}>
+      <nav
+        className={`search-page__pagination search-page__pagination--${position}`}
+        aria-label={`${activeResultType} search pagination`}
+      >
         <button
           className="search-page__pagination-button"
           type="button"
-          disabled={currentPage <= 1 || isLoadingSongs}
-          onClick={() => navigateToPage(currentPage - 1)}
+          disabled={page <= 1 || isLoadingPages}
+          onClick={() => navigateToSelectedPage(page - 1)}
         >
           Previous
         </button>
-        {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+        {firstPage > 1 && (
+          <button
+            className="search-page__pagination-button search-page__pagination-ellipsis"
+            type="button"
+            aria-label={`Jump to page ${Math.max(1, firstPage - PAGINATION_WINDOW_SIZE)}`}
+            disabled={isLoadingPages}
+            onClick={() => navigateToSelectedPage(Math.max(1, firstPage - PAGINATION_WINDOW_SIZE))}
+          >
+            …
+          </button>
+        )}
+        {Array.from(
+          { length: Math.max(0, lastPage - firstPage + 1) },
+          (_, index) => firstPage + index,
+        ).map((pageNumber) => (
           <button
             className="search-page__pagination-button search-page__pagination-number"
             type="button"
-            key={page}
-            aria-label={`Page ${page}`}
-            aria-current={page === currentPage ? 'page' : undefined}
-            disabled={isLoadingSongs || page === currentPage}
-            onClick={() => navigateToPage(page)}
+            key={pageNumber}
+            aria-label={`Page ${pageNumber}`}
+            aria-current={pageNumber === page ? 'page' : undefined}
+            disabled={isLoadingPages || pageNumber === page}
+            onClick={() => navigateToSelectedPage(pageNumber)}
           >
-            {page}
+            {pageNumber}
           </button>
         ))}
+        {lastPage < pageCount && (
+          <>
+            <button
+              className="search-page__pagination-button search-page__pagination-ellipsis"
+              type="button"
+              aria-label={`Jump to page ${lastPage + 1}`}
+              disabled={isLoadingPages}
+              onClick={() => navigateToSelectedPage(lastPage + 1)}
+            >
+              …
+            </button>
+            <button
+              className="search-page__pagination-button search-page__pagination-number"
+              type="button"
+              aria-label={`Page ${pageCount}`}
+              disabled={isLoadingPages}
+              onClick={() => navigateToSelectedPage(pageCount)}
+            >
+              {pageCount}
+            </button>
+          </>
+        )}
         <button
           className="search-page__pagination-button"
           type="button"
-          disabled={!hasNextPage || isLoadingSongs}
-          onClick={() => navigateToPage(currentPage + 1)}
+          disabled={!canGoNext || isLoadingPages}
+          onClick={() => navigateToSelectedPage(page + 1)}
         >
           Next
         </button>
@@ -241,7 +328,10 @@ export default function Search() {
                 className="search-page__filter-button"
                 type="button"
                 aria-pressed={activeResultType === 'songs'}
-                onClick={() => setActiveResultType('songs')}
+                onClick={() => {
+                  setActiveResultType('songs');
+                  if (currentPage > totalPages && totalPages > 0) navigateToPage(1);
+                }}
               >
                 Songs
               </button>
@@ -249,7 +339,12 @@ export default function Search() {
                 className="search-page__filter-button"
                 type="button"
                 aria-pressed={activeResultType === 'artists'}
-                onClick={() => setActiveResultType('artists')}
+                onClick={() => {
+                  setActiveResultType('artists');
+                  if (currentArtistPage > totalArtistPages && totalArtistPages > 0) {
+                    navigateToArtistPage(1);
+                  }
+                }}
               >
                 Artists
               </button>
@@ -313,28 +408,32 @@ export default function Search() {
             })}
           </ul>
         )}
-        {renderPagination('bottom')}
         {!isLoading && !searchError && activeResultType === 'artists' && artists.length > 0 && (
           <ul className="album-songs search-page__song-list" aria-label="Artist search results">
-            {artists.map((artist) => (
-              <li className="search-page__song" key={artist.id}>
-                <Link
-                  className="search-page__song-link"
-                  to={`/artists/${encodeURIComponent(artist.id)}`}
-                  state={{
-                    artist,
-                    from: `${location.pathname}${location.search}`,
-                  }}
-                >
-                  <div className="song-artwork album-cover search-page__artwork">
-                    {artist.image_url && <img src={artist.image_url} alt="" />}
-                  </div>
-                  <span className="album-songs__title">{artist.name}</span>
-                </Link>
-              </li>
-            ))}
+            {artists.map((artist) => {
+              const profileCover = getArtistProfileCover(artist.name) || artist.image_url;
+
+              return (
+                <li className="search-page__song" key={artist.id}>
+                  <Link
+                    className="search-page__song-link"
+                    to={`/artists/${encodeURIComponent(artist.id)}`}
+                    state={{
+                      artist,
+                      from: `${location.pathname}${location.search}`,
+                    }}
+                  >
+                    <div className="song-artwork album-cover search-page__artwork">
+                      {profileCover && <img src={profileCover} alt="" />}
+                    </div>
+                    <span className="album-songs__title">{artist.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
+        {renderPagination('bottom')}
       </section>
     </main>
   );

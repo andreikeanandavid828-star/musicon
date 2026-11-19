@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getGenreCover } from '../../gather_music/genreCovers.js';
+import { getArtistProfileCover } from '../../gather_music/artistProfileCovers.js';
 
 /**
  * Displays artist information and links to the artist's songs.
@@ -63,6 +64,10 @@ export default function IndividualArtist() {
     navigate(location.state?.from ? -1 : '/search');
   }
 
+  const profileCover = artist
+    ? getArtistProfileCover(artist.name) || artist.image_url
+    : null;
+
   return (
     <main className="individual-song-page individual-artist-page">
       <button
@@ -78,8 +83,8 @@ export default function IndividualArtist() {
       {!isLoading && !error && artist && (
         <>
           <header className="individual-artist__header">
-            {artist.image_url && (
-              <img className="individual-artist__image" src={artist.image_url} alt="" />
+            {profileCover && (
+              <img className="individual-artist__image" src={profileCover} alt="" />
             )}
             <h1>{artist.name}</h1>
           </header>
