@@ -4,13 +4,8 @@ import { songs as availableSongs } from '../../gather_music/songs.jsx';
 import SongArtwork from '../../gather_music/SongArtwork.jsx';
 
 /**
- * @fileoverview Implements the interactive song tier-list editor.
+ * @fileoverview Implements the interactive song tier-list editor and public browser.
  * @module TierList
- * @author Anthony
- * @date 2026-10-27
- *
- * The tier data structure maps each tier key to an ordered array of song
- * records. A neutral tier stores songs that have not been ranked.
  */
 
 const DEFAULT_TIER_LIST_TITLE = 'Untitled Tier List';
@@ -32,14 +27,13 @@ const emptyTierList = () => ({
     neutral: [],
 });
 
-/**
- * Lets users create and edit a tier list, including its title, tier labels,
- * and song assignments.
- *
- * @returns {React.JSX.Element} The tier-list editor and song picker.
- */
 export default function TierList() {
-    const [hasCreatedList, setHasCreatedList] = useState(false);
+    // View modes: 'menu' | 'editor' | 'public-feed' | 'public-view'
+    const [viewMode, setViewMode] = useState('menu');
+    const [publicLists, setPublicLists] = useState([]);
+    const [selectedPublicList, setSelectedPublicList] = useState(null);
+    const [feedError, setFeedError] = useState('');
+
     const [tiers, setTiers] = useState(emptyTierList);
     const [isSongPickerOpen, setIsSongPickerOpen] = useState(false);
     const [listTitle, setListTitle] = useState(DEFAULT_TIER_LIST_TITLE);
@@ -59,6 +53,22 @@ export default function TierList() {
         if (isSongPickerOpen && !dialog.open) dialog.showModal();
         if (!isSongPickerOpen && dialog.open) dialog.close();
     }, [isSongPickerOpen]);
+
+    async function loadPublicTierLists() {
+        setFeedError('');
+        try {
+            const response = await fetch('http://localhost:5000/api/tierlists', {
+                credentials: 'include',
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to load public tier lists');
+            setPublicLists(data.tier_lists || []);
+            setViewMode('public-feed');
+        } catch (err) {
+            setFeedError(err.message || 'Could not load public tier lists.');
+            setViewMode('public-feed');
+        }
+    }
 
     const addedSongIds = new Set(
         Object.values(tiers).flat().map((song) => song.catalogId),
@@ -83,7 +93,7 @@ export default function TierList() {
         setEditingTier(null);
     }
 
-    function handleShare() {
+    async function handleShare() {
         if (listTitle === DEFAULT_TIER_LIST_TITLE) {
             setShareNotice('Name your tier list before sharing.');
             setTitleDraft(listTitle);
@@ -91,7 +101,29 @@ export default function TierList() {
             return;
         }
 
-        setShareNotice('Sharing will be available soon.');
+        try {
+            setShareNotice('Saving and publishing...');
+            const response = await fetch('http://localhost:5000/api/tierlists', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: listTitle,
+                    tiers: tiers,
+                    tierNames: tierNames,
+                    is_public: true,
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to save');
+
+            const shareUrl = `${window.location.origin}/tierlist/${data.tier_list.id}`;
+            navigator.clipboard.writeText(shareUrl);
+            setShareNotice('Published! Link copied to clipboard.');
+        } catch (err) {
+            setShareNotice('Could not save tier list. Are you logged in?');
+        }
     }
 
     function addSong(song) {
@@ -138,21 +170,102 @@ export default function TierList() {
     return (
         <main className="tierlist-page">
             <h1>Tier List</h1>
-            {!hasCreatedList ? (
+
+            {viewMode === 'menu' && (
                 <section className="tierlist-start" aria-label="Tier list options">
                     <p>Choose from the available songs and rank your favorites.</p>
                     <div className="tierlist-actions">
-                        <Button className="button--primary" onClick={() => {
-                            setTiers(emptyTierList());
-                            setTierNames(DEFAULT_TIER_NAMES);
-                            setHasCreatedList(true);
-                        }}>
+                        <Button
+                            className="button--primary"
+                            onClick={() => {
+                                setTiers(emptyTierList());
+                                setTierNames(DEFAULT_TIER_NAMES);
+                                setListTitle(DEFAULT_TIER_LIST_TITLE);
+                                setShareNotice('');
+                                setViewMode('editor');
+                            }}
+                        >
                             New Tier List
                         </Button>
-                        <Button onClick={() => { }}>Find a Public Tier List</Button>
+                        <Button onClick={loadPublicTierLists}>Find a Public Tier List</Button>
                     </div>
                 </section>
-            ) : (
+            )}
+
+            {viewMode === 'public-feed' && (
+                <section className="tierlist-feed" aria-label="Public tier lists">
+                    <div className="tierlist-titlebar">
+                        <h2>Public Tier Lists</h2>
+                        <Button type="button" onClick={() => setViewMode('menu')}>← Back</Button>
+                    </div>
+
+                    {feedError && <p role="alert" className="error-msg">{feedError}</p>}
+
+                    {publicLists.length === 0 ? (
+                        <p>No public tier lists yet. Create and share one to be the first!</p>
+                    ) : (
+                        <div className="forum-list">
+                            {publicLists.map((item) => (
+                                <article
+                                    key={item.id}
+                                    className="forum-post"
+                                    style={{ cursor: 'pointer', padding: '16px', marginBottom: '12px' }}
+                                    onClick={() => {
+                                        setSelectedPublicList(item);
+                                        setViewMode('public-view');
+                                    }}
+                                >
+                                    <h3>{item.title}</h3>
+                                    <span className="forum-post-meta">
+                                        Created by {item.users?.username || 'Anonymous'}
+                                    </span>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
+
+            {viewMode === 'public-view' && selectedPublicList && (
+                <section className="tierlist-board" aria-label="Public tier list view">
+                    <div className="tierlist-titlebar">
+                        <div>
+                            <h2>{selectedPublicList.title}</h2>
+                            <span className="forum-post-meta">
+                                Created by {selectedPublicList.users?.username || 'Anonymous'}
+                            </span>
+                        </div>
+                        <Button type="button" onClick={loadPublicTierLists}>← Back to Public Lists</Button>
+                    </div>
+
+                    <div className="tierlist-rows">
+                        {TIER_KEYS.map((tierKey) => {
+                            const labels = selectedPublicList.tier_names || DEFAULT_TIER_NAMES;
+                            const rowSongs = selectedPublicList.tiers?.[tierKey] || [];
+                            return (
+                                <div className={`tierlist-row tierlist-row--${tierKey.toLowerCase()}`} key={tierKey}>
+                                    <h3>{labels[tierKey] || tierKey}</h3>
+                                    <div className="tierlist-songs">
+                                        {rowSongs.map((song) => (
+                                            <div
+                                                className="tierlist-song tierlist-song--artwork"
+                                                title={song.title}
+                                                aria-label={song.title}
+                                                role="img"
+                                                key={song.id}
+                                            >
+                                                <SongArtwork song={song} className="tierlist-song__artwork" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
+            {viewMode === 'editor' && (
                 <section className="tierlist-board" aria-label="Tier list editor">
                     <div className="tierlist-titlebar">
                         <h2>
@@ -196,7 +309,10 @@ export default function TierList() {
                                 </button>
                             )}
                         </h2>
-                        <Button type="button" onClick={handleShare}>Share</Button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <Button type="button" onClick={() => setViewMode('menu')}>← Back</Button>
+                            <Button type="button" onClick={handleShare}>Share</Button>
+                        </div>
                     </div>
                     {shareNotice && (
                         <p className="tierlist-share-notice" role="status">
@@ -292,6 +408,7 @@ export default function TierList() {
                     </div>
                 </section>
             )}
+
             <dialog
                 ref={songPickerRef}
                 className="tierlist-song-picker"

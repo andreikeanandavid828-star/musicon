@@ -9,6 +9,7 @@ from routes.forum import posts_bp
 from routes.albums import albums_bp
 from routes.spotify import spotify_bp
 from routes.search import search_bp
+from routes.tier_list import tier_lists_bp
 
 app = Flask(__name__)
 
@@ -28,6 +29,7 @@ app.register_blueprint(posts_bp, url_prefix="/api/posts")
 app.register_blueprint(albums_bp, url_prefix="/api/albums")
 app.register_blueprint(spotify_bp, url_prefix="/api/spotify")
 app.register_blueprint(search_bp, url_prefix="/api/search")
+app.register_blueprint(tier_lists_bp, url_prefix='/api/tierlists')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
