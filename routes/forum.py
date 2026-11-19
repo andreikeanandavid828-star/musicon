@@ -188,6 +188,7 @@ def unlike_post(post_id):
 
 
 # 3. Get single post details and its comments
+# 3. Get single post details and its comments
 @posts_bp.route('/<post_id>', methods=['GET', 'OPTIONS'], strict_slashes=False)
 def get_post_detail(post_id):
     """
@@ -212,7 +213,7 @@ def get_post_detail(post_id):
         # Fetch all comments for this post, including the commenter's username
         comments_res = supabase.table('comments').select(
             '*, users(username)'
-        ).eq('post_id', post_id).order('created_at', asc=True).execute()
+        ).eq('post_id', post_id).order('created_at', desc=False).execute()
 
         return jsonify({
             'post': post_res.data,

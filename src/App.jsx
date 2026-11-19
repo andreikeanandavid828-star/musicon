@@ -11,6 +11,7 @@ import SignUp from './pages/supplimentary/SignUp.jsx';
 import Tierlist from './pages/main_content/TierList.jsx';
 import TierlistButton from './home_buttons/side-bar_buttons/TierListButton.jsx';
 import Forum from './pages/main_content/Forum.jsx';
+import PostDetail from './PostDetail.jsx';
 import ForumButton from './home_buttons/side-bar_buttons/ForumButton.jsx';
 import SignupButton from './home_buttons/SignupButton.jsx';
 import Profile from './pages/supplimentary/profile/Profile.jsx';
@@ -309,6 +310,8 @@ function AppShell() {
         <Route path="/artists/by-name/:artistName" element={<IndividualArtist />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
+        <Route path="/forum/posts/:postId" element={<PostDetail />} /> {/* <--- Add this line */}
+
         <Route
           path="/albums"
           element={
