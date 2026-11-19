@@ -318,10 +318,19 @@ export default function Search() {
           <ul className="album-songs search-page__song-list" aria-label="Artist search results">
             {artists.map((artist) => (
               <li className="search-page__song" key={artist.id}>
-                <div className="song-artwork album-cover search-page__artwork">
-                  {artist.image_url && <img src={artist.image_url} alt="" />}
-                </div>
-                <span className="album-songs__title">{artist.name}</span>
+                <Link
+                  className="search-page__song-link"
+                  to={`/artists/${encodeURIComponent(artist.id)}`}
+                  state={{
+                    artist,
+                    from: `${location.pathname}${location.search}`,
+                  }}
+                >
+                  <div className="song-artwork album-cover search-page__artwork">
+                    {artist.image_url && <img src={artist.image_url} alt="" />}
+                  </div>
+                  <span className="album-songs__title">{artist.name}</span>
+                </Link>
               </li>
             ))}
           </ul>
