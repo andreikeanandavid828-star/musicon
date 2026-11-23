@@ -15,6 +15,7 @@ import PostDetail from './PostDetail.jsx';
 import ForumButton from './home_buttons/side-bar_buttons/ForumButton.jsx';
 import SignupButton from './home_buttons/SignupButton.jsx';
 import Profile from './pages/supplimentary/profile/Profile.jsx';
+import ProfileViewer from './pages/supplimentary/profile/ProfileViewer.jsx';
 import ProfileButton from './home_buttons/ProfileButton.jsx';
 import Albums from './pages/main_content/Albums.jsx';
 import AlbumButton from './home_buttons/side-bar_buttons/AlbumButton.jsx';
@@ -349,6 +350,10 @@ function AppShell() {
               onDefaultModeChange={changeDefaultMode}
             />
           }
+        />
+        <Route
+          path="/users/:userId"
+          element={<ProfileViewer />}
         />
         <Route
           path="/upload"
