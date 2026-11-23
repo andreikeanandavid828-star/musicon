@@ -7,6 +7,29 @@ import Button from './Button.jsx';
  * @module PostDetail
  */
 
+
+function AuthorLink({ item }) {
+    const username = item.users?.username || 'Anonymous';
+    const userId = item.user_id ?? item.users?.id;
+
+    if (!userId) {
+        return username;
+    }
+
+    return (
+        <Link
+            to={`/users/${encodeURIComponent(userId)}`}
+            style={{
+                color: 'var(--accent)',
+                fontWeight: 600
+            }}
+        >
+            {username}
+        </Link>
+    );
+}
+
+
 export default function PostDetail() {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
@@ -95,7 +118,7 @@ export default function PostDetail() {
                 <p className="forum-post-content" style={{ fontSize: '1.1rem', margin: '15px 0' }}>
                     {post.body}
                 </p>
-                <span className="forum-post-meta">Posted by {post.users?.username || 'Anonymous'}</span>
+                <span className="forum-post-meta">Posted by <AuthorLink item={post} /></span>
             </article>
 
             <section className="comments-section" style={{ marginTop: '30px' }}>
@@ -121,7 +144,7 @@ export default function PostDetail() {
                             <div key={comment.id || index} className="comment-card" style={{ padding: '12px', borderBottom: '1px solid var(--border)', margin: '10px 0' }}>
                                 <p>{comment.body}</p>
                                 <span className="forum-post-meta" style={{ fontSize: '0.85rem' }}>
-                                    {comment.users?.username || 'Anonymous'}
+                                    <AuthorLink item={comment} />
                                 </span>
                             </div>
                         ))
