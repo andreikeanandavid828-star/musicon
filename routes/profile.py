@@ -409,3 +409,64 @@ def update_my_profile():
         return jsonify({
             "error": "Failed to update profile"
         }), 500
+
+
+
+@profile.route("/users/<user_id>", methods=["GET"])
+def get_public_user_profile(user_id):
+    """
+    Retrieves a user's public profile through the
+    restricted Supabase RPC function.
+    """
+    try:
+        response = supabase.rpc(
+            "get_public_profile",
+            {"p_user_id": user_id}
+        ).execute()
+
+        data = response.data if response else None
+
+        if not isinstance(data, dict):
+            return jsonify({
+                "error": "Profile not found"
+            }), 404
+
+        bucket = supabase.storage.from_(
+            PROFILE_IMAGE_BUCKET
+        )
+
+        avatar_path = data.get("avatar_path")
+        banner_path = data.get("banner_path")
+
+        public_profile = {
+            "username": data["username"],
+            "bio": data.get("bio") or "",
+            "location": data.get("location") or "",
+            "profilePicture": (
+                bucket.get_public_url(avatar_path)
+                if avatar_path else None
+            ),
+            "bannerPicture": (
+                bucket.get_public_url(banner_path)
+                if banner_path else None
+            ),
+            "isArtist": data.get("is_artist", False),
+            "followers": 0,
+            "following": 0,
+            "friends": 0,
+            "ratings": 0,
+            "tierLists": 0,
+            "posts": data.get("posts", 0),
+        }
+
+        return jsonify({
+            "profile": public_profile
+        }), 200
+
+    except Exception:
+        current_app.logger.exception(
+            "GET PUBLIC PROFILE ERROR"
+        )
+        return jsonify({
+            "error": "Failed to retrieve public profile"
+        }), 500

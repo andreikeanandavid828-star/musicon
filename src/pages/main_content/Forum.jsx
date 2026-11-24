@@ -165,6 +165,8 @@ export default function Forum() {
                     <p className="forum-empty">No discussions yet. Your post will be the first.</p>
                 ) : sortedPosts.map((post) => {
                     const authorName = post.users?.username || 'Anonymous';
+                    const authorId = post.user_id ?? post.users?.id;
+                    const profileUrl = authorId ? `/users/${encodeURIComponent(authorId)}` : null;
                     const rawPath = post.users?.profile_picture_path;
                     const avatarPath = (rawPath && !rawPath.startsWith('file:///')) ? rawPath : null;
                     
@@ -172,22 +174,53 @@ export default function Forum() {
                         ? `https://lpvgrxwgruhlxbboivth.supabase.co/storage/v1/object/public/profile-images/${avatarPath}` 
                         : null;
 
+                    const avatarContent = avatarUrl ? (
+                        <img
+                            src={avatarUrl}
+                            alt={`${authorName}'s avatar`}
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '50%',
+                                objectFit: 'cover'
+                            }}
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                            }}
+                        />
+                    ) : (
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: 'var(--border)',
+                            display: 'grid',
+                            placeItems: 'center',
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold'
+                        }}>
+                            {authorName.charAt(0).toUpperCase()}
+                        </div>
+                    );
+
                     return (
                         <article className="forum-post" key={post.id}>
                             <div className="forum-post-heading" style={{ minWidth: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                
-                                <div className="forum-avatar-container" style={{ flexShrink: 0 }}>
-                                    {avatarUrl ? (
-                                        <img 
-                                            src={avatarUrl} 
-                                            alt={`${authorName}'s avatar`} 
-                                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
-                                            onError={(e) => { e.target.style.display = 'none'; }}
-                                        />
+                                        
+                                <div
+                                    className="forum-avatar-container"
+                                    style={{ flexShrink: 0 }}
+                                >
+                                    {profileUrl ? (
+                                        <Link
+                                            to={profileUrl}
+                                            aria-label={`View ${authorName}'s profile`}
+                                            style={{ display: 'inline-flex' }}
+                                        >
+                                            {avatarContent}
+                                        </Link>
                                     ) : (
-                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--border)', display: 'grid', placeItems: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                            {authorName.charAt(0).toUpperCase()}
-                                        </div>
+                                        avatarContent
                                     )}
                                 </div>
 
@@ -200,7 +233,21 @@ export default function Forum() {
                                     <p className="forum-post-content" style={{ overflowWrap: 'break-word', whiteSpace: 'normal' }}>
                                         {post.body}
                                     </p>
-                                    <span className="forum-post-meta">Posted by {authorName}</span>
+
+                                    <span className="forum-post-meta">
+                                        Posted by{' '}
+                                        {profileUrl ? (
+                                            <Link
+                                                to={profileUrl}
+                                                style={{ color: 'var(--accent)', fontWeight: 600 }}
+                                            >
+                                                {authorName}
+                                            </Link>
+                                        ) : (
+                                            authorName
+                                        )}
+                                    </span>
+
                                 </div>
                                 <LikeButton
                                     itemLabel={`post ${post.title}`}
