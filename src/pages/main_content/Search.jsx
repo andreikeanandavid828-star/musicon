@@ -1,7 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getGenreCover } from '../../gather_music/genreCovers.js';
+import { getArtistProfileCover } from '../../gather_music/artistProfileCovers.js';
 
 const COMMON_GENRE_ORDER = ['Pop', 'R&B', 'Hip Hop', 'Dance/Electronic', 'Rock'];
+const PAGINATION_WINDOW_SIZE = 10;
+
+function getPaginationWindow(currentPage, totalPages) {
+  const firstPage = Math.floor((currentPage - 1) / PAGINATION_WINDOW_SIZE)
+    * PAGINATION_WINDOW_SIZE + 1;
+
+  return {
+    firstPage,
+    lastPage: Math.min(firstPage + PAGINATION_WINDOW_SIZE - 1, totalPages),
+  };
+}
 
 function getSongGenres(genre) {
   const values = Array.isArray(genre) ? genre : [genre];
@@ -40,74 +53,155 @@ export default function Search() {
   const [songError, setSongError] = useState('');
   const [artistError, setArtistError] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('all');
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNextArtistPage, setHasNextArtistPage] = useState(false);
+  const [totalArtistPages, setTotalArtistPages] = useState(0);
   const location = useLocation();
-  const query = new URLSearchParams(location.search).get('q')?.trim() || '';
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get('q')?.trim() || '';
+  const requestedPage = Number(searchParams.get('page'));
+  const currentPage = Number.isInteger(requestedPage) && requestedPage > 0
+    ? requestedPage
+    : 1;
+  const requestedArtistPage = Number(searchParams.get('artist_page'));
+  const currentArtistPage = Number.isInteger(requestedArtistPage) && requestedArtistPage > 0
+    ? requestedArtistPage
+    : 1;
 
   useEffect(() => {
     setSelectedGenre('all');
     setActiveResultType('songs');
+  }, [query]);
+
+  useEffect(() => {
     if (!query) {
       setSongs([]);
-      setArtists([]);
       setSongError('');
-      setArtistError('');
       setIsLoadingSongs(false);
-      setIsLoadingArtists(false);
+      setHasNextPage(false);
+      setTotalPages(0);
       return undefined;
     }
 
     const controller = new AbortController();
     setSongs([]);
-    setArtists([]);
     setIsLoadingSongs(true);
-    setIsLoadingArtists(true);
     setSongError('');
-    setArtistError('');
+    setHasNextPage(false);
+    setTotalPages(0);
 
-    async function fetchResults(type, setResults, setError, setLoading, resultKey, fallbackError) {
+    async function fetchSongs() {
       try {
-        const params = new URLSearchParams({ q: query, page: '1' });
+        const params = new URLSearchParams({
+          q: query,
+          page: String(currentPage),
+        });
         const response = await fetch(
-          `http://localhost:5000/api/search/${type}?${params.toString()}`,
+          `http://localhost:5000/api/search/songs?${params.toString()}`,
           { signal: controller.signal },
         );
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || fallbackError);
+          throw new Error(data.error || 'Unable to search songs.');
         }
 
-        setResults(Array.isArray(data[resultKey]) ? data[resultKey].slice(0, 20) : []);
+        setSongs(Array.isArray(data.songs) ? data.songs.slice(0, 20) : []);
+        setTotalPages(Number.isInteger(data.total_pages) ? data.total_pages : 0);
+        setHasNextPage(
+          typeof data.has_next === 'boolean'
+            ? data.has_next
+            : Number(data.total_pages) > currentPage,
+        );
       } catch (error) {
         if (error.name !== 'AbortError') {
-          setResults([]);
-          setError(error.message || fallbackError);
+          setSongs([]);
+          setSongError(error.message || 'Unable to search songs.');
         }
       } finally {
         if (!controller.signal.aborted) {
-          setLoading(false);
+          setIsLoadingSongs(false);
         }
       }
     }
 
-    void fetchResults(
-      'songs',
-      setSongs,
-      setSongError,
-      setIsLoadingSongs,
-      'songs',
-      'Unable to search songs.',
-    );
-    void fetchResults(
-      'artists',
-      setArtists,
-      setArtistError,
-      setIsLoadingArtists,
-      'artists',
-      'Unable to search artists.',
-    );
+    void fetchSongs();
     return () => controller.abort();
-  }, [query]);
+  }, [query, currentPage]);
+
+  useEffect(() => {
+    if (!query) {
+      setArtists([]);
+      setArtistError('');
+      setIsLoadingArtists(false);
+      setHasNextArtistPage(false);
+      setTotalArtistPages(0);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setArtists([]);
+    setIsLoadingArtists(true);
+    setArtistError('');
+
+    async function fetchArtists() {
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          page: String(currentArtistPage),
+        });
+        const response = await fetch(
+          `http://localhost:5000/api/search/artists?${params.toString()}`,
+          { signal: controller.signal },
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Unable to search artists.');
+        }
+
+        setArtists(Array.isArray(data.artists) ? data.artists.slice(0, 20) : []);
+        setTotalArtistPages(Number.isInteger(data.total_pages) ? data.total_pages : 0);
+        setHasNextArtistPage(
+          typeof data.has_next === 'boolean'
+            ? data.has_next
+            : Number(data.total_pages) > currentArtistPage,
+        );
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setArtists([]);
+          setTotalArtistPages(0);
+          setHasNextArtistPage(false);
+          setArtistError(error.message || 'Unable to search artists.');
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoadingArtists(false);
+        }
+      }
+    }
+
+    void fetchArtists();
+    return () => controller.abort();
+  }, [query, currentArtistPage]);
+
+  function navigateToPage(page) {
+    const params = new URLSearchParams(location.search);
+    params.set('q', query);
+    params.set('page', String(page));
+    setActiveResultType('songs');
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  }
+
+  function navigateToArtistPage(page) {
+    const params = new URLSearchParams(location.search);
+    params.set('q', query);
+    params.set('artist_page', String(page));
+    setActiveResultType('artists');
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  }
 
   const genreByKey = new Map();
   songs.forEach((song) => {
@@ -138,6 +232,92 @@ export default function Search() {
   const searchError = activeResultType === 'songs' ? songError : artistError;
   const resultCount = activeResultType === 'songs' ? filteredSongs.length : artists.length;
 
+  function renderPagination(position) {
+    if (!query) return null;
+    const isArtistPagination = activeResultType === 'artists';
+    const page = isArtistPagination ? currentArtistPage : currentPage;
+    const pageCount = isArtistPagination ? totalArtistPages : totalPages;
+    const canGoNext = isArtistPagination ? hasNextArtistPage : hasNextPage;
+    const isLoadingPages = isArtistPagination ? isLoadingArtists : isLoadingSongs;
+    const navigateToSelectedPage = isArtistPagination
+      ? navigateToArtistPage
+      : navigateToPage;
+    const { firstPage, lastPage } = getPaginationWindow(page, pageCount);
+
+    return (
+      <nav
+        className={`search-page__pagination search-page__pagination--${position}`}
+        aria-label={`${activeResultType} search pagination`}
+      >
+        <button
+          className="search-page__pagination-button"
+          type="button"
+          disabled={page <= 1 || isLoadingPages}
+          onClick={() => navigateToSelectedPage(page - 1)}
+        >
+          Previous
+        </button>
+        {firstPage > 1 && (
+          <button
+            className="search-page__pagination-button search-page__pagination-ellipsis"
+            type="button"
+            aria-label={`Jump to page ${Math.max(1, firstPage - PAGINATION_WINDOW_SIZE)}`}
+            disabled={isLoadingPages}
+            onClick={() => navigateToSelectedPage(Math.max(1, firstPage - PAGINATION_WINDOW_SIZE))}
+          >
+            …
+          </button>
+        )}
+        {Array.from(
+          { length: Math.max(0, lastPage - firstPage + 1) },
+          (_, index) => firstPage + index,
+        ).map((pageNumber) => (
+          <button
+            className="search-page__pagination-button search-page__pagination-number"
+            type="button"
+            key={pageNumber}
+            aria-label={`Page ${pageNumber}`}
+            aria-current={pageNumber === page ? 'page' : undefined}
+            disabled={isLoadingPages || pageNumber === page}
+            onClick={() => navigateToSelectedPage(pageNumber)}
+          >
+            {pageNumber}
+          </button>
+        ))}
+        {lastPage < pageCount && (
+          <>
+            <button
+              className="search-page__pagination-button search-page__pagination-ellipsis"
+              type="button"
+              aria-label={`Jump to page ${lastPage + 1}`}
+              disabled={isLoadingPages}
+              onClick={() => navigateToSelectedPage(lastPage + 1)}
+            >
+              …
+            </button>
+            <button
+              className="search-page__pagination-button search-page__pagination-number"
+              type="button"
+              aria-label={`Page ${pageCount}`}
+              disabled={isLoadingPages}
+              onClick={() => navigateToSelectedPage(pageCount)}
+            >
+              {pageCount}
+            </button>
+          </>
+        )}
+        <button
+          className="search-page__pagination-button"
+          type="button"
+          disabled={!canGoNext || isLoadingPages}
+          onClick={() => navigateToSelectedPage(page + 1)}
+        >
+          Next
+        </button>
+      </nav>
+    );
+  }
+
   return (
     <main className="search-page">
       <section className="search-page__results" aria-label="Search">
@@ -148,7 +328,10 @@ export default function Search() {
                 className="search-page__filter-button"
                 type="button"
                 aria-pressed={activeResultType === 'songs'}
-                onClick={() => setActiveResultType('songs')}
+                onClick={() => {
+                  setActiveResultType('songs');
+                  if (currentPage > totalPages && totalPages > 0) navigateToPage(1);
+                }}
               >
                 Songs
               </button>
@@ -156,7 +339,12 @@ export default function Search() {
                 className="search-page__filter-button"
                 type="button"
                 aria-pressed={activeResultType === 'artists'}
-                onClick={() => setActiveResultType('artists')}
+                onClick={() => {
+                  setActiveResultType('artists');
+                  if (currentArtistPage > totalArtistPages && totalArtistPages > 0) {
+                    navigateToArtistPage(1);
+                  }
+                }}
               >
                 Artists
               </button>
@@ -177,6 +365,7 @@ export default function Search() {
             )}
           </div>
         )}
+        {renderPagination('top')}
         {!query && <p className="home-empty">Enter a song title in the search bar to get started.</p>}
         {isLoading && (
           <p className="home-empty" role="status">
@@ -191,33 +380,60 @@ export default function Search() {
         )}
         {!isLoading && !searchError && activeResultType === 'songs' && filteredSongs.length > 0 && (
           <ul className="album-songs search-page__song-list" aria-label="Song search results">
-            {filteredSongs.map((song) => (
-              <li className="search-page__song" key={song.id}>
-                <div className="song-artwork album-cover search-page__artwork">
-                  {song.albums?.cover_image_url && (
-                    <img src={song.albums.cover_image_url} alt="" />
-                  )}
-                </div>
-                <span className="album-songs__title">{song.title}</span>
-                <span className="album-songs__artist">
-                  {song.artist_name || 'Unknown artist'}
-                </span>
-              </li>
-            ))}
+            {filteredSongs.map((song) => {
+              const coverUrl = getGenreCover(song, selectedGenre)
+                || song.albums?.cover_image_url;
+
+              return (
+                <li className="search-page__song" key={song.id}>
+                  <Link
+                    className="search-page__song-link"
+                    to={`/songs/${encodeURIComponent(song.id)}`}
+                    state={{
+                      song,
+                      coverUrl,
+                      from: `${location.pathname}${location.search}`,
+                    }}
+                  >
+                    <div className="song-artwork album-cover search-page__artwork">
+                      {coverUrl && <img src={coverUrl} alt="" />}
+                    </div>
+                    <span className="album-songs__title">{song.title}</span>
+                    <span className="album-songs__artist">
+                      {song.artist_name || 'Unknown artist'}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
         {!isLoading && !searchError && activeResultType === 'artists' && artists.length > 0 && (
           <ul className="album-songs search-page__song-list" aria-label="Artist search results">
-            {artists.map((artist) => (
-              <li className="search-page__song" key={artist.id}>
-                <div className="song-artwork album-cover search-page__artwork">
-                  {artist.image_url && <img src={artist.image_url} alt="" />}
-                </div>
-                <span className="album-songs__title">{artist.name}</span>
-              </li>
-            ))}
+            {artists.map((artist) => {
+              const profileCover = getArtistProfileCover(artist.name) || artist.image_url;
+
+              return (
+                <li className="search-page__song" key={artist.id}>
+                  <Link
+                    className="search-page__song-link"
+                    to={`/artists/${encodeURIComponent(artist.id)}`}
+                    state={{
+                      artist,
+                      from: `${location.pathname}${location.search}`,
+                    }}
+                  >
+                    <div className="song-artwork album-cover search-page__artwork">
+                      {profileCover && <img src={profileCover} alt="" />}
+                    </div>
+                    <span className="album-songs__title">{artist.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
+        {renderPagination('bottom')}
       </section>
     </main>
   );

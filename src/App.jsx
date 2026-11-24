@@ -11,6 +11,7 @@ import SignUp from './pages/supplimentary/SignUp.jsx';
 import Tierlist from './pages/main_content/TierList.jsx';
 import TierlistButton from './home_buttons/side-bar_buttons/TierListButton.jsx';
 import Forum from './pages/main_content/Forum.jsx';
+import PostDetail from './PostDetail.jsx';
 import ForumButton from './home_buttons/side-bar_buttons/ForumButton.jsx';
 import SignupButton from './home_buttons/SignupButton.jsx';
 import Profile from './pages/supplimentary/profile/Profile.jsx';
@@ -19,6 +20,8 @@ import Albums from './pages/main_content/Albums.jsx';
 import AlbumButton from './home_buttons/side-bar_buttons/AlbumButton.jsx';
 import Upload from './pages/supplimentary/Upload.jsx';
 import Search from './pages/main_content/Search.jsx';
+import IndividualSong from './pages/supplimentary/IndividualSong.jsx';
+import IndividualArtist from './pages/supplimentary/IndividualArtist.jsx';
 import SearchBar from './home_buttons/SearchBar.jsx';
 import { songs } from './gather_music/songs.jsx';
 import Button from './Button.jsx';
@@ -302,8 +305,13 @@ function AppShell() {
         <Route path="/login" element={<Login onLoggedIn={handleLoggedIn} />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/songs/:songId" element={<IndividualSong />} />
+        <Route path="/artists/:artistId" element={<IndividualArtist />} />
+        <Route path="/artists/by-name/:artistName" element={<IndividualArtist />} />
         <Route path="/tierlist" element={<Tierlist />} />
         <Route path="/forum" element={<Forum />} />
+        <Route path="/forum/posts/:postId" element={<PostDetail />} /> {/* <--- Add this line */}
+
         <Route
           path="/albums"
           element={

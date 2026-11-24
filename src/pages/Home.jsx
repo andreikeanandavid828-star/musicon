@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { songs as catalogSongs } from '../gather_music/songs.jsx';
 import SongArtwork from '../gather_music/SongArtwork.jsx';
 import { Link } from 'react-router-dom';
@@ -25,6 +26,41 @@ export default function Home({
   selectedSong,
   onSelectSong,
 }) {
+  const songsRowRef = useRef(null);
+  const [canScrollSongsLeft, setCanScrollSongsLeft] = useState(false);
+  const [canScrollSongsRight, setCanScrollSongsRight] = useState(false);
+
+  useEffect(() => {
+    const row = songsRowRef.current;
+    if (!row) return undefined;
+
+    const updateScrollButtons = () => {
+      setCanScrollSongsLeft(row.scrollLeft > 0);
+      setCanScrollSongsRight(row.scrollLeft + row.clientWidth < row.scrollWidth - 1);
+    };
+
+    updateScrollButtons();
+    row.addEventListener('scroll', updateScrollButtons, { passive: true });
+
+    const resizeObserver = new ResizeObserver(updateScrollButtons);
+    resizeObserver.observe(row);
+
+    return () => {
+      row.removeEventListener('scroll', updateScrollButtons);
+      resizeObserver.disconnect();
+    };
+  }, [songs.length]);
+
+  function scrollSongs(direction) {
+    const row = songsRowRef.current;
+    if (!row) return;
+
+    row.scrollBy({
+      left: direction * row.clientWidth * 0.8,
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <main className="home-page">
       <h1>Musicon</h1>
@@ -33,24 +69,46 @@ export default function Home({
         {songs.length === 0 ? (
           <p className="home-empty">No songs available yet.</p>
         ) : (
-          <ul className="home-card-row" aria-label="Available songs">
-            {songs.map((song) => (
-              <li className="home-card" key={song.id}>
-                <button
-                  className="home-card__button"
-                  type="button"
-                  disabled={!song.src}
-                  aria-label={`Play ${song.title}${song.artist ? ` by ${song.artist}` : ''}`}
-                  aria-pressed={selectedSong?.id === song.id}
-                  onClick={() => onSelectSong(song)}
-                >
-                  <SongArtwork song={song} className="home-card__artwork" />
-                  <span className="home-card__title">{song.title}</span>
-                  {song.artist && <span className="home-card__subtitle">{song.artist}</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="home-song-carousel">
+            {canScrollSongsLeft && (
+              <button
+                className="home-song-carousel__arrow home-song-carousel__arrow--left"
+                type="button"
+                aria-label="Scroll songs left"
+                onClick={() => scrollSongs(-1)}
+              >
+                ‹
+              </button>
+            )}
+            <ul className="home-card-row" aria-label="Available songs" ref={songsRowRef}>
+              {songs.map((song) => (
+                <li className="home-card" key={song.id}>
+                  <button
+                    className="home-card__button"
+                    type="button"
+                    disabled={!song.src}
+                    aria-label={`Play ${song.title}${song.artist ? ` by ${song.artist}` : ''}`}
+                    aria-pressed={selectedSong?.id === song.id}
+                    onClick={() => onSelectSong(song)}
+                  >
+                    <SongArtwork song={song} className="home-card__artwork" />
+                    <span className="home-card__title">{song.title}</span>
+                    {song.artist && <span className="home-card__subtitle">{song.artist}</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {canScrollSongsRight && (
+              <button
+                className="home-song-carousel__arrow home-song-carousel__arrow--right"
+                type="button"
+                aria-label="Scroll songs right"
+                onClick={() => scrollSongs(1)}
+              >
+                ›
+              </button>
+            )}
+          </div>
         )}
       </section>
 
